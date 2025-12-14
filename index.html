@@ -3,416 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ed Arcade - Juega. Progresa. Conquista.</title>
+    <title>Nexus Arcade - Catálogo de Juegos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- VARIABLES DE TEMA (FUTURISTA NEON) --- */
-        :root {
-            --bg-color: #0a0a0f;
-            --card-bg: #1a1a2e;
-            --text-color: #e0e0e0;
-            --primary-color: #00d4ff; /* Azul Eléctrico */
-            --secondary-color: #ff006e; /* Rosa Neón */
-            --accent-color: #fb5607; /* Naranja */
-            --purple-accent: #8338ec; /* Morado */
-        }
-
-        /* --- ESTILOS GLOBALES --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-
-        /* --- HEADER --- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: rgba(26, 26, 46, 0.5);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
-        }
-
-        .search-bar {
-            flex-grow: 1;
-            max-width: 500px;
-            margin: 0 2rem;
-            position: relative;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 50px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
-        }
-
-        .user-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-
-        /* --- HERO SECTION --- */
-        .hero {
-            position: relative;
-            height: 70vh;
-            background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop') no-repeat center center/cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 10, 15, 0.6);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            padding: 2rem;
-        }
-
-        .hero-content h2 {
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 1rem;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.7);
-        }
-
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            margin: 0.5rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        .btn-primary {
-            background: var(--secondary-color);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(255, 0, 110, 0.7);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-        }
-
-        .btn-secondary:hover {
-            background: #fff;
-            color: var(--bg-color);
-        }
-
-        /* --- CATEGORIES --- */
-        .categories {
-            padding: 3rem 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .category-card {
-            background: var(--card-bg);
-            padding: 1.5rem 2rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            width: 150px;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
-            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .category-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* --- GAME GRID --- */
-        .game-grid {
-            padding: 2rem;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .game-card {
-            position: relative;
-            border-radius: 15px;
-            overflow: hidden;
-            background: var(--card-bg);
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            height: 350px;
-        }
-
-        .game-card:hover {
-            transform: scale(1.03);
-        }
-
-        .game-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .game-info {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(to top, rgba(10, 10, 15, 0.9), transparent);
-            padding: 1.5rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .game-card:hover .game-info {
-            opacity: 1;
-        }
-
-        .game-info h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .game-info p {
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .game-info .play-btn {
-            background: var(--primary-color);
-            color: var(--bg-color);
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            font-weight: 700;
-            font-family: 'Orbitron', sans-serif;
-            display: inline-block;
-        }
-        
-        /* --- FOOTER --- */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-            border-top: 1px solid rgba(0, 212, 255, 0.2);
-            font-size: 0.9rem;
-        }
-
-        /* --- RESPONSIVE DESIGN (PARA MÓVIL) --- */
-        @media (max-width: 768px) {
-            .header {
-                padding: 1rem;
-            }
-            .search-bar {
-                margin: 0 1rem;
-            }
-            .hero-content h2 {
-                font-size: 2.5rem;
-            }
-            .categories {
-                padding: 2rem 1rem;
-            }
-            .category-card {
-                width: calc(50% - 1rem);
-            }
-            .grid-container {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
+        /* --- ESTILOS (MISMOS QUE ANTES) --- */
+        :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --text-color: #e0e0e0; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; --purple-accent: #8338ec; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; line-height: 1.6; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(26, 26, 46, 0.5); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 212, 255, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); text-decoration: none; }
+        .search-bar { flex-grow: 1; max-width: 500px; margin: 0 2rem; }
+        .search-bar input { width: 100%; padding: 0.8rem 1.2rem; border-radius: 50px; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-size: 1rem; transition: all 0.3s ease; }
+        .search-bar input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 15px rgba(0, 212, 255, 0.5); }
+        .user-profile { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; }
+        .categories { padding: 3rem 2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .category-card { background: var(--card-bg); padding: 1.5rem 2rem; border-radius: 15px; text-align: center; border: 1px solid transparent; transition: all 0.3s ease; cursor: pointer; width: 150px; }
+        .category-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3); }
+        .category-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .game-grid { padding: 2rem; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .game-card { position: relative; border-radius: 15px; overflow: hidden; background: var(--card-bg); height: 350px; transition: transform 0.3s ease; }
+        .game-card:hover { transform: scale(1.03); }
+        .game-card a { text-decoration: none; color: inherit; display: block; width: 100%; height: 100%; }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; }
+        .game-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(10, 10, 15, 0.9), transparent); padding: 1.5rem; opacity: 0; transition: opacity 0.3s ease; }
+        .game-card:hover .game-info { opacity: 1; }
+        .game-info h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .game-info p { font-size: 0.9rem; margin-bottom: 1rem; }
+        .game-info .play-btn { background: var(--primary-color); color: var(--bg-color); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 700; font-family: 'Orbitron', sans-serif; display: inline-block; }
+        .footer { text-align: center; padding: 2rem; margin-top: 3rem; border-top: 1px solid rgba(0, 212, 255, 0.2); font-size: 0.9rem; }
+        @media (max-width: 768px) { .header { padding: 1rem; } .search-bar { margin: 0 1rem; } .categories { padding: 2rem 1rem; } .category-card { width: calc(50% - 1rem); } .grid-container { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
     </style>
 </head>
 <body>
-
-    <!-- ======== HEADER ======== -->
-    <header class="header">
-        <div class="logo">NEXUS ARCADE</div>
-        <div class="search-bar">
-            <input type="text" placeholder="Busca tu próxima obsesión...">
-        </div>
-        <div class="user-profile">👤</div>
-    </header>
-
+    <header class="header"> <a href="index.html" class="logo">NEXUS ARCADE</a> <div class="search-bar"> <input type="text" placeholder="Busca tu próxima obsesión..."> </div> <div class="user-profile">👤</div> </header>
     <main>
-        <!-- ======== HERO SECTION ======== -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Cyber Drift</h2>
-                <p>Domina las calles de Neo-Tokyo en esta carrera de alta velocidad. ¿Te atreves a desafiar a los mejores pilotos?</p>
-                <button class="btn btn-primary">JUGAR AHORA</button>
-                <button class="btn btn-secondary">AÑADIR A FAVORITOS</button>
-            </div>
-        </section>
-
-        <!-- ======== CATEGORIES ======== -->
         <section class="categories">
-            <div class="category-card">
-                <div class="icon">🧩</div>
-                <h3>Puzzles</h3>
-            </div>
-            <div class="category-card">
-                <div class="icon">🏃‍♂️</div>
-                <h3>Carreras Infinitas</h3>
-            </div>
-            <div class="category-card">
-                <div class="icon">🎯</div>
-                <h3>Arcade</h3>
-            </div>
-            <div class="category-card">
-                <div class="icon">🏰</div>
-                <h3>Estrategia</h3>
-            </div>
-            <div class="category-card">
-                <div class="icon">💰</div>
-                <h3>Idle Clickers</h3>
-            </div>
+            <div class="category-card"> <div class="icon">🧩</div> <h3>Puzzles</h3> </div>
+            <div class="category-card"> <div class="icon">🏃‍♂️</div> <h3>Arcade</h3> </div>
+            <div class="category-card"> <div class="icon">🎯</div> <h3>Habilidad</h3> </div>
+            <div class="category-card"> <div class="icon">🧠</div> <h3>Memoria</h3> </div>
         </section>
-
-        <!-- ======== GAME GRID ======== -->
         <section class="game-grid">
             <div class="grid-container">
-                <!-- Juego 1 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1974&auto=format&fit=crop" alt="Crystal Quest">
-                    <div class="game-info">
-                        <h3>Crystal Quest</h3>
-                        <p>Match-3 con un giro mágico.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
-                <!-- Juego 2 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1606090921513-063827a1e878?q=80&w=1974&auto=format&fit=crop" alt="Sky Defenders">
-                    <div class="game-info">
-                        <h3>Sky Defenders</h3>
-                        <p>Protege tu reino de los invasores.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
-                <!-- Juego 3 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1552820728-8b83bb250bcb?q=80&w=2070&auto=format&fit=crop" alt="Pixel Miner">
-                    <div class="game-info">
-                        <h3>Pixel Miner</h3>
-                        <p>Cava profundo y hazte rico.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
-                <!-- Juego 4 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop" alt="Neon Racer">
-                    <div class="game-info">
-                        <h3>Neon Racer</h3>
-                        <p>Velocidad pura en la ciudad.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
-                <!-- Juego 5 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop" alt="Galactic Wars">
-                    <div class="game-info">
-                        <h3>Galactic Wars</h3>
-                        <p>Un clásico arcade espacial.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
-                <!-- Juego 6 -->
-                <div class="game-card">
-                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=1934&auto=format&fit=crop" alt="Tower Siege">
-                    <div class="game-info">
-                        <h3>Tower Siege</h3>
-                        <p>La mejor estrategia es la defensa.</p>
-                        <span class="play-btn">JUGAR</span>
-                    </div>
-                </div>
+                <div class="game-card"> <a href="juego-snake.html"> <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1974&auto=format&fit=crop" alt="Snake Classic"> <div class="game-info"> <h3>Snake Classic</h3> <p>El clásico juego de la serpiente. ¡No te comas la cola!</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+                <div class="game-card"> <a href="juego-breakout.html"> <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=2070&auto=format&fit=crop" alt="Neon Breaker"> <div class="game-info"> <h3>Neon Breaker</h3> <p>Rompe todos los ladrillos con la pelota y tu pala.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+                <div class="game-card"> <a href="juego-memory.html"> <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" alt="Memory Matrix"> <div class="game-info"> <h3>Memory Matrix</h3> <p>Encuentra todas las parejas de símbolos ocultos.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
             </div>
         </section>
     </main>
-
-    <!-- ======== FOOTER ======== -->
-    <footer class="footer">
-        <p>&copy; 2024 Nexus Arcade. Todos los derechos reservados.</p>
-    </footer>
-
+    <footer class="footer"> <p>&copy; 2024 Nexus Arcade. Todos los derechos reservados.</p> </footer>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Arcade - Catálogo de Juegos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- ESTILOS (MISMOS QUE ANTES) --- */
+        :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --text-color: #e0e0e0; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; --purple-accent: #8338ec; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; line-height: 1.6; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(26, 26, 46, 0.5); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 212, 255, 0.2); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); text-decoration: none; }
+        .search-bar { flex-grow: 1; max-width: 500px; margin: 0 2rem; }
+        .search-bar input { width: 100%; padding: 0.8rem 1.2rem; border-radius: 50px; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-size: 1rem; transition: all 0.3s ease; }
+        .search-bar input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 15px rgba(0, 212, 255, 0.5); }
+        .user-profile { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; }
+        .categories { padding: 3rem 2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .category-card { background: var(--card-bg); padding: 1.5rem 2rem; border-radius: 15px; text-align: center; border: 1px solid transparent; transition: all 0.3s ease; cursor: pointer; width: 150px; }
+        .category-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3); }
+        .category-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .game-grid { padding: 2rem; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .game-card { position: relative; border-radius: 15px; overflow: hidden; background: var(--card-bg); height: 350px; transition: transform 0.3s ease; }
+        .game-card:hover { transform: scale(1.03); }
+        .game-card a { text-decoration: none; color: inherit; display: block; width: 100%; height: 100%; }
+        .game-card img { width: 100%; height: 100%; object-fit: cover; }
+        .game-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(10, 10, 15, 0.9), transparent); padding: 1.5rem; opacity: 0; transition: opacity 0.3s ease; }
+        .game-card:hover .game-info { opacity: 1; }
+        .game-info h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .game-info p { font-size: 0.9rem; margin-bottom: 1rem; }
+        .game-info .play-btn { background: var(--primary-color); color: var(--bg-color); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 700; font-family: 'Orbitron', sans-serif; display: inline-block; }
+        .footer { text-align: center; padding: 2rem; margin-top: 3rem; border-top: 1px solid rgba(0, 212, 255, 0.2); font-size: 0.9rem; }
+        @media (max-width: 768px) { .header { padding: 1rem; } .search-bar { margin: 0 1rem; } .categories { padding: 2rem 1rem; } .category-card { width: calc(50% - 1rem); } .grid-container { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
+    </style>
+</head>
+<body>
+    <header class="header"> <a href="index.html" class="logo">NEXUS ARCADE</a> <div class="search-bar"> <input type="text" placeholder="Busca tu próxima obsesión..."> </div> <div class="user-profile">👤</div> </header>
+    <main>
+        <section class="categories">
+            <div class="category-card"> <div class="icon">🧩</div> <h3>Puzzles</h3> </div>
+            <div class="category-card"> <div class="icon">🏃‍♂️</div> <h3>Arcade</h3> </div>
+            <div class="category-card"> <div class="icon">🎯</div> <h3>Habilidad</h3> </div>
+            <div class="category-card"> <div class="icon">🧠</div> <h3>Memoria</h3> </div>
+        </section>
+        <section class="game-grid">
+            <div class="grid-container">
+                <div class="game-card"> <a href="juego-snake.html"> <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1974&auto=format&fit=crop" alt="Snake Classic"> <div class="game-info"> <h3>Snake Classic</h3> <p>El clásico juego de la serpiente. ¡No te comas la cola!</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+                <div class="game-card"> <a href="juego-breakout.html"> <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=2070&auto=format&fit=crop" alt="Neon Breaker"> <div class="game-info"> <h3>Neon Breaker</h3> <p>Rompe todos los ladrillos con la pelota y tu pala.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+                <div class="game-card"> <a href="juego-memory.html"> <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" alt="Memory Matrix"> <div class="game-info"> <h3>Memory Matrix</h3> <p>Encuentra todas las parejas de símbolos ocultos.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer"> <p>&copy; 2024 Nexus Arcade. Todos los derechos reservados.</p> </footer>
 </body>
 </html>
