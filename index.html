@@ -50,71 +50,42 @@
         </section>
         <section class="game-grid">
             <div class="grid-container">
-                <div class="game-card"> <a href="juego-snake.html"> <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1974&auto=format&fit=crop" alt="Snake Classic"> <div class="game-info"> <h3>Snake Classic</h3> <p>El clásico juego de la serpiente. ¡No te comas la cola!</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
-                <div class="game-card"> <a href="juego-breakout.html"> <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=2070&auto=format&fit=crop" alt="Neon Breaker"> <div class="game-info"> <h3>Neon Breaker</h3> <p>Rompe todos los ladrillos con la pelota y tu pala.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
-                <div class="game-card"> <a href="juego-memory.html"> <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" alt="Memory Matrix"> <div class="game-info"> <h3>Memory Matrix</h3> <p>Encuentra todas las parejas de símbolos ocultos.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
+                <!-- Juego 1: Snake Classic -->
+                <div class="game-card"> 
+                    <a href="juego-snake.html"> 
+                        <img src="https://i.imgur.com/gKmM2OV.png" alt="Snake Classic"> 
+                        <div class="game-info"> 
+                            <h3>Snake Classic</h3> 
+                            <p>El clásico juego de la serpiente. ¡No te comas la cola!</p> 
+                            <span class="play-btn">JUGAR</span> 
+                        </div> 
+                    </a> 
+                </div>
+                <!-- Juego 2: Neon Breaker -->
+                <div class="game-card"> 
+                    <a href="juego-breakout.html"> 
+                        <img src="https://i.imgur.com/o2v2hZf.jpeg" alt="Neon Breaker"> 
+                        <div class="game-info"> 
+                            <h3>Neon Breaker</h3> 
+                            <p>Rompe todos los ladrillos con la pelota y tu pala.</p> 
+                            <span class="play-btn">JUGAR</span> 
+                        </div> 
+                    </a> 
+                </div>
+                <!-- Juego 3: Memory Matrix -->
+                <div class="game-card"> 
+                    <a href="juego-memory.html"> 
+                        <img src="https://i.imgur.com/K4tWk3B.png" alt="Memory Matrix"> 
+                        <div class="game-info"> 
+                            <h3>Memory Matrix</h3> 
+                            <p>Encuentra todas las parejas de símbolos ocultos.</p> 
+                            <span class="play-btn">JUGAR</span> 
+                        </div> 
+                    </a> 
+                </div>
             </div>
         </section>
     </main>
     <footer class="footer"> <p>&copy; 2025 Ed Arcade. Todos los derechos reservados.</p> </footer>
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Arcade - Catálogo de Juegos</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- ESTILOS (MISMOS QUE ANTES) --- */
-        :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --text-color: #e0e0e0; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; --purple-accent: #8338ec; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; line-height: 1.6; }
-        h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(26, 26, 46, 0.5); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 212, 255, 0.2); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); text-decoration: none; }
-        .search-bar { flex-grow: 1; max-width: 500px; margin: 0 2rem; }
-        .search-bar input { width: 100%; padding: 0.8rem 1.2rem; border-radius: 50px; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(255, 255, 255, 0.05); color: var(--text-color); font-size: 1rem; transition: all 0.3s ease; }
-        .search-bar input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 15px rgba(0, 212, 255, 0.5); }
-        .user-profile { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; }
-        .categories { padding: 3rem 2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
-        .category-card { background: var(--card-bg); padding: 1.5rem 2rem; border-radius: 15px; text-align: center; border: 1px solid transparent; transition: all 0.3s ease; cursor: pointer; width: 150px; }
-        .category-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3); }
-        .category-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .game-grid { padding: 2rem; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .game-card { position: relative; border-radius: 15px; overflow: hidden; background: var(--card-bg); height: 350px; transition: transform 0.3s ease; }
-        .game-card:hover { transform: scale(1.03); }
-        .game-card a { text-decoration: none; color: inherit; display: block; width: 100%; height: 100%; }
-        .game-card img { width: 100%; height: 100%; object-fit: cover; }
-        .game-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(10, 10, 15, 0.9), transparent); padding: 1.5rem; opacity: 0; transition: opacity 0.3s ease; }
-        .game-card:hover .game-info { opacity: 1; }
-        .game-info h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-        .game-info p { font-size: 0.9rem; margin-bottom: 1rem; }
-        .game-info .play-btn { background: var(--primary-color); color: var(--bg-color); padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 700; font-family: 'Orbitron', sans-serif; display: inline-block; }
-        .footer { text-align: center; padding: 2rem; margin-top: 3rem; border-top: 1px solid rgba(0, 212, 255, 0.2); font-size: 0.9rem; }
-        @media (max-width: 768px) { .header { padding: 1rem; } .search-bar { margin: 0 1rem; } .categories { padding: 2rem 1rem; } .category-card { width: calc(50% - 1rem); } .grid-container { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
-    </style>
-</head>
-<body>
-    <header class="header"> <a href="index.html" class="logo">NEXUS ARCADE</a> <div class="search-bar"> <input type="text" placeholder="Busca tu próxima obsesión..."> </div> <div class="user-profile">👤</div> </header>
-    <main>
-        <section class="categories">
-            <div class="category-card"> <div class="icon">🧩</div> <h3>Puzzles</h3> </div>
-            <div class="category-card"> <div class="icon">🏃‍♂️</div> <h3>Arcade</h3> </div>
-            <div class="category-card"> <div class="icon">🎯</div> <h3>Habilidad</h3> </div>
-            <div class="category-card"> <div class="icon">🧠</div> <h3>Memoria</h3> </div>
-        </section>
-        <section class="game-grid">
-            <div class="grid-container">
-                <div class="game-card"> <a href="juego-snake.html"> <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1974&auto=format&fit=crop" alt="Snake Classic"> <div class="game-info"> <h3>Snake Classic</h3> <p>El clásico juego de la serpiente. ¡No te comas la cola!</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
-                <div class="game-card"> <a href="juego-breakout.html"> <img src="https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=2070&auto=format&fit=crop" alt="Neon Breaker"> <div class="game-info"> <h3>Neon Breaker</h3> <p>Rompe todos los ladrillos con la pelota y tu pala.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
-                <div class="game-card"> <a href="juego-memory.html"> <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" alt="Memory Matrix"> <div class="game-info"> <h3>Memory Matrix</h3> <p>Encuentra todas las parejas de símbolos ocultos.</p> <span class="play-btn">JUGAR</span> </div> </a> </div>
-            </div>
-        </section>
-    </main>
-    <footer class="footer"> <p>&copy; 2024 Nexus Arcade. Todos los derechos reservados.</p> </footer>
 </body>
 </html>
