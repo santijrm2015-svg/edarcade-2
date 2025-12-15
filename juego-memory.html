@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Matrix - Nexus Arcade</title>
+    <title>Memory Matrix - Ed Arcade</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --primary-color: #00d4ff; --secondary-color: #ff006e; }
         body { background-color: var(--bg-color); color: #e0e0e0; font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .game-header { position: absolute; top: 20px; left: 20px; }
+        .game-header { position: absolute; top: 20px; left: 20px; z-index: 100; }
         .game-header a { font-family: 'Orbitron', sans-serif; color: var(--primary-color); text-decoration: none; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .game-container { text-align: center; }
+        .game-container { text-align: center; width: 100%; max-width: 500px; padding: 1rem; }
         .game-container h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
         .game-info { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; margin-bottom: 1rem; }
         .game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; perspective: 1000px; }
-        .card { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer; }
+        .card { width: 100%; aspect-ratio: 1 / 1; position: relative; transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer; }
         .card.flipped { transform: rotateY(180deg); }
         .card-front, .card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
         .card-front { background: var(--card-bg); border: 2px solid var(--primary-color); }
         .card-back { background: var(--primary-color); color: var(--bg-color); transform: rotateY(180deg); }
+        @media (max-width: 480px) {
+            .game-board { gap: 8px; }
+            .card-front, .card-back { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -32,10 +36,13 @@
         const gameBoard = document.getElementById('gameBoard'); const movesDisplay = document.getElementById('moves');
         const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮']; let cards = [...emojis, ...emojis]; let moves = 0; let firstCard = null; let secondCard = null; let lockBoard = false;
         function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
-        function createCard(emoji) { const card = document.createElement('div'); card.classList.add('card'); card.innerHTML = `<div class="card-front"></div><div class="card-back">${emoji}</div>`; card.addEventListener('click', flipCard); return card; }
+        function createCard(emoji) { const card = document.createElement('div'); card.classList.add('card'); card.innerHTML = `<div class="card-front"></div><div class="card-back">${emoji}</div>`; 
+            card.addEventListener('click', flipCard); 
+            card.addEventListener('touchstart', (e) => { e.preventDefault(); flipCard.call(card, e); });
+            return card; }
         function flipCard() { if (lockBoard) return; if (this === firstCard) return; this.classList.add('flipped'); if (!firstCard) { firstCard = this; return; } secondCard = this; moves++; movesDisplay.textContent = moves; checkForMatch(); }
         function checkForMatch() { const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent; isMatch ? disableCards() : unflipCards(); }
-        function disableCards() { firstCard.removeEventListener('click', flipCard); secondCard.removeEventListener('click', flipCard); resetBoard(); }
+        function disableCards() { firstCard.removeEventListener('click', flipCard); firstCard.removeEventListener('touchstart', flipCard); secondCard.removeEventListener('click', flipCard); secondCard.removeEventListener('touchstart', flipCard); resetBoard(); }
         function unflipCards() { lockBoard = true; setTimeout(() => { firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); resetBoard(); }, 1000); }
         function resetBoard() { [firstCard, secondCard] = [null, null]; lockBoard = false; }
         function startGame() { shuffle(cards); cards.forEach(emoji => gameBoard.appendChild(createCard(emoji))); }
