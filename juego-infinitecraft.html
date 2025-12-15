@@ -3,529 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ed TV</title>
+    <title>Infinite Craft - Versión Adaptativa</title>
     <style>
-        /* --- ESTILOS GLOBALES Y CLON DE OME TV --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* --- ESTILOS CSS --- */
+        :root {
+            --bg-color: #1a1a1a;
+            --sidebar-bg: #252525;
+            --item-bg: #3a3a3a;
+            --item-hover-bg: #4a4a4a;
+            --slot-bg: #2a2a2a;
+            --text-color: #f0f0f0;
+            --accent-color: #4a9eff;
+            --success-color: #4eff4a;
+            --error-color: #ff4a4a;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
             display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- LADO IZQUIERDO (INTERFAZ DE USUARIO) --- */
-        .user-interface {
-            width: 30%;
-            min-width: 300px;
-            background-color: #111;
+        /* Sidebar */
+        #sidebar {
+            width: 100%;
+            background-color: var(--sidebar-bg);
+            padding: 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            border-bottom: 1px solid #444;
+            max-height: 30vh;
+        }
+
+        #sidebar h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .item {
+            background-color: var(--item-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s, transform 0.1s, border-color 0.2s;
+            user-select: none;
+            border: 2px solid transparent;
+        }
+
+        .item:hover {
+            background-color: var(--item-hover-bg);
+            transform: scale(1.05);
+        }
+
+        .item.selected {
+            border-color: var(--accent-color);
+            background-color: var(--item-hover-bg);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Main Content */
+        #main-content {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px; /* Aumenté el margen para rellenar el espacio */
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #game-title {
+            font-size: 2.5em;
             margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--accent-color);
         }
 
-        .logo i {
-            color: #ff9500;
-            margin-right: 10px;
-            font-size: 2rem;
-        }
-
-        .online-users {
-            font-size: 0.9rem;
+        #stats {
+            margin-bottom: 30px;
+            font-size: 1.2em;
             color: #aaa;
         }
-        .active-viewers {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 5px;
-        }
 
-        /* Sección de botones de descarga eliminada */
-
-        .control-buttons {
+        #crafting-area {
             display: flex;
-            flex-direction: column;
-            width: 100%;
-            gap: 10px;
-        }
-
-        .control-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            background-color: #ff9500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .control-btn:hover {
-            background-color: #e68500;
-            transform: translateY(-2px);
-        }
-
-        .control-btn.stop {
-            background-color: #d32f2f;
-        }
-
-        .control-btn.stop:hover {
-            background-color: #b71c1c;
-        }
-
-        /* --- LADO DERECHO (VIDEO Y CHAT) --- */
-        .video-chat-area {
-            flex-grow: 1;
-            position: relative;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
+            gap: 30px;
             align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        /* --- VIDEOS --- */
-        #strangerVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-        }
-
-        #userVideo {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 200px;
+        .slot {
+            width: 150px;
             height: 150px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #ff9500;
-            z-index: 3;
-            display: none;
+            border: 3px dashed #555;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, background-color 0.3s;
+            word-wrap: break-word;
+            cursor: pointer;
         }
         
-        /* --- MENSAJES Y CONTROLES SOBRE EL VIDEO --- */
-        .overlay-message {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px 30px;
-            border-radius: 10px;
-            z-index: 4;
+        .slot:hover {
+            background-color: rgba(74, 158, 255, 0.1);
         }
 
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 4;
-            display: none;
+        #plus-sign {
+            font-size: 3em;
+            color: #666;
         }
 
-        .top-controls button {
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 15px;
-            padding: 8px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .top-controls button:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-        .top-controls button.active {
-            color: #ff9500;
-        }
-
-        .report-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 5px;
-            z-index: 4;
-            display: none;
-        }
-        .report-btn:hover {
-            color: #d32f2f;
-        }
-
-        /* --- CHAT --- */
-        .chat-overlay {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 40%;
-            max-width: 450px;
-            height: 50%;
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 4;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message.you {
-            background-color: #007aff;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        .message.stranger {
-            background-color: #333;
-            align-self: flex-start;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #444;
-        }
-
-        .chat-input-area input {
-            flex-grow: 1;
-            padding: 8px;
-            border: 1px solid #555;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 15px;
-            outline: none;
-        }
-
-        /* --- MODALS --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #222;
+        #result-area {
+            min-width: 200px;
+            min-height: 100px;
             padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 400px;
+            border-radius: 12px;
+            background-color: var(--slot-bg);
             text-align: center;
-        }
-        .modal-content ul {
-            list-style: none;
-            text-align: left;
-            padding: 0;
-        }
-        .modal-content li {
-            padding: 10px;
-            border-bottom: 1px solid #444;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .modal-content li:hover {
-            background-color: #333;
-        }
-        .close-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
+            font-size: 1.8em;
             font-weight: bold;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
         }
-        .close-modal:hover { color: #fff; }
 
+        #result-area.new-discovery { animation: pulse 0.5s; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 25px var(--success-color); } 100% { transform: scale(1); } }
+        #result-area.error { color: var(--error-color); }
+
+        #controls { margin-top: 20px; }
+        button { background-color: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 1em; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #357ae8; }
+
+        /* --- Media Query para Escritorio --- */
+        @media (min-width: 769px) {
+            body { flex-direction: row; }
+            #sidebar {
+                width: 250px;
+                height: 100vh;
+                max-height: none;
+                border-right: 1px solid #444;
+                border-bottom: none;
+            }
+        }
     </style>
-    <!-- Font Awesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <!-- Lado Izquierdo: Interfaz de Usuario -->
-    <div class="user-interface">
-        <div class="logo-section">
-            <div class="logo">
-                <i class="fas fa-tv"></i>
-                <span>Ed TV</span>
-            </div>
-            <div class="online-users" id="globalUsersCount">312.931 usuarios en línea</div>
-            <div class="active-viewers" id="activeViewersCount">0 espectadores activos</div>
-        </div>
-
-        <!-- SECCIÓN DE BOTONES DE DESCARGA ELIMINADA -->
-
-        <div class="control-buttons">
-            <button class="control-btn" id="startButton">Iniciar</button>
-            <button class="control-btn stop" id="stopButton">Parar</button>
-            <button class="control-btn" id="countryButton">País</button>
-            <button class="control-btn" id="iamButton">Soy</button>
+    <div id="sidebar">
+        <h2>Elementos</h2>
+        <div id="items-container">
+            <!-- Los elementos se generarán aquí con JavaScript -->
         </div>
     </div>
 
-    <!-- Lado Derecho: Video y Chat -->
-    <div class="video-chat-area">
-        <video id="strangerVideo" autoplay muted loop>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-        <video id="userVideo" autoplay muted></video>
-
-        <button class="report-btn" id="reportButton" style="display:none;"><i class="fas fa-flag"></i></button>
-
-        <div id="startPrompt" class="overlay-message">
-            <p>Para comenzar, presiona <strong>Iniciar</strong> y acepta las reglas. Mantén tu cámara visible.</p>
-        </div>
+    <div id="main-content">
+        <h1 id="game-title">Infinite Craft</h1>
+        <div id="stats">Descubiertos: <span id="discovered-count">4</span> / <span id="total-count">4</span></div>
         
-        <div class="top-controls" id="topControls">
-            <button id="micButton"><i class="fas fa-microphone-slash"></i></button>
-            <button id="fullscreenButton"><i class="fas fa-expand"></i></button>
-            <button id="settingsButton"><i class="fas fa-cog"></i></button>
+        <div id="crafting-area">
+            <div id="slot1" class="slot" data-slot="1"></div>
+            <div id="plus-sign">+</div>
+            <div id="slot2" class="slot" data-slot="2"></div>
         </div>
 
-        <div class="chat-overlay" id="chatOverlay">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-area">
-                <form id="messageForm">
-                    <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
-                </form>
-            </div>
-        </div>
-    </div>
+        <div id="result-area">Toca dos elementos para combinar</div>
 
-    <!-- Modals -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('settingsModal')">&times;</span>
-            <h2>Configuración</h2>
-            <p>Ajusta tu experiencia aquí (solo por apariencia).</p>
-        </div>
-    </div>
-    <div id="countryModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('countryModal')">&times;</span>
-            <h2>Selecciona tu país</h2>
-            <ul>
-                <li>España</li>
-                <li>México</li>
-                <li>Argentina</li>
-                <li>Colombia</li>
-                <li>Estados Unidos</li>
-            </ul>
-        </div>
-    </div>
-    <div id="iamModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('iamModal')">&times;</span>
-            <h2>Yo soy...</h2>
-            <ul>
-                <li>Chico</li>
-                <li>Chica</li>
-                <li>Pareja</li>
-            </ul>
+        <div id="controls">
+            <button id="clear-btn">Limpiar</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- ELEMENTOS DEL DOM ---
-            const startButton = document.getElementById('startButton');
-            const stopButton = document.getElementById('stopButton');
-            const strangerVideo = document.getElementById('strangerVideo');
-            const userVideo = document.getElementById('userVideo');
-            const startPrompt = document.getElementById('startPrompt');
-            const topControls = document.getElementById('topControls');
-            const chatOverlay = document.getElementById('chatOverlay');
-            const chatMessages = document.getElementById('chatMessages');
-            const messageForm = document.getElementById('messageForm');
-            const messageInput = document.getElementById('messageInput');
-            const micButton = document.getElementById('micButton');
-            const fullscreenButton = document.getElementById('fullscreenButton');
-            const reportButton = document.getElementById('reportButton');
+        // --- LÓGICA JAVASCRIPT ---
+        const itemsContainer = document.getElementById('items-container');
+        const slot1 = document.getElementById('slot1');
+        const slot2 = document.getElementById('slot2');
+        const resultArea = document.getElementById('result-area');
+        const clearBtn = document.getElementById('clear-btn');
+        const discoveredCountEl = document.getElementById('discovered-count');
+        const totalCountEl = document.getElementById('total-count');
 
-            // --- ESTADO Y LÓGICA ---
-            let userStream = null;
-            let audioStream = null;
-            let conversationHistory = [];
-            const API_URL = 'http://localhost:3001/chat';
-            const WS_URL = 'ws://localhost:3001';
+        let discoveredItems = [];
+        const initialItems = ['Agua', 'Tierra', 'Fuego', 'Viento'];
+        
+        // --- BASE DE DATOS DE RECETAS (COMPLETA) ---
+        const recipes = {
+            'Agua,Tierra': 'Lodo', 'Agua,Fuego': 'Vapor', 'Agua,Viento': 'Ola', 'Tierra,Fuego': 'Lava', 'Tierra,Viento': 'Polvo', 'Fuego,Viento': 'Humo',
+            'Lodo,Planta': 'Pantano', 'Vapor,Aire': 'Nube', 'Nube,Agua': 'Lluvia', 'Lava,Agua': 'Piedra', 'Lava,Tierra': 'Volcán', 'Piedra,Fuego': 'Metal', 'Piedra,Tierra': 'Roca',
+            'Metal,Viento': 'Espada', 'Metal,Piedra': 'Herramienta', 'Metal,Electricidad': 'Cable', 'Metal,Agua': 'Óxido', 'Metal,Aire': 'Óxido',
+            'Planta,Planta': 'Árbol', 'Planta,Sol': 'Oxígeno', 'Planta,Agua': 'Alga', 'Planta,Hombre': 'Agricultura', 'Planta,Madera': 'Fruta',
+            'Árbol,Árbol': 'Bosque', 'Árbol,Herramienta': 'Madera', 'Árbol,Fuego': 'Leña', 'Árbol,Agua': 'Balsa', 'Árbol,Viento': 'Hoja',
+            'Madera,Herramienta': 'Rueda', 'Madera,Agua': 'Balsa', 'Madera,Fuego': 'Leña', 'Madera,Madera': 'Casa', 'Madera,Piedra': 'Hacha',
+            'Leña,Fuego': 'Campamento', 'Campamento,Persona': 'Historia', 'Campamento,Tierra': 'Asentamiento', 'Campamento,Cielo': 'Estrellas',
+            'Pantano,Vida': 'Bacteria', 'Bacteria,Vida': 'Pez', 'Bacteria,Tierra': 'Tierra Fértil', 'Bacteria,Agua': 'Plancton',
+            'Pez,Agua': 'Banco de Peces', 'Pez,Herramienta': 'Pesca', 'Pez,Pez': 'Escama', 'Pez,Ave': 'Pingüino',
+            'Lluvia,Tierra': 'Barro', 'Lluvia,Planta': 'Crecimiento', 'Lluvia,Frío': 'Nieve', 'Lluvia,Campo': 'Arcoíris',
+            'Barro,Vida': 'Humano', 'Barro,Fuego': 'Ladrillo', 'Barro,Piedra': 'Cerámica', 'Barro,Agua': 'Goo',
+            'Humano,Madera': 'Herramienta', 'Humano,Leña': 'Fuego', 'Humano,Piedra': 'Casa', 'Humano,Humano': 'Amor', 'Humano,Amor': 'Familia', 'Humano,Familia': 'Tribu',
+            'Humano,Fuego': 'Idea', 'Humano,Idea': 'Filosofía', 'Humano,Filosofía': 'Religión', 'Humano,Religión': 'Templo', 'Humano,Templo': 'Sacerdote',
+            'Humano,Metal': 'Rueda', 'Rueda,Rueda': 'Coche', 'Rueda,Metal': 'Tren', 'Rueda,Agua': 'Barco', 'Rueda,Aire': 'Avión',
+            'Humano,Árbol': 'Conocimiento', 'Conocimiento,Computadora': 'Inteligencia Artificial', 'Conocimiento,Libro': 'Sabiduría',
+            'Humano,Barro': 'Cerámica', 'Cerámica,Horno': 'Ladrillo', 'Ladrillo,Ladrillo': 'Muro', 'Muro,Muro': 'Castillo', 'Muro,Casa': 'Ciudad',
+            'Humano,Barco': 'Navegación', 'Humano,Coche': 'Tráfico', 'Humano,Avión': 'Piloto',
+            'Espada,Humano': 'Guerrero', 'Guerrero,Guerrero': 'Ejército', 'Ejército,Castillo': 'Rey', 'Rey,Reina': 'Familia Real',
+            'Humano,Pez': 'Sirena', 'Humano,Caballo': 'Centauro', 'Humano,Ave': 'Ángel',
+            'Herramienta,Madera': 'Hacha', 'Hacha,Árbol': 'Leña', 'Hacha,Animal': 'Carne', 'Hacha,Guerra': 'Hacha de Guerra',
+            'Herramienta,Piedra': 'Cuchillo', 'Cuchillo,Carne': 'Filete', 'Cuchillo,Guerra': 'Daga',
+            'Fuego,Planta': 'Cenizas', 'Cenizas,Vida': 'Fénix', 'Cenizas,Agua': 'Lye',
+            'Volcán,Agua': 'Isla', 'Isla,Isla': 'Archipiélago', 'Isla,Humano': 'Náufrago',
+            'Agua,Agua': 'Lago', 'Lago,Lago': 'Mar', 'Mar,Tierra': 'Continente', 'Continente,Continente': 'Planeta', 'Planeta,Planeta': 'Sistema Solar',
+            'Sistema Solar,Sistema Solar': 'Galaxia', 'Galaxia,Vida': 'Extraterrestre',
+            'Metal,Metal': 'Acero', 'Acero,Vapor': 'Motor', 'Motor,Coche': 'Automóvil', 'Motor,Ave': 'Avión',
+            'Hielo,Fuego': 'Agua Tibia', 'Hielo,Viento': 'Nieve', 'Nieve,Nieve': 'Nevada', 'Nevada,Árbol': 'Árbol de Navidad',
+            'Viento,Viento': 'Tornado', 'Agua,Tornado': 'Tsunami',
+            'Sol,Tierra': 'Desierto', 'Desierto,Planta': 'Cactus',
+            'Sol,Sol': 'Supernova', 'Luna,Estrella': 'Cielo Nocturno',
+            'Electricidad,Metal': 'Imán', 'Electricidad,Agua': 'Oxígeno', 'Electricidad,Aire': 'Ozono', 'Electricidad,Sandía': 'Relámpago',
+            'Vida,Tierra': 'Semilla', 'Semilla,Agua': 'Planta', 'Semilla,Tierra': 'Árbol',
+            'Vida,Fuego': 'Fénix', 'Vida,Agua': 'Pez', 'Vida,Tierra': 'Humano', 'Vida,Aire': 'Pájaro',
+            'Tiempo,Tiempo': 'Reloj', 'Reloj,Energía': 'Tiempo', 'Reloj,Humano': 'Muerte',
+            'Amor,Amor': 'Sexo', 'Sexo,Humano': 'Bebé', 'Bebé,Agua': 'Nado', 'Bebé,Libro': 'Estudiante',
+            'Familia,Casa': 'Hogar', 'Hogar,Calor': 'Felicidad', 'Hogar,Trabajo': 'Estrés',
+            'Dinero,Humano': 'Trabajo', 'Trabajo,Dinero': 'Riqueza', 'Riqueza,Humano': 'Banquero',
+            'Arma,Humano': 'Guerrero', 'Guerra,Paz': 'Tregua', 'Guerra,Guerra': 'Destrucción',
+            'Música,Humano': 'Canción', 'Canción,Canción': 'Álbum', 'Canción,Palabra': 'Letra',
+            'Palabra,Palabra': 'Frase', 'Frase,Frase': 'Párrafo', 'Párrafo,Párrafo': 'Libro',
+            'Libro,Libro': 'Biblioteca', 'Biblioteca,Conocimiento': 'Universidad', 'Universidad,Humano': 'Científico',
+            'Científico,Idea': 'Descubrimiento', 'Científico,Laboratorio': 'Experimento',
+            'Idea,Computadora': 'Software', 'Software,Software': 'Aplicación', 'Software,Humano': 'Usuario',
+            'Computadora,Computadora': 'Internet', 'Internet,Conocimiento': 'Wikipedia', 'Internet,Humano': 'Red Social',
+            'Red Social,Red Social': 'Comunicación', 'Comunicación,Comunicación': 'Lenguaje',
+            'Juego,Juego': 'Deporte', 'Deporte,Humano': 'Atleta', 'Deporte,Bola': 'Pelota',
+            'Arte,Arte': 'Estilo', 'Arte,Humano': 'Artista', 'Artista,Pincel': 'Pintura',
+            'Pintura,Pared': 'Mural', 'Pintura,Lienzo': 'Cuadro',
+            'Comida,Agua': 'Sopa', 'Comida,Fuego': 'Cocina', 'Comida,Planta': 'Verdura', 'Comida,Animal': 'Carne',
+            'Carne,Fuego': 'Carne Asada', 'Carne,Planta': 'Hamburguesa',
+            'Pan,Queso': 'Sandwich', 'Pan,Tomate': 'Pizza',
+            'Leche,Chocolate': 'Chocolate Caliente', 'Leche,Frío': 'Helado',
+            'Dulce,Agua': 'Refresco', 'Dulce,Fruta': 'Mermelada',
+            'Sal,Agua': 'Agua Salada', 'Sal,Patata': 'Papas Fritas',
+            'Huevo,Fuego': 'Huevo Frito', 'Huevo,Agua': 'Huevo Duro',
+            'Flor,Árbol': 'Fruta', 'Flor,Flor': 'Ramo', 'Flor,Agua': 'Jardín',
+            'Jardín,Jardín': 'Parque', 'Parque,Animales': 'Zoológico',
+            'Arena,Agua': 'Playa', 'Playa,Sol': 'Vacaciones',
+            'Montaña,Montaña': 'Cordillera', 'Montaña,Nube': 'Cima',
+            'Cielo,Tierra': 'Horizonte', 'Cielo,Mar': 'Costa',
+            'Noche,Día': 'Ciclo', 'Noche,Estrella': 'Cielo Estrellado', 'Día,Sol': 'Luz',
+            'Luz,Oscuridad': 'Sombra', 'Sombra,Humano': 'Fantasma',
+            'Frío,Agua': 'Hielo', 'Frío,Frío': 'Frío Absoluto',
+            'Calor,Calor': 'Fuego', 'Calor,Agua': 'Vapor',
+            'Piedra,Piedra': 'Roca', 'Roca,Roca': 'Montaña',
+            'Metal,Metal': 'Oro', 'Oro,Humano': 'Avaricia', 'Oro,Rey': 'Corona',
+            'Diamante,Diamante': 'Joyas', 'Joyas,Rey': 'Tesoro',
+            'Humano,Muerte': 'Esqueleto', 'Esqueleto,Vida': 'Zombi',
+            'Vampiro,Muerte': 'No-muerto', 'Hombre Lobo,Luna': 'Lobo',
+            'Mago,Hechizo': 'Magia', 'Magia,Libro': 'Grimorio',
+            'Dragón,Fuego': 'Fuego Dragón', 'Dragón,Huevo': 'Cría de Dragón', 'Dragón,Metal': 'Escamas de Dragón',
+            'Robot,Vida': 'Androide', 'Androide,Conciencia': 'Ciborg',
+            'Espacio,Tiempo': 'Universo', 'Universo,Origen': 'Big Bang',
+            'Cero,Cero': 'Nada', 'Nada,Universo': 'Vacío',
+            'Dios,Humano': 'Religión', 'Dios,Diablo': 'Dualidad',
+            'Bien,Mal': 'Moral', 'Moral,Humano': 'Ética',
+            'Verdad,Mentira': 'Paradoja', 'Paradoja,Humano': 'Confusión',
+            'Cerebro,Computadora': 'Inteligencia Artificial', 'Cerebro,Conocimiento': 'Mente',
+            'Mente,Cuerpo': 'Ser', 'Ser,Tiempo': 'Experiencia',
+            'Amistad,Amistad': 'Lealtad', 'Amor,Tristeza': 'Dolor',
+            'Paz,Guerra': 'Conflicto', 'Conflicto,Resolución': 'Acuerdo',
+            'Ciencia,Naturaleza': 'Biología', 'Biología,Vida': 'Evolución',
+            'Química,Agua': 'H2O', 'Física,Energía': 'Trabajo',
+            'Historia,Humano': 'Cultura', 'Cultura,Sociedad': 'Civilización',
+            'Lenguaje,Escritura': 'Alfabeto', 'Alfabeto,Libro': 'Conocimiento',
+            'Música,Ritmo': 'Bailar', 'Bailar,Felicidad': 'Fiesta',
+            'Fuego,Madera': 'Cocina', 'Cocina,Comida': 'Receta',
+            'Juego,Reglas': 'Deporte', 'Deporte,Competencia': 'Campeonato',
+            'Tecnología,Sociedad': 'Futuro', 'Futuro,Pasado': 'Presente',
+            'Infinite Craft,Creación': 'Juego Infinito'
+        };
 
-            // --- CONEXIÓN WEBSOCKET PARA CONTEO DE VISTANTES ---
-            const ws = new WebSocket(WS_URL);
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'viewerCount') {
-                    document.getElementById('activeViewersCount').textContent = `${data.count} espectadores activos`;
-                }
-            };
+        // --- FUNCIONES PRINCIPALES ---
+        let selectedItem = null;
 
-            // --- SIMULACIÓN DE CONTEO GLOBAL DE USUARIOS ---
-            let globalUsers = 312931;
-            setInterval(() => {
-                const change = Math.floor(Math.random() * 21) - 10;
-                globalUsers += change;
-                if (globalUsers < 300000) globalUsers = 300000;
-                document.getElementById('globalUsersCount').textContent = `${globalUsers.toLocaleString('es-ES')} usuarios en línea`;
-            }, 5000);
+        function init() {
+            loadGameState();
+            renderSidebar();
+            setupEventListeners();
+            updateStats();
+        }
 
-            // --- FUNCIONES ---
-            const addMessage = (text, sender) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender);
-                messageDiv.textContent = text;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            };
-            
-            const getBotResponse = async (userMessage) => {
-                conversationHistory.push({ role: 'user', content: userMessage });
-                try {
-                    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversationHistory }) });
-                    const data = await response.json();
-                    const botReply = data.reply;
-                    conversationHistory.push({ role: 'assistant', content: botReply });
-                    addMessage(botReply, 'stranger');
-                } catch (error) {
-                    console.error('Error:', error);
-                    addMessage('El extraño se ha desconectado.', 'stranger');
-                }
-            };
+        function loadGameState() {
+            const saved = localStorage.getItem('infiniteCraftDiscoveries');
+            if (saved) {
+                discoveredItems = JSON.parse(saved);
+            } else {
+                discoveredItems = [...initialItems];
+                saveGameState();
+            }
+        }
 
-            const startMedia = async () => {
-                try {
-                    userStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    userVideo.srcObject = userStream;
-                    userVideo.style.display = 'block';
-                } catch (error) { console.error("Error de cámara:", error); userVideo.style.display = 'none'; }
-            };
-            const stopMedia = () => {
-                if (userStream) { userStream.getTracks().forEach(t => t.stop()); userStream = null; }
-                if (audioStream) { audioStream.getTracks().forEach(t => t.stop()); audioStream = null; }
-                userVideo.style.display = 'none';
-            };
+        function saveGameState() {
+            localStorage.setItem('infiniteCraftDiscoveries', JSON.stringify(discoveredItems));
+        }
 
-            const toggleMicrophone = async () => {
-                const icon = micButton.querySelector('i');
-                if (audioStream) {
-                    audioStream.getTracks().forEach(t => t.stop());
-                    audioStream = null;
-                    icon.className = 'fas fa-microphone-slash';
-                    micButton.classList.remove('active');
-                } else {
-                    try {
-                        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        icon.className = 'fas fa-microphone';
-                        micButton.classList.add('active');
-                    } catch (error) { console.error("Error de micrófono:", error); }
-                }
-            };
+        function updateStats() {
+            discoveredCountEl.textContent = discoveredItems.length;
+            // Calculamos el total de elementos únicos (iniciales + resultados de recetas)
+            const allItems = new Set([...initialItems, ...Object.values(recipes)]);
+            totalCountEl.textContent = allItems.size;
+        }
 
-            const toggleFullscreen = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-compress';
-                } else {
-                    document.exitFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-expand';
-                }
-            };
-            
-            const openModal = (modalId) => { document.getElementById(modalId).style.display = 'flex'; };
-            const closeModal = (modalId) => { document.getElementById(modalId).style.display = 'none'; };
-            window.closeModal = closeModal;
-            
-            const startChat = () => {
-                startPrompt.style.display = 'none';
-                topControls.style.display = 'block';
-                chatOverlay.style.display = 'flex';
-                reportButton.style.display = 'block';
-                
-                strangerVideo.style.display = 'block';
-                strangerVideo.play();
-                startMedia();
-                getBotResponse("Hola, ¿qué tal?");
-            };
-
-            const stopChat = () => {
-                stopMedia();
-                strangerVideo.pause(); strangerVideo.currentTime = 0; strangerVideo.style.display = 'none';
-                conversationHistory = []; chatMessages.innerHTML = '';
-                topControls.style.display = 'none'; chatOverlay.style.display = 'none'; reportButton.style.display = 'none';
-                startPrompt.style.display = 'block';
-            };
-
-            // --- EVENT LISTENERS ---
-            startButton.addEventListener('click', startChat);
-            stopButton.addEventListener('click', stopChat);
-            micButton.addEventListener('click', toggleMicrophone);
-            fullscreenButton.addEventListener('click', toggleFullscreen);
-            document.getElementById('settingsButton').addEventListener('click', () => openModal('settingsModal'));
-            document.getElementById('countryButton').addEventListener('click', () => openModal('countryModal'));
-            document.getElementById('iamButton').addEventListener('click', () => openModal('iamModal'));
-            reportButton.addEventListener('click', () => alert('Usuario reportado. (Solo es una simulación)'));
-
-            messageForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const text = messageInput.value.trim();
-                if (text) { addMessage(text, 'you'); messageInput.value = ''; getBotResponse(text); }
+        function renderSidebar() {
+            itemsContainer.innerHTML = '';
+            discoveredItems.sort().forEach(itemName => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item';
+                itemEl.textContent = itemName;
+                itemEl.dataset.itemName = itemName;
+                itemEl.addEventListener('click', handleItemClick);
+                itemsContainer.appendChild(itemEl);
             });
-        });
+        }
+
+        function setupEventListeners() {
+            slot1.addEventListener('click', handleItemClick);
+            slot2.addEventListener('click', handleItemClick);
+            clearBtn.addEventListener('click', clearCraftingArea);
+        }
+
+        function handleItemClick(e) {
+            const clickedElement = e.currentTarget;
+            const itemName = clickedElement.dataset.itemName || clickedElement.textContent;
+            if (!itemName) return;
+
+            if (selectedItem === null) {
+                selectedItem = itemName;
+                document.querySelectorAll('.item.selected').forEach(el => el.classList.remove('selected'));
+                const itemEl = document.querySelector(`.item[data-item-name="${itemName}"]`);
+                if(itemEl) itemEl.classList.add('selected');
+
+                if (!slot1.dataset.itemName) {
+                    slot1.textContent = itemName; slot1.dataset.itemName = itemName;
+                } else if (!slot2.dataset.itemName) {
+                    slot2.textContent = itemName; slot2.dataset.itemName = itemName;
+                }
+            } else {
+                const item1 = selectedItem;
+                const item2 = itemName;
+                if (item1 === item2) {
+                    showResult('No puedes combinar un elemento consigo mismo', false);
+                } else {
+                    checkForCombination(item1, item2);
+                }
+                clearSelection();
+            }
+        }
+        
+        function clearSelection() {
+            document.querySelectorAll('.item.selected').forEach(el => el.classList.remove('selected'));
+            selectedItem = null;
+        }
+
+        function checkForCombination(item1, item2) {
+            const key = [item1, item2].sort().join(',');
+            const result = recipes[key];
+
+            if (result) {
+                showResult(result, true);
+                if (!discoveredItems.includes(result)) {
+                    discoveredItems.push(result);
+                    saveGameState();
+                    renderSidebar();
+                    updateStats();
+                }
+            } else {
+                showResult('No pasa nada', false);
+            }
+        }
+
+        function showResult(resultText, isSuccess) {
+            resultArea.textContent = resultText;
+            resultArea.className = 'new-discovery';
+            if (!isSuccess) {
+                resultArea.classList.add('error');
+            }
+            setTimeout(() => { resultArea.classList.remove('new-discovery', 'error'); }, 1500);
+        }
+
+        function clearCraftingArea() {
+            slot1.textContent = ''; slot1.dataset.itemName = '';
+            slot2.textContent = ''; slot2.dataset.itemName = '';
+            resultArea.textContent = 'Toca dos elementos para combinar';
+            clearSelection();
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
