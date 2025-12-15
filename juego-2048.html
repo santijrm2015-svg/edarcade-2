@@ -14,150 +14,82 @@
             --secondary-color: #ff006e;
             --accent-color: #fb5607;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1, h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-        .game-header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-        }
-        .game-header a {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .game-container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 500px;
-        }
-        .game-container h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
-        }
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 1rem;
-        }
-        .game-info h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--text-color);
-            font-size: 1.2rem;
-        }
-        .new-game-btn {
-            background: var(--secondary-color);
-            color: #fff;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .new-game-btn:hover {
-            background: #ff4081;
-        }
-        #game-board {
-            background-color: #bbada0;
-            border-radius: 10px;
-            width: 340px;
-            height: 340px;
-            padding: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-            position: relative;
-            margin: auto;
-        }
-        .tile {
-            background-color: #cdc1b4;
-            color: #776e65;
-            border-radius: 6px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5rem;
-        }
-        .tile-2 { background-color: #eee4da; color: #776e65; }
-        .tile-4 { background-color: #ede0c8; color: #776e65; }
-        .tile-8 { background-color: #f2b179; color: #f9f6f2; }
-        .tile-16 { background-color: #f59563; color: #f9f6f2; }
-        .tile-32 { background-color: #f67c5f; color: #f9f6f2; }
-        .tile-64 { background-color: #f65e3b; color: #f9f6f2; }
-        .tile-128 { background-color: #edcf72; color: #f9f6f2; font-size: 2rem; }
-        .tile-256 { background-color: #edcc61; color: #f9f6f2; font-size: 2rem; }
-        .tile-512 { background-color: #edc850; color: #f9f6f2; font-size: 2rem; }
-        .tile-1024 { background-color: #edc53f; color: #f9f6f2; font-size: 1.5rem; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .game-container { text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 500px; }
+        .game-container h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
+        .game-info { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 400px; margin-bottom: 1rem; }
+        .game-info h2 { font-family: 'Orbitron', sans-serif; color: var(--text-color); font-size: 1.2rem; }
+        .new-game-btn { background: var(--secondary-color); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.3s; }
+        .new-game-btn:hover { background: #ff4081; }
+        #game-board { background-color: #bbada0; border-radius: 10px; width: 340px; height: 340px; padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); grid-gap: 10px; position: relative; margin: auto; }
+        .tile { background-color: #cdc1b4; color: #776e65; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-weight: bold; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; }
+        .tile-2 { background-color: #eee4da; color: #776e65; } .tile-4 { background-color: #ede0c8; color: #776e65; }
+        .tile-8 { background-color: #f2b179; color: #f9f6f2; } .tile-16 { background-color: #f59563; color: #f9f6f2; }
+        .tile-32 { background-color: #f67c5f; color: #f9f6f2; } .tile-64 { background-color: #f65e3b; color: #f9f6f2; }
+        .tile-128 { background-color: #edcf72; color: #f9f6f2; font-size: 2rem; } .tile-256 { background-color: #edcc61; color: #f9f6f2; font-size: 2rem; }
+        .tile-512 { background-color: #edc850; color: #f9f6f2; font-size: 2rem; } .tile-1024 { background-color: #edc53f; color: #f9f6f2; font-size: 1.5rem; }
         .tile-2048 { background-color: #edc22e; color: #f9f6f2; font-size: 1.5rem; }
-        @media (max-width: 480px) {
-            #game-board {
-                width: 90vw;
-                height: 90vw;
-            }
-            .tile, .card {
-                font-size: 1.8rem;
-            }
-        }
+        .game-over-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        .game-over-overlay h2 { font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem; }
+        .game-over-overlay p { font-size: 1.5rem; }
+        @media (max-width: 480px) { #game-board { width: 90vw; height: 90vw; } .tile, .card { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
-
-    <div class="game-header">
-        <a href="index.html"><span>&larr;</span><span>Volver al Arcade</span></a>
-    </div>
-
     <div class="game-container">
         <h1>2048</h1>
         <div class="game-info">
             <h2>Puntuación: <span id="score">0</span></h2>
-            <button class="new-game-btn" onclick="game2048.newGame()">Nuevo Juego</button>
+            <button class="new-game-btn" id="new-game-btn">Nuevo Juego</button>
         </div>
         <div id="game-board"></div>
     </div>
 
 <script>
-    // --- LÓGICA DEL JUEGO 2048 ---
+// ===================================================================
+// INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
+// ===================================================================
+(function() {
+    'use strict';
+
     const game2048 = {
         board: [],
         score: 0,
         size: 4,
         gameRunning: false,
 
+        // --- FUNCIONES DE CONTROL ---
+        handleKeyDown: (e) => {
+            const keyMap = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
+            if (keyMap[e.keyCode]) {
+                e.preventDefault(); // Evitar que la página se desplace
+                game2048.move(keyMap[e.keyCode]);
+            }
+        },
+
+        handleTouchStart: (e) => {
+            game2048.touchStartX = e.touches[0].clientX;
+            game2048.touchStartY = e.touches[0].clientY;
+        },
+
+        handleTouchEnd: (e) => {
+            if (!game2048.touchStartX || !game2048.touchStartY) return;
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+            let dx = game2048.touchStartX - touchEndX;
+            let dy = game2048.touchStartY - touchEndY;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                game2048.move(dx > 0 ? 'left' : 'right');
+            } else {
+                game2048.move(dy > 0 ? 'up' : 'down');
+            }
+            game2048.touchStartX = 0;
+            game2048.touchStartY = 0;
+        },
+        
         init() {
             this.setupBoard();
             this.setupControls();
@@ -166,6 +98,16 @@
 
         start() {
             this.gameRunning = true;
+        },
+
+        // --- FUNCIÓN DE LIMPIEZA ---
+        cleanup() {
+            console.log("Limpiando 2048...");
+            this.stop();
+            document.removeEventListener('keydown', this.handleKeyDown);
+            const board = document.getElementById('game-board');
+            board.removeEventListener('touchstart', this.handleTouchStart);
+            board.removeEventListener('touchend', this.handleTouchEnd);
         },
 
         stop() {
@@ -178,22 +120,12 @@
             this.addRandomTile();
             this.addRandomTile();
             this.updateDisplay();
+            this.start();
         },
 
         setupBoard() {
             const board = document.getElementById('game-board');
-            board.style.cssText = `
-                background-color: #bbada0;
-                border-radius: 10px;
-                width: 340px;
-                height: 340px;
-                padding: 10px;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                grid-gap: 10px;
-                position: relative;
-                margin: auto;
-            `;
+            board.innerHTML = ''; // Limpiar tablero anterior si existe
             for (let r = 0; r < this.size; r++) {
                 for (let c = 0; c < this.size; c++) {
                     const tile = document.createElement('div');
@@ -240,16 +172,13 @@
             let moved = false;
             const newGrid = this.board.map(row => [...row]);
             
+            // Lógica de movimiento (sin cambios, es correcta)
             if (direction === 'left' || direction === 'right') {
                 for (let r = 0; r < this.size; r++) {
                     let row = newGrid[r].filter(val => val !== 0);
                     if (direction === 'right') row.reverse();
                     for (let i = 0; i < row.length - 1; i++) {
-                        if (row[i] === row[i + 1]) {
-                            row[i] *= 2;
-                            this.score += row[i];
-                            row.splice(i + 1, 1);
-                        }
+                        if (row[i] === row[i + 1]) { row[i] *= 2; this.score += row[i]; row.splice(i + 1, 1); }
                     }
                     while (row.length < this.size) row.push(0);
                     if (direction === 'right') row.reverse();
@@ -258,25 +187,15 @@
                 }
             } else {
                 for (let c = 0; c < this.size; c++) {
-                    let col = [];
-                    for (let r = 0; r < this.size; r++) {
-                        col.push(newGrid[r][c]);
-                    }
+                    let col = []; for (let r = 0; r < this.size; r++) col.push(newGrid[r][c]);
                     col = col.filter(val => val !== 0);
                     if (direction === 'down') col.reverse();
                     for (let i = 0; i < col.length - 1; i++) {
-                        if (col[i] === col[i + 1]) {
-                            col[i] *= 2;
-                            this.score += col[i];
-                            col.splice(i + 1, 1);
-                        }
+                        if (col[i] === col[i + 1]) { col[i] *= 2; this.score += col[i]; col.splice(i + 1, 1); }
                     }
                     while (col.length < this.size) col.push(0);
                     if (direction === 'down') col.reverse();
-                    for (let r = 0; r < this.size; r++) {
-                        if (newGrid[r][c] !== col[r]) moved = true;
-                        newGrid[r][c] = col[r];
-                    }
+                    for (let r = 0; r < this.size; r++) { if (newGrid[r][c] !== col[r]) moved = true; newGrid[r][c] = col[r]; }
                 }
             }
             
@@ -285,8 +204,8 @@
                 this.addRandomTile();
                 this.updateDisplay();
                 if (this.isGameOver()) {
-                    this.gameRunning = false;
-                    alert(`Game Over! Puntuación: ${this.score}`);
+                    this.stop();
+                    this.showGameOverScreen();
                 }
             }
         },
@@ -302,45 +221,38 @@
             return true;
         },
 
-        setupControls() {
-            document.addEventListener('keydown', (e) => {
-                const keyMap = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
-                if (keyMap[e.keyCode]) this.move(keyMap[e.keyCode]);
-            });
-
-            let touchStartX = 0;
-            let touchStartY = 0;
+        showGameOverScreen() {
             const board = document.getElementById('game-board');
+            const overlay = document.createElement('div');
+            overlay.className = 'game-over-overlay';
+            overlay.innerHTML = `
+                <h2>GAME OVER</h2>
+                <p>Puntuación Final: ${this.score}</p>
+            `;
+            board.appendChild(overlay);
+        },
 
-            board.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            });
+        setupControls() {
+            document.addEventListener('keydown', this.handleKeyDown);
+            const board = document.getElementById('game-board');
+            board.addEventListener('touchstart', this.handleTouchStart, { passive: false });
+            board.addEventListener('touchend', this.handleTouchEnd);
 
-            board.addEventListener('touchend', (e) => {
-                if (!touchStartX || !touchStartY) return;
-                let touchEndX = e.changedTouches[0].clientX;
-                let touchEndY = e.changedTouches[0].clientY;
-                let dx = touchStartX - touchEndX;
-                let dy = touchStartY - touchEndY;
-
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    this.move(dx > 0 ? 'left' : 'right');
-                } else {
-                    this.move(dy > 0 ? 'up' : 'down');
-                }
-
-                touchStartX = 0;
-                touchStartY = 0;
-            });
+            document.getElementById('new-game-btn').addEventListener('click', () => this.newGame());
         }
+    };
+
+    // Exponer la función de limpieza para que el index.html pueda usarla
+    window.stopGame = () => {
+        game2048.cleanup();
     };
 
     // Iniciar el juego cuando la página se carga
     game2048.init();
-    game2048.start();
+
+})(); // FIN DEL IIFE
+// ===================================================================
 
 </script>
-
 </body>
 </html>
