@@ -115,6 +115,8 @@
                     <div class="game-card" onclick="launchGame('juego-2048')"> <img src="https://z-cdn-media.chatglm.cn/files/d31b0413-87ba-44a1-9d31-da1b454847c2.png?auth_key=1865770278-c22b85a1afde4a7f9095b23d597635bf-0-b6c18309a6f40422f1bf88af9b800fa9" alt="2048"> <div class="game-info"> <h3>2048</h3> <p>Fusiona los números.</p> <span class="play-btn">JUGAR</span> </div> </div>
                     <div class="game-card" onclick="launchGame('juego-spaceinvaders')"> <img src="https://z-cdn-media.chatglm.cn/files/79d99534-3bb5-4f52-a3bc-12fe1430e535.png?auth_key=1865770802-e17a7f9e878f4f11aa1ec353a72022cc-0-78145370a78f05c46e101be682729477" alt="Space Invaders"> <div class="game-info"> <h3>Space Invaders</h3> <p>Defiende la Tierra.</p> <span class="play-btn">JUGAR</span> </div> </div>
                     <div class="game-card" onclick="launchGame('juego-asteroids')"> <img src="https://z-cdn-media.chatglm.cn/files/bda8bb99-ee27-43fc-8b96-71b76d701b4d.png?auth_key=1865771249-5a014f22682c49dea49abc154ca16245-0-b6e57c2dadd96a9ea4d243b66c51989e" alt="Asteroids"> <div class="game-info"> <h3>Asteroids</h3> <p>Navega el espacio.</p> <span class="play-btn">JUGAR</span> </div> </div>
+                    <div class="game-card" onclick="launchGame('juego-idleminer')"> <img src="https://z-cdn-media.chatglm.cn/files/3af612fa-6f4f-43fa-989f-59f2170f764a.png?auth_key=1865772122-d234768be017451a8ece2fe578a718a7-0-6c219e57af3893f00a90a553ea6d2811" alt="Idle Miner"> <div class="game-info"> <h3>Idle Miner</h3> <p>Cava y hazte rico.</p> <span class="play-btn">JUGAR</span> </div> </div>
+                    <div class="game-card" onclick="launchGame('juego-infinitecraft')"> <img src="https://z-cdn-media.chatglm.cn/files/9b2b5a3e-7c0b-484c-9b2f-0e6d8a3b3e5a.png?auth_key=1865772219-3f8e7a5c1d6a4e6c8a8f8d7e5c9e4d-0-6e8d7c9e4d6a4e6c8a8f8d7e5c9e4d" alt="Infinite Craft"> <div class="game-info"> <h3>Infinite Craft</h3> <p>Combina elementos para descubrir nuevos objetos.</p> <span class="play-btn">JUGAR</span> </div> </div>
                 </div>
             </section>
         </main>
@@ -141,7 +143,7 @@
 
 <script>
 // ===================================================================
-// MANEJADOR DE JUEGOS Y LÓGICA PRINCIPAL
+// MANEJADOR DE JUEGOS Y LÓGICA PRINCIPAL (MEJORADO)
 // ===================================================================
 const catalogView = document.getElementById('catalog-view');
 const gameViewer = document.getElementById('game-viewer');
@@ -153,7 +155,6 @@ let animationFrameId = null;
 function launchGame(gameName) {
     // Detener el juego actual si hay uno
     if (currentGame) {
-        // Intentar detener el juego actual si existe una función de detención
         if (typeof window.stopGame === 'function') {
             window.stopGame();
         }
@@ -164,7 +165,11 @@ function launchGame(gameName) {
 
     // Limpiar contenido anterior
     gameContainer.innerHTML = '<div class="loading-indicator">Cargando juego...</div>';
-    document.querySelectorAll('.d-pad button').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
+    // Limpiar listeners de controles táctiles antiguos
+    document.querySelectorAll('.d-pad button').forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+    });
 
     // Ocultar catálogo, mostrar visor
     catalogView.classList.add('hidden');
@@ -177,46 +182,50 @@ function launchGame(gameName) {
 }
 
 function loadGameFromHTML(gameName) {
-    // Construir la URL del archivo del juego
     const gameUrl = `${gameName}.html`;
     
-    // Usar fetch para cargar el contenido del juego
     fetch(gameUrl)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`No se pudo cargar el juego: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.text();
         })
         .then(html => {
-            // Extraer el contenido del body del HTML cargado
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
+
+            // Actualizar el título de la página
+            const gameTitle = doc.querySelector('title');
+            if (gameTitle) {
+                document.title = gameTitle.textContent;
+            }
+
+            // Extraer el contenido del body del HTML cargado
             const gameContent = doc.body.innerHTML;
+            gameContainer.innerHTML = gameContent;
             
             // Extraer y ejecutar los scripts del juego
             const scripts = doc.querySelectorAll('script');
-            
-            // Insertar el contenido del juego en el contenedor
-            gameContainer.innerHTML = gameContent;
-            
-            // Ejecutar los scripts del juego
-            scripts.forEach(script => {
+            scripts.forEach(oldScript => {
                 const newScript = document.createElement('script');
-                if (script.src) {
-                    newScript.src = script.src;
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
                 } else {
-                    newScript.textContent = script.textContent;
+                    newScript.textContent = oldScript.textContent;
                 }
+                // Importante: async=false para que se ejecuten en orden
+                newScript.async = false;
                 document.body.appendChild(newScript);
             });
         })
         .catch(error => {
             console.error('Error al cargar el juego:', error);
             gameContainer.innerHTML = `
-                <div class="error-message">
+                <div class="error-message" style="color: var(--secondary-color); font-family: 'Orbitron', sans-serif; text-align: center;">
                     <h2>Error al cargar el juego</h2>
-                    <p>No se pudo cargar el juego ${gameName}. Por favor, inténtalo de nuevo más tarde.</p>
+                    <p>No se pudo cargar el archivo <strong>${gameName}.html</strong>.</p>
+                    <p>Verifica que el archivo exista y que estés usando un servidor local.</p>
                     <button onclick="backToArcade()" class="new-game-btn">Volver al catálogo</button>
                 </div>
             `;
@@ -224,9 +233,7 @@ function loadGameFromHTML(gameName) {
 }
 
 function backToArcade() {
-    // Detener el juego actual
     if (currentGame) {
-        // Intentar detener el juego actual si existe una función de detención
         if (typeof window.stopGame === 'function') {
             window.stopGame();
         }
@@ -235,11 +242,13 @@ function backToArcade() {
         }
     }
     
-    // Ocultar visor, mostrar catálogo
     gameViewer.classList.add('hidden');
     catalogView.classList.remove('hidden');
-    touchControls.style.display = 'none'; // Ocultar controles táctiles por defecto
+    touchControls.style.display = 'none';
     currentGame = null;
+    
+    // Restaurar el título original
+    document.title = 'Ed Arcade - Juega Instantáneamente';
     
     // Limpiar el contenedor del juego
     gameContainer.innerHTML = '<div class="loading-indicator">Cargando juego...</div>';
