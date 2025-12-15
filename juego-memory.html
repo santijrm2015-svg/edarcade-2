@@ -8,8 +8,6 @@
     <style>
         :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --primary-color: #00d4ff; --secondary-color: #ff006e; }
         body { background-color: var(--bg-color); color: #e0e0e0; font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .game-header { position: absolute; top: 20px; left: 20px; z-index: 100; }
-        .game-header a { font-family: 'Orbitron', sans-serif; color: var(--primary-color); text-decoration: none; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
         .game-container { text-align: center; width: 100%; max-width: 500px; padding: 1rem; }
         .game-container h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
         .game-info { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; margin-bottom: 1rem; }
@@ -26,27 +24,127 @@
     </style>
 </head>
 <body>
-    <div class="game-header"><a href="index.html"><span>&larr;</span><span>Volver al Arcade</span></a></div>
     <div class="game-container">
         <h1>Memory Matrix</h1>
         <div class="game-info">Movimientos: <span id="moves">0</span></div>
         <div class="game-board" id="gameBoard"></div>
     </div>
+
     <script>
-        const gameBoard = document.getElementById('gameBoard'); const movesDisplay = document.getElementById('moves');
-        const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮']; let cards = [...emojis, ...emojis]; let moves = 0; let firstCard = null; let secondCard = null; let lockBoard = false;
-        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
-        function createCard(emoji) { const card = document.createElement('div'); card.classList.add('card'); card.innerHTML = `<div class="card-front"></div><div class="card-back">${emoji}</div>`; 
-            card.addEventListener('click', flipCard); 
-            card.addEventListener('touchstart', (e) => { e.preventDefault(); flipCard.call(card, e); });
-            return card; }
-        function flipCard() { if (lockBoard) return; if (this === firstCard) return; this.classList.add('flipped'); if (!firstCard) { firstCard = this; return; } secondCard = this; moves++; movesDisplay.textContent = moves; checkForMatch(); }
-        function checkForMatch() { const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent; isMatch ? disableCards() : unflipCards(); }
-        function disableCards() { firstCard.removeEventListener('click', flipCard); firstCard.removeEventListener('touchstart', flipCard); secondCard.removeEventListener('click', flipCard); secondCard.removeEventListener('touchstart', flipCard); resetBoard(); }
-        function unflipCards() { lockBoard = true; setTimeout(() => { firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); resetBoard(); }, 1000); }
-        function resetBoard() { [firstCard, secondCard] = [null, null]; lockBoard = false; }
-        function startGame() { shuffle(cards); cards.forEach(emoji => gameBoard.appendChild(createCard(emoji))); }
+    // ===================================================================
+    // INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
+    // ===================================================================
+    (function() {
+        'use strict';
+
+        // --- VARIABLES DEL JUEGO (AHORA PRIVADAS) ---
+        const gameBoard = document.getElementById('gameBoard');
+        const movesDisplay = document.getElementById('moves');
+        const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮'];
+        let cards = [...emojis, ...emojis];
+        let moves = 0;
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let unflipTimeoutId = null; // Para almacenar el ID del timeout
+
+        // --- FUNCIONES DEL JUEGO ---
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Función de evento nombrada para poder ser eliminada
+        function flipCard(e) {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flipped');
+
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            moves++;
+            movesDisplay.textContent = moves;
+            checkForMatch();
+        }
+
+        function createCard(emoji) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.innerHTML = `<div class="card-front"></div><div class="card-back">${emoji}</div>`;
+            
+            // Añadir listeners usando la función nombrada
+            card.addEventListener('click', flipCard);
+            card.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                flipCard.call(card, e);
+            });
+            return card;
+        }
+
+        function checkForMatch() {
+            const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            firstCard.removeEventListener('touchstart', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('touchstart', flipCard);
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            // Guardar el ID del timeout para poder limpiarlo
+            unflipTimeoutId = setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [firstCard, secondCard] = [null, null];
+            lockBoard = false;
+        }
+
+        function startGame() {
+            shuffle(cards);
+            cards.forEach(emoji => gameBoard.appendChild(createCard(emoji)));
+        }
+        
+        // --- FUNCIÓN DE LIMPIEZA PROPIA DEL JUEGO ---
+        window.stopGame = function() {
+            console.log("Deteniendo Memory Matrix...");
+            
+            // Limpiar el timeout si está activo
+            clearTimeout(unflipTimeoutId);
+            
+            // Eliminar los event listeners de todas las cartas
+            const allCards = gameBoard.querySelectorAll('.card');
+            allCards.forEach(card => {
+                card.removeEventListener('click', flipCard);
+                card.removeEventListener('touchstart', flipCard);
+            });
+
+            // Limpiar el tablero
+            gameBoard.innerHTML = '';
+        };
+
+        // --- INICIALIZACIÓN DEL JUEGO ---
         startGame();
+
+    })(); // FIN DEL IIFE
+    // ===================================================================
+
     </script>
 </body>
 </html>
