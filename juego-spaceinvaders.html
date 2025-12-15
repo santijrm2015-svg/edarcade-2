@@ -3,137 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invaders - Ed Arcade</title>
+    <title>Space Invaders - Arcade Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0a0a0f;
-            --card-bg: #1a1a2e;
-            --text-color: #e0e0e0;
-            --primary-color: #00d4ff;
-            --secondary-color: #ff006e;
-            --accent-color: #fb5607;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1, h2, h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-        .game-header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-        }
-        .game-header a {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .game-container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-        }
-        .game-container h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
-        }
-        #gameCanvas {
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-            background-color: #111;
-            max-width: 100%;
-            height: auto;
-        }
-        .game-controls {
-            margin-top: 1.5rem;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-        }
+        :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --text-color: #e0e0e0; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
+        .game-container { text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; }
+        .game-container h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
+        #gameCanvas { border: 2px solid var(--primary-color); border-radius: 10px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); background-color: #000; max-width: 100%; height: auto; }
+        .game-controls { margin-top: 1.5rem; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; }
         /* Controles Táctiles para Móvil */
-        .touch-controls {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-        }
-        .d-pad {
-            position: relative;
-            width: 150px;
-            height: 150px;
-        }
-        .d-pad button {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 212, 255, 0.3);
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            color: var(--primary-color);
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .d-pad button:active {
-            background: rgba(0, 212, 255, 0.6);
-        }
-        .d-pad .up { top: 0; left: 50px; }
-        .d-pad .down { bottom: 0; left: 50px; }
-        .d-pad .left { top: 50px; left: 0; }
-        .d-pad .right { top: 50px; right: 0; }
-        @media (max-width: 768px) {
-            .touch-controls {
-                display: block;
-            }
-            .game-controls {
-                display: none;
-            }
-        }
+        .touch-controls { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .d-pad { position: relative; width: 150px; height: 150px; }
+        .d-pad button { position: absolute; width: 50px; height: 50px; background: rgba(0, 212, 255, 0.3); border: 2px solid var(--primary-color); border-radius: 10px; color: var(--primary-color); font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+        .d-pad button:active { background: rgba(0, 212, 255, 0.6); }
+        .d-pad .up { top: 0; left: 50px; } .d-pad .down { bottom: 0; left: 50px; }
+        .d-pad .left { top: 50px; left: 0; } .d-pad .right { top: 50px; right: 0; }
+        .d-pad .fire { top: 50px; left: 50px; background: rgba(255, 0, 110, 0.3); border-color: var(--secondary-color); color: var(--secondary-color); width: 50px; height: 50px; border-radius: 50%; }
+        .d-pad .fire:active { background: rgba(255, 0, 110, 0.6); }
+        @media (max-width: 768px) { .touch-controls { display: block; } .game-controls { display: none; } }
     </style>
 </head>
 <body>
-
-    <div class="game-header">
-        <a href="index.html"><span>&larr;</span><span>Volver al Arcade</span></a>
-    </div>
-
     <div class="game-container">
         <h1>Space Invaders</h1>
-        <canvas id="gameCanvas" width="500" height="300"></canvas>
-        <div class="game-controls">
-            <p>Flechas para mover, Espacio para disparar</p>
-        </div>
+        <canvas id="gameCanvas" width="600" height="500"></canvas>
+        <div class="game-controls"><p>Flechas para mover, Espacio para disparar</p></div>
     </div>
 
     <!-- Controles Táctiles para Móvil -->
@@ -143,175 +40,560 @@
             <button class="down" data-direction="down">↓</button>
             <button class="left" data-direction="left">←</button>
             <button class="right" data-direction="right">→</button>
+            <button class="fire" data-direction="fire">FUEGO</button>
         </div>
     </div>
 
 <script>
-    // --- LÓGICA DEL JUEGO SPACE INVADERS ---
+// ===================================================================
+// INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
+// ===================================================================
+(function() {
+    'use strict';
+
+    // --- VARIABLES DEL JUEGO ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    
+    // Constantes del juego
+    const PLAYER_WIDTH = 40;
+    const PLAYER_HEIGHT = 25;
+    const INVADER_WIDTH = 25;
+    const INVADER_HEIGHT = 20;
+    const BULLET_WIDTH = 4;
+    const BULLET_HEIGHT = 10;
+    const BUNKER_WIDTH = 60;
+    const BUNKER_HEIGHT = 40;
 
-    const player = {
-        x: 230,
-        y: 270,
-        width: 30,
-        height: 20
-    };
-    let bullets = [];
-    let invaders = [];
-    let invaderDirection = 1;
+    // Estado del juego
+    let gameState = 'start'; // 'start', 'playing', 'gameOver', 'levelComplete'
+    let score = 0;
+    let lives = 3;
+    let level = 1;
+    let invaderSpeed = 0.5;
     let invaderDropDistance = 20;
-    let gameRunning = false;
-    let animationFrameId = null;
+    let invaderDirection = 1;
+    let invaderAnimationFrame = 0;
+    let lastShotTime = 0;
+    const SHOT_COOLDOWN = 300; // en milisegundos
 
+    // Entidades del juego
+    const player = {
+        x: canvas.width / 2 - PLAYER_WIDTH / 2,
+        y: canvas.height - 60,
+        width: PLAYER_WIDTH,
+        height: PLAYER_HEIGHT,
+        speed: 5,
+        isHit: false,
+        invulnerableTime: 0
+    };
+
+    let bullets = [];
+    let alienBullets = [];
+    let invaders = [];
+    let bunkers = [];
+    let particles = []; // Para efectos de explosión
+    let stars = []; // Para el fondo de estrellas
+
+    // --- FUNCIONES DE INICIALIZACIÓN ---
     function init() {
+        createStars();
+        createBunkers();
+        setupControls();
+        resetGame();
+    }
+
+    function startGame() {
+        resetGame();
+        gameState = 'playing';
+        gameLoop();
+    }
+
+    function resetGame() {
+        score = 0;
+        lives = 3;
+        level = 1;
+        invaderSpeed = 0.5;
+        player.x = canvas.width / 2 - PLAYER_WIDTH / 2;
+        player.isHit = false;
+        player.invulnerableTime = 0;
+        bullets = [];
+        alienBullets = [];
+        particles = [];
+        createInvaders();
+        createBunkers();
+    }
+
+    function nextLevel() {
+        level++;
+        invaderSpeed += 0.3; // Aumenta la dificultad
+        bullets = [];
+        alienBullets = [];
+        particles = [];
+        createInvaders();
+        createBunkers();
+        gameState = 'playing'; // Continúa al siguiente nivel
+    }
+    
+    function createStars() {
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                brightness: Math.random()
+            });
+        }
+    }
+
+    function createInvaders() {
         invaders = [];
-        for(let r = 0; r < 4; r++) {
-            for(let c = 0; c < 8; c++) {
+        for(let r = 0; r < 5; r++) {
+            for(let c = 0; c < 11; c++) {
                 invaders.push({
-                    x: c * 40 + 50,
-                    y: r * 30 + 30,
-                    width: 25,
-                    height: 20,
+                    x: c * (INVADER_WIDTH + 10) + 35,
+                    y: r * (INVADER_HEIGHT + 15) + 50,
+                    width: INVADER_WIDTH,
+                    height: INVADER_HEIGHT,
+                    type: r < 1 ? 'squid' : (r < 3 ? 'crab' : 'octopus'), // Diferentes tipos
                     alive: true
                 });
             }
         }
-        setupControls();
+    }
+    
+    function createBunkers() {
+        bunkers = [];
+        const bunkerCount = 4;
+        const spacing = canvas.width / (bunkerCount + 1);
+        for (let i = 1; i <= bunkerCount; i++) {
+            bunkers.push({
+                x: spacing * i - BUNKER_WIDTH / 2,
+                y: canvas.height - 150,
+                width: BUNKER_WIDTH,
+                height: BUNKER_HEIGHT,
+                blocks: createBunkerBlocks()
+            });
+        }
     }
 
-    function start() {
-        bullets = [];
-        gameRunning = true;
-        gameLoop();
+    function createBunkerBlocks() {
+        // Matriz para representar los bloques del búnker (1 = bloque, 0 = vacío)
+        return [
+            [0,0,1,1,1,1,1,1,0,0],
+            [0,1,1,1,1,1,1,1,1,0],
+            [1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,0,0,0,0,1,1,1],
+            [1,1,0,0,0,0,0,0,1,1]
+        ];
     }
 
-    function stop() {
-        gameRunning = false;
-    }
-
+    // --- BUCLE PRINCIPAL DEL JUEGO ---
     function gameLoop() {
-        if (!gameRunning) return;
+        if (gameState !== 'playing') return;
         update();
         draw();
-        animationFrameId = requestAnimationFrame(() => gameLoop());
+        requestAnimationFrame(gameLoop);
     }
 
+    // --- LÓGICA DE ACTUALIZACIÓN ---
     function update() {
-        // Mover jugador
-        // (La lógica de movimiento del jugador se manejará con los controles táctiles y de teclado)
-    }
-
-    function draw() {
-        ctx.fillStyle = '#111';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Dibujar jugador
-        ctx.fillStyle = '#0f0';
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-
-        // Dibujar invasores
-        ctx.fillStyle = '#f00';
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                ctx.fillRect(inv.x, inv.y, inv.width, inv.height);
-            }
-        });
-
-        // Dibujar balas
-        ctx.fillStyle = '#ff0';
-        bullets.forEach(b => {
-            ctx.fillRect(b.x, b.y, 4, 10);
-        });
-    }
-
-    function setupControls() {
-        document.addEventListener('keydown', (e) => {
-            if (e.keyCode === 37 && player.x > 0) {
-                player.x -= 10;
-            }
-            if (e.keyCode === 39 && player.x < canvas.width - player.width) {
-                player.x += 10;
-            }
-            if (e.keyCode === 32) {
-                bullets.push({
-                    x: player.x + player.width / 2 - 2,
-                    y: player.y,
-                    hit: false
-                });
-            }
-        });
-
-        // Controles Táctiles
-        touchControls.style.display = 'block';
-        document.querySelectorAll('.d-pad button').forEach(button => {
-            button.addEventListener('click', () => {
-                const direction = button.dataset.direction;
-                handlePlayerInput(direction);
-            });
-            button.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handlePlayerInput(button.dataset.direction);
-            });
-        });
-    }
-
-    function handlePlayerInput(direction) {
-        if (direction === 'left') {
-            player.x -= 10;
-        } else if (direction === 'right') {
-            player.x += 10;
-        }
-        }
+        // Actualizar animaciones
+        invaderAnimationFrame = (invaderAnimationFrame + 1) % 60;
         
-        // La lógica de disparo
-        if (direction === 'fire') {
-            bullets.push({
-                x: player.x + player.width / 2 - 2,
-                y: player.y,
-                hit: false
-            });
-        }
-    }
+        // Actualizar estrellas
+        stars.forEach(star => {
+            star.brightness += (Math.random() - 0.5) * 0.1;
+            star.brightness = Math.max(0.3, Math.min(1, star.brightness));
+        });
 
-    // Lógica de juego (movimiento de invasores y colisiones)
-    function updateGame() {
+        // Actualizar jugador
+        if (player.isHit && Date.now() - player.invulnerableTime > 2000) {
+            player.isHit = false;
+        }
+
+        // Mover balas del jugador
+        bullets = bullets.filter(b => b.y > 0 && !b.hit);
+        bullets.forEach(b => b.y -= 10);
+
+        // Mover balas de los alienígenas
+        alienBullets = alienBullets.filter(b => b.y < canvas.height);
+        alienBullets.forEach(b => b.y += 5);
+
+        // Lógica de disparo de los alienígenas (más frecuente en niveles altos)
+        invaders.forEach(inv => {
+            if (inv.alive && Math.random() < 0.001 * level) {
+                alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
+            }
+        });
+
+        // Mover invasores
         let edge = false;
         invaders.forEach(inv => {
             if (inv.alive) {
-                inv.x += invaderDirection * 0.5;
-                if (inv.x <= 0 || inv.x + inv.width >= canvas.width) {
-                    edge = true;
-                }
+                inv.x += invaderDirection * invaderSpeed;
+                if (inv.x <= 0 || inv.x + inv.width >= canvas.width) edge = true;
             }
         });
         if (edge) {
             invaderDirection *= -1;
-            invaders.forEach(inv => {
-                inv.y += invaderDropDistance;
-            });
+            invaders.forEach(inv => inv.y += invaderDropDistance);
         }
         
-        bullets = bullets.filter(b => b.y > 0 && !b.hit);
-        bullets.forEach(b => {
-            b.y -= 5;
+        // Actualizar partículas de explosión
+        particles = particles.filter(p => p.life > 0);
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
         });
+        
+        // --- DETECCIÓN DE COLISIONES ---
+        checkCollisions();
+
+        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA ---
+        if (invaders.filter(inv => inv.alive).length === 0) {
+            gameState = 'levelComplete';
+            setTimeout(() => nextLevel(), 2000); // Pausa antes del siguiente nivel
+        }
+
+        if (lives <= 0) {
+            gameState = 'gameOver';
+        }
+    }
+
+    function checkCollisions() {
+        // 1. Balas del jugador vs. Invasores
         bullets.forEach(b => {
             invaders.forEach(inv => {
-                if (inv.alive && b.x < inv.x + inv.width && b.x + 4 > inv.x && b.y < inv.y + inv.height && b.y + 10 > inv.y) {
+                if (inv.alive && b.x < inv.x + inv.width && b.x + BULLET_WIDTH > inv.x && b.y < inv.y + inv.height && b.y + BULLET_HEIGHT > inv.y) {
                     inv.alive = false;
                     b.hit = true;
+                    score += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
+                    createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2);
                 }
             });
         });
-        invaders = invaders.filter(inv => inv.alive);
+
+        // 2. Balas de invasores vs. Jugador
+        if (!player.isHit) {
+            alienBullets.forEach(b => {
+                if (b.x < player.x + player.width && b.x + BULLET_WIDTH > player.x && b.y < player.y + player.height && b.y + BULLET_HEIGHT > player.y) {
+                    lives--;
+                    player.isHit = true;
+                    player.invulnerableTime = Date.now();
+                    alienBullets = alienBullets.filter(bullet => bullet !== b); // Eliminar la bala que impactó
+                    createExplosion(player.x + player.width / 2, player.y + player.height / 2);
+                }
+            });
+        }
+
+        // 3. Invasores vs. Jugador (si llegan a tu línea)
+        invaders.forEach(inv => {
+            if (inv.alive && inv.y + inv.height >= player.y) {
+                gameState = 'gameOver';
+            }
+        });
+
+        // 4. Balas vs. Búnkeres
+        bullets.forEach(b => {
+            bunkers.forEach(bunker => {
+                checkBunkerCollision(bunker, b);
+            });
+        });
+        alienBullets.forEach(b => {
+            bunkers.forEach(bunker => {
+                checkBunkerCollision(bunker, b);
+            });
+        });
     }
 
-    // Iniciar el juego cuando se carga la página
+    function checkBunkerCollision(bunker, bullet) {
+        const blockWidth = bunker.width / bunker.blocks[0].length;
+        const blockHeight = bunker.height / bunker.blocks.length;
+        const bCol = Math.floor((bullet.x - bunker.x) / blockWidth);
+        const bRow = Math.floor((bullet.y - bunker.y) / blockHeight);
+
+        if (bRow >= 0 && bRow < bunker.blocks.length && bCol >= 0 && bCol < bunker.blocks[0].length) {
+            if (bunker.blocks[bRow][bCol] === 1) {
+                bunker.blocks[bRow][bCol] = 0;
+                bullet.hit = true; // Marcar la bala para ser eliminada
+                // Pequeña explosión en el bloque
+                for(let i = 0; i < 3; i++) {
+                    particles.push({
+                        x: bullet.x,
+                        y: bullet.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 15,
+                        color: '#0f0'
+                    });
+                }
+            }
+        }
+    }
+
+    function createExplosion(x, y) {
+        for(let i = 0; i < 15; i++) {
+            particles.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 30,
+                color: `hsl(${Math.random() * 60 + 15}, 100%, 50%)` // Colores amarillo/naranja
+            });
+        }
+    }
+
+    // --- LÓGICA DE DIBUJO ---
+    function draw() {
+        // Limpiar lienzo
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Dibujar estrellas de fondo
+        drawStars();
+
+        // Dibujar entidades del juego
+        drawBunkers();
+        drawPlayer();
+        drawInvaders();
+        drawBullets();
+        drawParticles();
+        drawUI();
+
+        // Dibujar pantallas de estado
+        if (gameState === 'start') drawStartScreen();
+        if (gameState === 'gameOver') drawGameOverScreen();
+        if (gameState === 'levelComplete') drawLevelCompleteScreen();
+    }
+    
+    function drawStars() {
+        ctx.fillStyle = '#fff';
+        stars.forEach(star => {
+            ctx.globalAlpha = star.brightness;
+            ctx.fillRect(star.x, star.y, star.size, star.size);
+        });
+        ctx.globalAlpha = 1;
+    }
+
+    function drawPlayer() {
+        if (player.isHit && Math.floor(Date.now() / 100) % 2 === 0) {
+            return; // Efecto de parpadeo cuando es vulnerable
+        }
+        
+        ctx.fillStyle = '#0ff'; // Cian brillante
+        // Base de la nave
+        ctx.fillRect(player.x + 10, player.y + 15, 20, 10);
+        // Cañón
+        ctx.fillRect(player.x + 18, player.y + 5, 4, 15);
+        // Alas
+        ctx.beginPath();
+        ctx.moveTo(player.x, player.y + 15);
+        ctx.lineTo(player.x + 10, player.y + 15);
+        ctx.lineTo(player.x + 10, player.y + 25);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(player.x + PLAYER_WIDTH, player.y + 15);
+        ctx.lineTo(player.x + 30, player.y + 15);
+        ctx.lineTo(player.x + 30, player.y + 25);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function drawInvaders() {
+        invaders.forEach(inv => {
+            if (inv.alive) {
+                const frame = Math.floor(invaderAnimationFrame / 30) % 2;
+                ctx.fillStyle = '#fff';
+                drawInvaderShape(inv, frame);
+            }
+        });
+    }
+
+    function drawInvaderShape(invader, frame) {
+        const x = invader.x;
+        const y = invader.y;
+        ctx.save();
+        ctx.translate(x + invader.width / 2, y + invader.height / 2);
+
+        if (invader.type === 'squid') {
+            // Dibujo simplificado de un 'calamar'
+            ctx.fillRect(-10, -5, 20, 3);
+            ctx.fillRect(-8, -2, 3, 5);
+            ctx.fillRect(5, -2, 3, 5);
+            ctx.fillRect(-5, 3, 10, 3);
+            if (frame === 1) {
+                ctx.fillRect(-10, -8, 3, 3);
+                ctx.fillRect(7, -8, 3, 3);
+            }
+        } else if (invader.type === 'crab') {
+            // Dibujo simplificado de un 'cangrejo'
+            ctx.fillRect(-10, -5, 20, 3);
+            ctx.fillRect(-10, 0, 20, 3);
+            ctx.fillRect(-12, -5, 3, 8);
+            ctx.fillRect(9, -5, 3, 8);
+            if (frame === 1) {
+                ctx.fillRect(-5, 3, 3, 3);
+                ctx.fillRect(2, 3, 3, 3);
+            }
+        } else { // octopus
+            // Dibujo simplificado de un 'pulpo'
+            ctx.fillRect(-10, -5, 20, 5);
+            ctx.fillRect(-5, 0, 10, 5);
+            if (frame === 1) {
+                ctx.fillRect(-12, -5, 3, 3);
+                ctx.fillRect(9, -5, 3, 3);
+                ctx.fillRect(-12, 2, 3, 3);
+                ctx.fillRect(9, 2, 3, 3);
+            }
+        }
+        ctx.restore();
+    }
+
+    function drawBunkers() {
+        ctx.fillStyle = '#0f0'; // Verde clásico de los búnkeres
+        bunkers.forEach(bunker => {
+            const blockWidth = bunker.width / bunker.blocks[0].length;
+            const blockHeight = bunker.height / bunker.blocks.length;
+            bunker.blocks.forEach((row, r) => {
+                row.forEach((block, c) => {
+                    if (block === 1) {
+                        ctx.fillRect(bunker.x + c * blockWidth, bunker.y + r * blockHeight, blockWidth, blockHeight);
+                    }
+                });
+            });
+        });
+    }
+
+    function drawBullets() {
+        // Balas del jugador
+        ctx.fillStyle = '#ff0'; // Amarillo neón
+        bullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
+        // Balas de los invasores
+        ctx.fillStyle = '#f00'; // Rojo neón
+        alienBullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
+    }
+    
+    function drawParticles() {
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life / 30;
+            ctx.fillRect(p.x, p.y, 3, 3);
+        });
+        ctx.globalAlpha = 1;
+    }
+
+    function drawUI() {
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px Orbitron';
+        ctx.textAlign = 'left';
+        ctx.fillText(`PUNTUACIÓN: ${score}`, 10, 30);
+        ctx.textAlign = 'right';
+        ctx.fillText(`NIVEL: ${level}`, canvas.width - 10, 30);
+        ctx.fillText(`VIDAS: ${lives}`, canvas.width - 10, 55);
+    }
+
+    function drawStartScreen() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0ff';
+        ctx.font = '50px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.fillText('SPACE INVADERS', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.font = '20px Orbitron';
+        ctx.fillText('Presiona ENTER para Jugar', canvas.width / 2, canvas.height / 2 + 20);
+    }
+
+    function drawGameOverScreen() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f00';
+        ctx.font = '60px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 30);
+        ctx.fillStyle = '#fff';
+        ctx.font = '25px Orbitron';
+        ctx.fillText(`Puntuación Final: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+        ctx.font = '20px Orbitron';
+        ctx.fillText('Presiona ENTER para Jugar de Nuevo', canvas.width / 2, canvas.height / 2 + 60);
+    }
+
+    function drawLevelCompleteScreen() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0f0';
+        ctx.font = '50px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.fillText(`NIVEL ${level} COMPLETADO`, canvas.width / 2, canvas.height / 2);
+    }
+
+    // --- MANEJO DE EVENTOS ---
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            if (gameState === 'start' || gameState === 'gameOver') {
+                startGame();
+            }
+            return;
+        }
+
+        if (gameState !== 'playing') return;
+
+        if (e.key === 'ArrowLeft' && player.x > 0) player.x -= player.speed;
+        if (e.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += player.speed;
+        
+        if (e.key === ' ') {
+            e.preventDefault(); // Evita que la página se desplace
+            const now = Date.now();
+            if (now - lastShotTime > SHOT_COOLDOWN) {
+                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
+                lastShotTime = now;
+            }
+        }
+    };
+
+    const handleInput = (action) => {
+        if (gameState !== 'playing') return;
+        if (action === 'left' && player.x > 0) player.x -= player.speed;
+        else if (action === 'right' && player.x < canvas.width - player.width) player.x += player.speed;
+        else if (action === 'fire') {
+            const now = Date.now();
+            if (now - lastShotTime > SHOT_COOLDOWN) {
+                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
+                lastShotTime = now;
+            }
+        }
+    };
+    
+    const setupControls = () => {
+        document.addEventListener('keydown', handleKeyDown);
+        document.querySelectorAll('.d-pad button').forEach(button => {
+            button.addEventListener('click', () => handleInput(button.dataset.direction));
+            button.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput(button.dataset.direction); });
+        });
+    };
+
+    // --- FUNCIÓN DE LIMPIEZA ---
+    window.stopGame = function() {
+        console.log("Deteniendo Space Invaders...");
+        gameState = 'stopped';
+        document.removeEventListener('keydown', handleKeyDown);
+        document.querySelectorAll('.d-pad button').forEach(button => {
+            button.removeEventListener('click', () => handleInput(button.dataset.direction));
+            button.removeEventListener('touchstart', (e) => { e.preventDefault(); handleInput(button.dataset.direction); });
+        });
+    };
+
+    // --- INICIALIZACIÓN ---
     init();
-    start();
+    draw(); // Dibuja la pantalla de inicio inicialmente
+
+})(); // FIN DEL IIFE
+// ===================================================================
 
 </script>
-
 </body>
 </html>
