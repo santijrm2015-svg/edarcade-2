@@ -3,529 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ed TV</title>
+    <title>Asteroids - Un Solo Archivo</title>
     <style>
-        /* --- ESTILOS GLOBALES Y CLON DE OME TV --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Estilos CSS para que se vea bien */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #000;
-            color: #fff;
-            overflow: hidden;
+            color: #0f0; /* Verde clásico de arcade */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            display: flex;
-        }
-
-        /* --- LADO IZQUIERDO (INTERFAZ DE USUARIO) --- */
-        .user-interface {
-            width: 30%;
-            min-width: 300px;
-            background-color: #111;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo-section {
+            margin: 0;
             text-align: center;
-            margin-bottom: 40px; /* Aumenté el margen para rellenar el espacio */
+            overflow: hidden; /* Evita barras de scroll */
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+        h1 {
             margin-bottom: 10px;
+            text-shadow: 0 0 10px #0f0;
         }
 
-        .logo i {
-            color: #ff9500;
-            margin-right: 10px;
-            font-size: 2rem;
-        }
-
-        .online-users {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        .active-viewers {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        /* Sección de botones de descarga eliminada */
-
-        .control-buttons {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            gap: 10px;
-        }
-
-        .control-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            background-color: #ff9500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .control-btn:hover {
-            background-color: #e68500;
-            transform: translateY(-2px);
-        }
-
-        .control-btn.stop {
-            background-color: #d32f2f;
-        }
-
-        .control-btn.stop:hover {
-            background-color: #b71c1c;
-        }
-
-        /* --- LADO DERECHO (VIDEO Y CHAT) --- */
-        .video-chat-area {
-            flex-grow: 1;
-            position: relative;
+        canvas {
+            border: 2px solid #0f0;
             background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            box-shadow: 0 0 20px #0f0;
         }
 
-        /* --- VIDEOS --- */
-        #strangerVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        #gameInfo {
             position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2em;
         }
 
-        #userVideo {
+        #gameOverScreen {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 200px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #ff9500;
-            z-index: 3;
-            display: none;
-        }
-        
-        /* --- MENSAJES Y CONTROLES SOBRE EL VIDEO --- */
-        .overlay-message {
-            position: absolute;
-            bottom: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border: 2px solid #0f0;
             text-align: center;
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px 30px;
-            border-radius: 10px;
-            z-index: 4;
+            display: none; /* Oculto por defecto */
         }
 
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 4;
-            display: none;
+        #gameOverScreen h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #f00;
+            text-shadow: 0 0 10px #f00;
         }
 
-        .top-controls button {
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
+        #restartBtn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Courier New', Courier, monospace;
             cursor: pointer;
-            margin-left: 15px;
-            padding: 8px;
+            background-color: #111;
+            color: #0f0;
+            border: 2px solid #0f0;
             border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .top-controls button:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-        .top-controls button.active {
-            color: #ff9500;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .report-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 5px;
-            z-index: 4;
-            display: none;
+        #restartBtn:hover {
+            background-color: #0f0;
+            color: #000;
         }
-        .report-btn:hover {
-            color: #d32f2f;
-        }
-
-        /* --- CHAT --- */
-        .chat-overlay {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 40%;
-            max-width: 450px;
-            height: 50%;
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 4;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message.you {
-            background-color: #007aff;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        .message.stranger {
-            background-color: #333;
-            align-self: flex-start;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #444;
-        }
-
-        .chat-input-area input {
-            flex-grow: 1;
-            padding: 8px;
-            border: 1px solid #555;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 15px;
-            outline: none;
-        }
-
-        /* --- MODALS --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #222;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .modal-content ul {
-            list-style: none;
-            text-align: left;
-            padding: 0;
-        }
-        .modal-content li {
-            padding: 10px;
-            border-bottom: 1px solid #444;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .modal-content li:hover {
-            background-color: #333;
-        }
-        .close-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal:hover { color: #fff; }
-
     </style>
-    <!-- Font Awesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <!-- Lado Izquierdo: Interfaz de Usuario -->
-    <div class="user-interface">
-        <div class="logo-section">
-            <div class="logo">
-                <i class="fas fa-tv"></i>
-                <span>Ed TV</span>
-            </div>
-            <div class="online-users" id="globalUsersCount">312.931 usuarios en línea</div>
-            <div class="active-viewers" id="activeViewersCount">0 espectadores activos</div>
-        </div>
+    <h1>ASTEROIDS</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-        <!-- SECCIÓN DE BOTONES DE DESCARGA ELIMINADA -->
-
-        <div class="control-buttons">
-            <button class="control-btn" id="startButton">Iniciar</button>
-            <button class="control-btn stop" id="stopButton">Parar</button>
-            <button class="control-btn" id="countryButton">País</button>
-            <button class="control-btn" id="iamButton">Soy</button>
-        </div>
+    <div id="gameInfo">
+        Puntuación: <span id="score">0</span> | Vidas: <span id="lives">3</span>
     </div>
 
-    <!-- Lado Derecho: Video y Chat -->
-    <div class="video-chat-area">
-        <video id="strangerVideo" autoplay muted loop>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-        <video id="userVideo" autoplay muted></video>
-
-        <button class="report-btn" id="reportButton" style="display:none;"><i class="fas fa-flag"></i></button>
-
-        <div id="startPrompt" class="overlay-message">
-            <p>Para comenzar, presiona <strong>Iniciar</strong> y acepta las reglas. Mantén tu cámara visible.</p>
-        </div>
-        
-        <div class="top-controls" id="topControls">
-            <button id="micButton"><i class="fas fa-microphone-slash"></i></button>
-            <button id="fullscreenButton"><i class="fas fa-expand"></i></button>
-            <button id="settingsButton"><i class="fas fa-cog"></i></button>
-        </div>
-
-        <div class="chat-overlay" id="chatOverlay">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-area">
-                <form id="messageForm">
-                    <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('settingsModal')">&times;</span>
-            <h2>Configuración</h2>
-            <p>Ajusta tu experiencia aquí (solo por apariencia).</p>
-        </div>
-    </div>
-    <div id="countryModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('countryModal')">&times;</span>
-            <h2>Selecciona tu país</h2>
-            <ul>
-                <li>España</li>
-                <li>México</li>
-                <li>Argentina</li>
-                <li>Colombia</li>
-                <li>Estados Unidos</li>
-            </ul>
-        </div>
-    </div>
-    <div id="iamModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('iamModal')">&times;</span>
-            <h2>Yo soy...</h2>
-            <ul>
-                <li>Chico</li>
-                <li>Chica</li>
-                <li>Pareja</li>
-            </ul>
-        </div>
+    <div id="gameOverScreen">
+        <h2>GAME OVER</h2>
+        <p>Puntuación Final: <span id="finalScore">0</span></p>
+        <button id="restartBtn">Reiniciar Juego</button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- ELEMENTOS DEL DOM ---
-            const startButton = document.getElementById('startButton');
-            const stopButton = document.getElementById('stopButton');
-            const strangerVideo = document.getElementById('strangerVideo');
-            const userVideo = document.getElementById('userVideo');
-            const startPrompt = document.getElementById('startPrompt');
-            const topControls = document.getElementById('topControls');
-            const chatOverlay = document.getElementById('chatOverlay');
-            const chatMessages = document.getElementById('chatMessages');
-            const messageForm = document.getElementById('messageForm');
-            const messageInput = document.getElementById('messageInput');
-            const micButton = document.getElementById('micButton');
-            const fullscreenButton = document.getElementById('fullscreenButton');
-            const reportButton = document.getElementById('reportButton');
+        // --- JAVASCRIPT ---
 
-            // --- ESTADO Y LÓGICA ---
-            let userStream = null;
-            let audioStream = null;
-            let conversationHistory = [];
-            const API_URL = 'http://localhost:3001/chat';
-            const WS_URL = 'ws://localhost:3001';
+        // 1. CONFIGURACIÓN INICIAL
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const livesEl = document.getElementById('lives');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScoreEl = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
 
-            // --- CONEXIÓN WEBSOCKET PARA CONTEO DE VISTANTES ---
-            const ws = new WebSocket(WS_URL);
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'viewerCount') {
-                    document.getElementById('activeViewersCount').textContent = `${data.count} espectadores activos`;
-                }
-            };
+        // 2. CONSTANTES DEL JUEGO
+        const SHIP_SIZE = 15;
+        const SHIP_THRUST = 0.5;
+        const SHIP_TURN_SPEED = 0.08;
+        const FRICTION = 0.99;
+        const ASTEROID_JAG = 0.4; // Qué tan irregulares son los asteroides
+        const ASTEROID_NUM = 3; // Número inicial de asteroides
+        const ASTEROID_SIZE = 50; // Tamaño del asteroide grande
+        const BULLET_SPEED = 10;
+        const BULLET_MAX_LIFE = 40; // Frames que vive una bala
 
-            // --- SIMULACIÓN DE CONTEO GLOBAL DE USUARIOS ---
-            let globalUsers = 312931;
-            setInterval(() => {
-                const change = Math.floor(Math.random() * 21) - 10;
-                globalUsers += change;
-                if (globalUsers < 300000) globalUsers = 300000;
-                document.getElementById('globalUsersCount').textContent = `${globalUsers.toLocaleString('es-ES')} usuarios en línea`;
-            }, 5000);
+        // 3. VARIABLES DEL JUEGO
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+        let ship, asteroids = [], bullets = [];
+        let gameOver = false;
+        let keys = {};
 
-            // --- FUNCIONES ---
-            const addMessage = (text, sender) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender);
-                messageDiv.textContent = text;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            };
-            
-            const getBotResponse = async (userMessage) => {
-                conversationHistory.push({ role: 'user', content: userMessage });
-                try {
-                    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversationHistory }) });
-                    const data = await response.json();
-                    const botReply = data.reply;
-                    conversationHistory.push({ role: 'assistant', content: botReply });
-                    addMessage(botReply, 'stranger');
-                } catch (error) {
-                    console.error('Error:', error);
-                    addMessage('El extraño se ha desconectado.', 'stranger');
-                }
-            };
+        // 4. CLASES PARA OBJETOS DEL JUEGO
 
-            const startMedia = async () => {
-                try {
-                    userStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    userVideo.srcObject = userStream;
-                    userVideo.style.display = 'block';
-                } catch (error) { console.error("Error de cámara:", error); userVideo.style.display = 'none'; }
-            };
-            const stopMedia = () => {
-                if (userStream) { userStream.getTracks().forEach(t => t.stop()); userStream = null; }
-                if (audioStream) { audioStream.getTracks().forEach(t => t.stop()); audioStream = null; }
-                userVideo.style.display = 'none';
-            };
+        class Ship {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.angle = 90 / 180 * Math.PI; // Apuntando hacia arriba
+                this.radius = SHIP_SIZE / 2;
+                this.thrusting = false;
+                this.invulnerable = false;
+                this.invulnerableTime = 120; // 2 segundos a 60fps
+            }
 
-            const toggleMicrophone = async () => {
-                const icon = micButton.querySelector('i');
-                if (audioStream) {
-                    audioStream.getTracks().forEach(t => t.stop());
-                    audioStream = null;
-                    icon.className = 'fas fa-microphone-slash';
-                    micButton.classList.remove('active');
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                // Efecto de parpadeo cuando es invulnerable
+                if (this.invulnerable && Math.floor(this.invulnerableTime / 5) % 2 === 0) {
+                    ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
                 } else {
-                    try {
-                        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        icon.className = 'fas fa-microphone';
-                        micButton.classList.add('active');
-                    } catch (error) { console.error("Error de micrófono:", error); }
+                    ctx.strokeStyle = '#0f0';
+                    ctx.fillStyle = '#0f0';
                 }
-            };
-
-            const toggleFullscreen = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-compress';
-                } else {
-                    document.exitFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-expand';
-                }
-            };
-            
-            const openModal = (modalId) => { document.getElementById(modalId).style.display = 'flex'; };
-            const closeModal = (modalId) => { document.getElementById(modalId).style.display = 'none'; };
-            window.closeModal = closeModal;
-            
-            const startChat = () => {
-                startPrompt.style.display = 'none';
-                topControls.style.display = 'block';
-                chatOverlay.style.display = 'flex';
-                reportButton.style.display = 'block';
                 
-                strangerVideo.style.display = 'block';
-                strangerVideo.play();
-                startMedia();
-                getBotResponse("Hola, ¿qué tal?");
-            };
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(SHIP_SIZE, 0);
+                ctx.lineTo(-SHIP_SIZE, -SHIP_SIZE / 2);
+                ctx.lineTo(-SHIP_SIZE / 2, 0);
+                ctx.lineTo(-SHIP_SIZE, SHIP_SIZE / 2);
+                ctx.closePath();
+                ctx.stroke();
 
-            const stopChat = () => {
-                stopMedia();
-                strangerVideo.pause(); strangerVideo.currentTime = 0; strangerVideo.style.display = 'none';
-                conversationHistory = []; chatMessages.innerHTML = '';
-                topControls.style.display = 'none'; chatOverlay.style.display = 'none'; reportButton.style.display = 'none';
-                startPrompt.style.display = 'block';
-            };
+                // Fuego de propulsión
+                if (this.thrusting) {
+                    ctx.strokeStyle = 'orange';
+                    ctx.fillStyle = 'red';
+                    ctx.beginPath();
+                    ctx.moveTo(-SHIP_SIZE / 2, 0);
+                    ctx.lineTo(-SHIP_SIZE * 1.5, 0);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(-SHIP_SIZE * 1.2, 0, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
 
-            // --- EVENT LISTENERS ---
-            startButton.addEventListener('click', startChat);
-            stopButton.addEventListener('click', stopChat);
-            micButton.addEventListener('click', toggleMicrophone);
-            fullscreenButton.addEventListener('click', toggleFullscreen);
-            document.getElementById('settingsButton').addEventListener('click', () => openModal('settingsModal'));
-            document.getElementById('countryButton').addEventListener('click', () => openModal('countryModal'));
-            document.getElementById('iamButton').addEventListener('click', () => openModal('iamModal'));
-            reportButton.addEventListener('click', () => alert('Usuario reportado. (Solo es una simulación)'));
+                ctx.restore();
+            }
 
-            messageForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const text = messageInput.value.trim();
-                if (text) { addMessage(text, 'you'); messageInput.value = ''; getBotResponse(text); }
-            });
+            update() {
+                // Aplica fricción
+                this.vx *= FRICTION;
+                this.vy *= FRICTION;
+
+                // Actualiza posición
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Maneja la invulnerabilidad
+                if (this.invulnerable) {
+                    this.invulnerableTime--;
+                    if (this.invulnerableTime <= 0) {
+                        this.invulnerable = false;
+                    }
+                }
+
+                // Envuelve la nave en los bordes
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            rotate(direction) {
+                this.angle += direction * SHIP_TURN_SPEED;
+            }
+
+            thrust() {
+                this.thrusting = true;
+                this.vx += Math.cos(this.angle) * SHIP_THRUST;
+                this.vy += Math.sin(this.angle) * SHIP_THRUST;
+            }
+            
+            stopThrust() {
+                this.thrusting = false;
+            }
+
+            shoot() {
+                bullets.push(new Bullet(this.x, this.y, this.angle));
+            }
+        }
+
+        class Asteroid {
+            constructor(x, y, size) {
+                this.x = x;
+                this.y = y;
+                this.size = size; // 'large', 'medium', 'small'
+                const radius_map = { 'large': ASTEROID_SIZE, 'medium': ASTEROID_SIZE / 2, 'small': ASTEROID_SIZE / 4 };
+                this.radius = radius_map[size];
+                this.vx = (Math.random() * 2 - 1) * (ASTEROID_SIZE / this.radius); // Los más rápidos son más pequeños
+                this.vy = (Math.random() * 2 - 1) * (ASTEROID_SIZE / this.radius);
+                this.vertices = this.createVertices();
+            }
+
+            createVertices() {
+                const vertices = [];
+                const numVertices = 8 + Math.floor(Math.random() * 5);
+                for (let i = 0; i < numVertices; i++) {
+                    const angle = (i / numVertices) * Math.PI * 2;
+                    const variance = 0.8 + Math.random() * ASTEROID_JAG;
+                    vertices.push({
+                        x: Math.cos(angle) * this.radius * variance,
+                        y: Math.sin(angle) * this.radius * variance
+                    });
+                }
+                return vertices;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.strokeStyle = '#0f0';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
+                for (let i = 1; i < this.vertices.length; i++) {
+                    ctx.lineTo(this.vertices[i].x, this.vertices[i].y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Envuelve el asteroide en los bordes
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            breakApart() {
+                const newAsteroids = [];
+                if (this.size === 'large') {
+                    newAsteroids.push(new Asteroid(this.x, this.y, 'medium'));
+                    newAsteroids.push(new Asteroid(this.x, this.y, 'medium'));
+                    score += 20;
+                } else if (this.size === 'medium') {
+                    newAsteroids.push(new Asteroid(this.x, this.y, 'small'));
+                    newAsteroids.push(new Asteroid(this.x, this.y, 'small'));
+                    score += 50;
+                } else { // small
+                    score += 100;
+                }
+                return newAsteroids;
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.vx = Math.cos(angle) * BULLET_SPEED;
+                this.vy = Math.sin(angle) * BULLET_SPEED;
+                this.life = BULLET_MAX_LIFE;
+                this.radius = 2;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.fillStyle = '#0f0';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#0f0';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+
+                // Envuelve la bala en los bordes
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            isExpired() {
+                return this.life <= 0;
+            }
+        }
+
+        // 5. FUNCIONES PRINCIPALES DEL JUEGO
+
+        function init() {
+            score = 0;
+            lives = 3;
+            level = 1;
+            gameOver = false;
+            ship = new Ship(canvas.width / 2, canvas.height / 2);
+            asteroids = createAsteroids(ASTEROID_NUM + level);
+            bullets = [];
+            gameOverScreen.style.display = 'none';
+            updateUI();
+            gameLoop();
+        }
+
+        function createAsteroids(count) {
+            const newAsteroids = [];
+            for (let i = 0; i < count; i++) {
+                let x, y;
+                do {
+                    x = Math.random() * canvas.width;
+                    y = Math.random() * canvas.height;
+                } while (dist(x, y, ship.x, ship.y) < ASTEROID_SIZE * 2 + ship.radius); // Asegura que no aparezcan sobre la nave
+                
+                newAsteroids.push(new Asteroid(x, y, 'large'));
+            }
+            return newAsteroids;
+        }
+
+        function gameLoop() {
+            if (gameOver) return;
+
+            // Limpia el canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Efecto de estela
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- MANEJO DE ENTRADA ---
+            if (keys['ArrowLeft']) ship.rotate(-1);
+            if (keys['ArrowRight']) ship.rotate(1);
+            if (keys['ArrowUp']) ship.thrust();
+            else ship.stopThrust();
+            
+            // --- ACTUALIZACIONES ---
+            ship.update();
+            bullets.forEach(bullet => bullet.update());
+            asteroids.forEach(asteroid => asteroid.update());
+
+            // Filtra balas expiradas
+            bullets = bullets.filter(bullet => !bullet.isExpired());
+
+            // --- DETECCIÓN DE COLISIONES ---
+            // Balas vs Asteroides
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = asteroids.length - 1; j >= 0; j--) {
+                    if (dist(bullets[i].x, bullets[i].y, asteroids[j].x, asteroids[j].y) < bullets[i].radius + asteroids[j].radius) {
+                        const newAsteroids = asteroids[j].breakApart();
+                        asteroids.splice(j, 1);
+                        asteroids.push(...newAsteroids);
+                        bullets.splice(i, 1);
+                        updateUI();
+                        break; // Sal del bucle de asteroides para evitar errores de índice
+                    }
+                }
+            }
+
+            // Nave vs Asteroides
+            if (!ship.invulnerable) {
+                for (let asteroid of asteroids) {
+                    if (dist(ship.x, ship.y, asteroid.x, asteroid.y) < ship.radius + asteroid.radius) {
+                        lives--;
+                        updateUI();
+                        if (lives <= 0) {
+                            endGame();
+                        } else {
+                            ship = new Ship(canvas.width / 2, canvas.height / 2);
+                            ship.invulnerable = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // --- DIBUJADO ---
+            ship.draw();
+            bullets.forEach(bullet => bullet.draw());
+            asteroids.forEach(asteroid => asteroid.draw());
+
+            // --- COMPROBACIÓN DE NUEVO NIVEL ---
+            if (asteroids.length === 0) {
+                level++;
+                ship = new Ship(canvas.width / 2, canvas.height / 2);
+                ship.invulnerable = true;
+                asteroids = createAsteroids(ASTEROID_NUM + level);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            gameOver = true;
+            finalScoreEl.textContent = score;
+            gameOverScreen.style.display = 'block';
+        }
+
+        function updateUI() {
+            scoreEl.textContent = score;
+            livesEl.textContent = lives;
+        }
+
+        // Función auxiliar para calcular distancia
+        function dist(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // 6. EVENT LISTENERS
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if (e.key === ' ') {
+                e.preventDefault(); // Evita que la página se desplace
+                if (!gameOver) ship.shoot();
+            }
         });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        restartBtn.addEventListener('click', init);
+
+        // --- INICIA EL JUEGO ---
+        init();
+
     </script>
 </body>
 </html>
