@@ -6,145 +6,388 @@
     <title>Memory Matrix - Ed Arcade</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --primary-color: #00d4ff; --secondary-color: #ff006e; }
-        body { background-color: var(--bg-color); color: #e0e0e0; font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .game-container { text-align: center; width: 100%; max-width: 500px; padding: 1rem; }
-        .game-container h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
-        .game-info { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; margin-bottom: 1rem; }
-        .game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; perspective: 1000px; }
-        .card { width: 100%; aspect-ratio: 1 / 1; position: relative; transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer; }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-front, .card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .card-front { background: var(--card-bg); border: 2px solid var(--primary-color); }
-        .card-back { background: var(--primary-color); color: var(--bg-color); transform: rotateY(180deg); }
+        /* --- Variables de Estilo --- */
+        :root {
+            --bg-color: #0a0a0f;
+            --card-bg: #1a1a2e;
+            --text-color: #e0e0e0;
+            --primary-color: #00d4ff;
+            --secondary-color: #ff006e;
+            --success-color: #0f0; /* Verde para las parejas encontradas */
+        }
+
+        /* --- Estilos Globales y del Contenedor --- */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 1rem;
+        }
+
+        .game-container h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .game-info {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        /* --- Estilos del Tablero de Juego y Cartas --- */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            perspective: 1000px;
+        }
+
+        .card {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .card-front {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+        }
+
+        .card-back {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            transform: rotateY(180deg);
+        }
+        
+        /* Estilo para las cartas que han sido emparejadas */
+        .card.matched .card-front {
+            border-color: var(--success-color);
+            box-shadow: 0 0 15px var(--success-color);
+        }
+        .card.matched {
+            /* Hacemos la carta no cliqueable una vez emparejada */
+            pointer-events: none;
+        }
+
+        /* --- Estilos para la Pantalla de Victoria y Botones --- */
+        .win-screen {
+            display: none; /* Oculta por defecto */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 15, 0.85);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .win-screen.show {
+            display: flex;
+        }
+
+        .win-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+
+        .win-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #00a8cc;
+            transform: scale(1.05);
+        }
+
+        /* --- Media Queries para Dispositivos Móviles --- */
         @media (max-width: 480px) {
-            .game-board { gap: 8px; }
-            .card-front, .card-back { font-size: 2rem; }
+            .game-board {
+                gap: 8px;
+            }
+            .card-front, .card-back {
+                font-size: 2rem;
+            }
+            .game-container h1 {
+                font-size: 2rem;
+            }
+            .win-content h2 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
         <h1>Memory Matrix</h1>
-        <div class="game-info">Movimientos: <span id="moves">0</span></div>
+        <div class="game-info">
+            <span>Movimientos: <span id="moves">0</span></span>
+            <button id="reset-btn" class="btn">Nuevo Juego</button>
+        </div>
         <div class="game-board" id="gameBoard"></div>
     </div>
 
-    <script>
-    // ===================================================================
-    // INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
-    // ===================================================================
-    (function() {
-        'use strict';
+    <!-- Pantalla de Victoria (inicialmente oculta) -->
+    <div class="win-screen" id="winScreen">
+        <div class="win-content">
+            <h2>¡GANASTE!</h2>
+            <p>Completaste el juego en <span id="final-moves">0</span> movimientos.</p>
+            <button id="play-again-btn" class="btn">Jugar de Nuevo</button>
+        </div>
+    </div>
 
-        // --- VARIABLES DEL JUEGO (AHORA PRIVADAS) ---
-        const gameBoard = document.getElementById('gameBoard');
-        const movesDisplay = document.getElementById('moves');
-        const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮'];
-        let cards = [...emojis, ...emojis];
-        let moves = 0;
-        let firstCard = null;
-        let secondCard = null;
-        let lockBoard = false;
-        let unflipTimeoutId = null; // Para almacenar el ID del timeout
+<script>
+// ===================================================================
+// INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
+// ===================================================================
+(function() {
+    'use strict';
 
-        // --- FUNCIONES DEL JUEGO ---
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
+    // --- VARIABLES DEL JUEGO (PRIVADAS DENTRO DEL IIFE) ---
+    const gameBoard = document.getElementById('gameBoard');
+    const movesDisplay = document.getElementById('moves');
+    const winScreen = document.getElementById('winScreen');
+    const finalMovesDisplay = document.getElementById('final-moves');
+    const resetBtn = document.getElementById('reset-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+
+    // Símbolos para las cartas
+    const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮'];
+    
+    // Estado del juego
+    let cards = [];
+    let moves = 0;
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+    let unflipTimeoutId = null;
+
+    // --- FUNCIONES DEL JUEGO ---
+
+    /**
+     * Baraja un array utilizando el algoritmo de Fisher-Yates.
+     * @param {Array} array - El array a barajar.
+     */
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    /**
+     * Maneja el evento de clic en una carta.
+     */
+    function flipCard() {
+        if (lockBoard) return;
+        if (this === firstCard) return;
+
+        this.classList.add('flipped');
+
+        if (!firstCard) {
+            // Primer clic
+            firstCard = this;
+            return;
         }
 
-        // Función de evento nombrada para poder ser eliminada
-        function flipCard(e) {
-            if (lockBoard) return;
-            if (this === firstCard) return;
+        // Segundo clic
+        secondCard = this;
+        checkForMatch();
+    }
 
-            this.classList.add('flipped');
+    /**
+     * Crea el elemento DOM para una carta.
+     * @param {string} emoji - El emoji que irá en la parte trasera de la carta.
+     * @returns {HTMLElement} - El elemento de la carta.
+     */
+    function createCard(emoji) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `
+            <div class="card-front"></div>
+            <div class="card-back">${emoji}</div>
+        `;
+        card.addEventListener('click', flipCard);
+        return card;
+    }
 
-            if (!firstCard) {
-                firstCard = this;
-                return;
-            }
+    /**
+     * Comprueba si las dos cartas volteadas son una pareja.
+     */
+    function checkForMatch() {
+        const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent;
+        moves++;
+        movesDisplay.textContent = moves;
 
-            secondCard = this;
-            moves++;
-            movesDisplay.textContent = moves;
-            checkForMatch();
+        isMatch ? disableCards() : unflipCards();
+    }
+
+    /**
+     * Deshabilita las cartas emparejadas y comprueba la condición de victoria.
+     */
+    function disableCards() {
+        firstCard.removeEventListener('click', flipCard);
+        secondCard.removeEventListener('click', flipCard);
+
+        // Añadir clase para estilo visual de pareja encontrada
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+
+        matchedPairs++;
+        if (matchedPairs === emojis.length) {
+            // Se han encontrado todas las parejas
+            setTimeout(showWinScreen, 500); // Pequeña espera para que se vea la última pareja
         }
 
-        function createCard(emoji) {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.innerHTML = `<div class="card-front"></div><div class="card-back">${emoji}</div>`;
-            
-            // Añadir listeners usando la función nombrada
-            card.addEventListener('click', flipCard);
-            card.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                flipCard.call(card, e);
-            });
-            return card;
-        }
+        resetBoard();
+    }
 
-        function checkForMatch() {
-            const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent;
-            isMatch ? disableCards() : unflipCards();
-        }
-
-        function disableCards() {
-            firstCard.removeEventListener('click', flipCard);
-            firstCard.removeEventListener('touchstart', flipCard);
-            secondCard.removeEventListener('click', flipCard);
-            secondCard.removeEventListener('touchstart', flipCard);
+    /**
+     * Vuelve a voltear las cartas si no son una pareja.
+     */
+    function unflipCards() {
+        lockBoard = true;
+        unflipTimeoutId = setTimeout(() => {
+            firstCard.classList.remove('flipped');
+            secondCard.classList.remove('flipped');
             resetBoard();
-        }
+        }, 1000);
+    }
 
-        function unflipCards() {
-            lockBoard = true;
-            // Guardar el ID del timeout para poder limpiarlo
-            unflipTimeoutId = setTimeout(() => {
-                firstCard.classList.remove('flipped');
-                secondCard.classList.remove('flipped');
-                resetBoard();
-            }, 1000);
-        }
+    /**
+     * Restablece el estado del tablero para el siguiente turno.
+     */
+    function resetBoard() {
+        [firstCard, secondCard] = [null, null];
+        lockBoard = false;
+    }
 
-        function resetBoard() {
-            [firstCard, secondCard] = [null, null];
-            lockBoard = false;
-        }
+    /**
+     * Muestra la pantalla de victoria con el resultado final.
+     */
+    function showWinScreen() {
+        finalMovesDisplay.textContent = moves;
+        winScreen.classList.add('show');
+    }
 
-        function startGame() {
-            shuffle(cards);
-            cards.forEach(emoji => gameBoard.appendChild(createCard(emoji)));
-        }
+    /**
+     * Oculta la pantalla de victoria.
+     */
+    function hideWinScreen() {
+        winScreen.classList.remove('show');
+    }
+
+    /**
+     * Inicializa o reinicia el juego por completo.
+     */
+    function startGame() {
+        // Limpiar estado anterior
+        clearTimeout(unflipTimeoutId);
+        gameBoard.innerHTML = '';
+        hideWinScreen();
         
-        // --- FUNCIÓN DE LIMPIEZA PROPIA DEL JUEGO ---
-        window.stopGame = function() {
-            console.log("Deteniendo Memory Matrix...");
-            
-            // Limpiar el timeout si está activo
-            clearTimeout(unflipTimeoutId);
-            
-            // Eliminar los event listeners de todas las cartas
-            const allCards = gameBoard.querySelectorAll('.card');
-            allCards.forEach(card => {
-                card.removeEventListener('click', flipCard);
-                card.removeEventListener('touchstart', flipCard);
-            });
+        // Restablecer variables de estado
+        cards = [...emojis, ...emojis];
+        moves = 0;
+        matchedPairs = 0;
+        movesDisplay.textContent = moves;
+        resetBoard();
 
-            // Limpiar el tablero
-            gameBoard.innerHTML = '';
-        };
+        // Barajar y crear las cartas en el tablero
+        shuffle(cards);
+        cards.forEach(emoji => gameBoard.appendChild(createCard(emoji)));
+    }
+    
+    // --- FUNCIÓN DE LIMPIEZA PROPIA DEL JUEGO (PARA EL SISTEMA DE ARCADE) ---
+    window.stopGame = function() {
+        console.log("Deteniendo Memory Matrix...");
+        
+        // Limpiar el timeout si está activo
+        clearTimeout(unflipTimeoutId);
+        
+        // Eliminar los event listeners de todas las cartas (aunque las borremos, es buena práctica)
+        const allCards = gameBoard.querySelectorAll('.card');
+        allCards.forEach(card => {
+            card.removeEventListener('click', flipCard);
+        });
 
-        // --- INICIALIZACIÓN DEL JUEGO ---
+        // Limpiar el tablero y la pantalla de victoria
+        gameBoard.innerHTML = '';
+        hideWinScreen();
+    };
+
+    // --- INICIALIZACIÓN DEL JUEGO ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Añadir listeners a los botones de reinicio
+        resetBtn.addEventListener('click', startGame);
+        playAgainBtn.addEventListener('click', startGame);
+
+        // Iniciar la primera partida
         startGame();
+    });
 
     })(); // FIN DEL IIFE
-    // ===================================================================
+// ===================================================================
 
-    </script>
+</script>
 </body>
 </html>
