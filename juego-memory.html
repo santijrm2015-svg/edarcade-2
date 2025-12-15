@@ -14,6 +14,7 @@
             --primary-color: #00d4ff;
             --secondary-color: #ff006e;
             --success-color: #0f0; /* Verde para las parejas encontradas */
+            --perfect-color: #FFD700; /* Color dorado para el juego perfecto */
         }
 
         /* --- Estilos Globales y del Contenedor --- */
@@ -131,8 +132,8 @@
         .win-content h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 3rem;
-            color: var(--success-color);
             margin-bottom: 1rem;
+            text-shadow: 0 0 15px currentColor;
         }
 
         .win-content p {
@@ -206,11 +207,13 @@
     const movesDisplay = document.getElementById('moves');
     const winScreen = document.getElementById('winScreen');
     const finalMovesDisplay = document.getElementById('final-moves');
+    const winMessageDisplay = document.querySelector('.win-content h2');
     const resetBtn = document.getElementById('reset-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
 
     // Símbolos para las cartas
     const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮'];
+    const totalPairs = emojis.length;
     
     // Estado del juego
     let cards = [];
@@ -293,7 +296,7 @@
         secondCard.classList.add('matched');
 
         matchedPairs++;
-        if (matchedPairs === emojis.length) {
+        if (matchedPairs === totalPairs) {
             // Se han encontrado todas las parejas
             setTimeout(showWinScreen, 500); // Pequeña espera para que se vea la última pareja
         }
@@ -323,9 +326,26 @@
 
     /**
      * Muestra la pantalla de victoria con el resultado final.
+     * Incluye una verificación para un "Juego Perfecto".
      */
     function showWinScreen() {
+        // Medida de seguridad para evitar mostrar la pantalla de victoria si no se ha jugado.
+        if (moves === 0) {
+            console.error("Intento de mostrar pantalla de victoria con 0 movimientos. Abortando.");
+            return;
+        }
+
         finalMovesDisplay.textContent = moves;
+
+        // Comprobar si es un juego perfecto (ganar sin fallos)
+        if (moves === totalPairs) {
+            winMessageDisplay.textContent = '¡JUEGO PERFECTO!';
+            winMessageDisplay.style.color = 'var(--perfect-color)';
+        } else {
+            winMessageDisplay.textContent = '¡GANASTE!';
+            winMessageDisplay.style.color = 'var(--success-color)';
+        }
+        
         winScreen.classList.add('show');
     }
 
