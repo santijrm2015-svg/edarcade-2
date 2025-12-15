@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Matrix - Ed Arcade</title>
+    
+    <!-- Google Fonts para un estilo atractivo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- Variables de Estilo --- */
+        /* --- VARIABLES DE ESTILO --- */
         :root {
             --bg-color: #0a0a0f;
             --card-bg: #1a1a2e;
@@ -17,7 +22,7 @@
             --perfect-color: #FFD700; /* Color dorado para el juego perfecto */
         }
 
-        /* --- Estilos Globales y del Contenedor --- */
+        /* --- ESTILOS GLOBALES Y DEL CONTENEDOR --- */
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -54,7 +59,7 @@
             align-items: center;
         }
 
-        /* --- Estilos del Tablero de Juego y Cartas --- */
+        /* --- ESTILOS DEL TABLERO DE JUEGO Y CARTAS --- */
         .game-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -109,7 +114,7 @@
             pointer-events: none;
         }
 
-        /* --- Estilos para la Pantalla de Victoria y Botones --- */
+        /* --- ESTILOS PARA LA PANTALLA DE VICTORIA Y BOTONES --- */
         .win-screen {
             display: none; /* Oculta por defecto */
             position: fixed;
@@ -159,7 +164,7 @@
             transform: scale(1.05);
         }
 
-        /* --- Media Queries para Dispositivos Móviles --- */
+        /* --- MEDIA QUERIES PARA DISPOSITIVOS MÓVILES --- */
         @media (max-width: 480px) {
             .game-board {
                 gap: 8px;
@@ -177,6 +182,7 @@
     </style>
 </head>
 <body>
+
     <div class="game-container">
         <h1>Memory Matrix</h1>
         <div class="game-info">
@@ -197,12 +203,12 @@
 
 <script>
 // ===================================================================
-// INICIO DEL CÓDIGO DEL JUEGO (ENVUELTO EN UN IIFE)
+// LÓGICA DEL JUEGO MEMORY MATRIX
 // ===================================================================
 (function() {
     'use strict';
 
-    // --- VARIABLES DEL JUEGO (PRIVADAS DENTRO DEL IIFE) ---
+    // --- VARIABLES DEL JUEGO ---
     const gameBoard = document.getElementById('gameBoard');
     const movesDisplay = document.getElementById('moves');
     const winScreen = document.getElementById('winScreen');
@@ -377,24 +383,6 @@
         cards.forEach(emoji => gameBoard.appendChild(createCard(emoji)));
     }
     
-    // --- FUNCIÓN DE LIMPIEZA PROPIA DEL JUEGO (PARA EL SISTEMA DE ARCADE) ---
-    window.stopGame = function() {
-        console.log("Deteniendo Memory Matrix...");
-        
-        // Limpiar el timeout si está activo
-        clearTimeout(unflipTimeoutId);
-        
-        // Eliminar los event listeners de todas las cartas (aunque las borremos, es buena práctica)
-        const allCards = gameBoard.querySelectorAll('.card');
-        allCards.forEach(card => {
-            card.removeEventListener('click', flipCard);
-        });
-
-        // Limpiar el tablero y la pantalla de victoria
-        gameBoard.innerHTML = '';
-        hideWinScreen();
-    };
-
     // --- INICIALIZACIÓN DEL JUEGO ---
     document.addEventListener('DOMContentLoaded', () => {
         // Añadir listeners a los botones de reinicio
@@ -405,7 +393,7 @@
         startGame();
     });
 
-    })(); // FIN DEL IIFE
+})(); // FIN DEL IIFE
 // ===================================================================
 
 </script>
