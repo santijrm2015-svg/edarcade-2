@@ -60,6 +60,34 @@
         .d-pad .up { top: 0; left: 50px; } .d-pad .down { bottom: 0; left: 50px; }
         .d-pad .left { top: 50px; left: 0; } .d-pad .right { top: 50px; right: 0; }
         @media (max-width: 768px) { .touch-controls { display: block; } .game-controls-viewer { display: none; } }
+        
+        /* Estilos para Infinite Craft */
+        .main-area { display: flex; gap: 20px; flex-grow: 1; }
+        .sidebar { background: var(--card-bg); border-radius: 15px; padding: 1.5rem; width: 250px; overflow-y: auto; max-height: 70vh; border: 1px solid rgba(0, 212, 255, 0.2); }
+        .sidebar h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 1rem; color: var(--primary-color); }
+        .elements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .element { background: rgba(0, 212, 255, 0.1); border: 1px solid var(--primary-color); color: var(--text-color); padding: 10px; border-radius: 10px; text-align: center; cursor: grab; user-select: none; transition: all 0.2s ease; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; }
+        .element:hover { background: rgba(0, 212, 255, 0.2); transform: scale(1.05); }
+        .element.selected { background: var(--secondary-color); border-color: var(--secondary-color); color: #fff; cursor: grabbing; }
+        .crafting-area { flex-grow: 1; background: var(--card-bg); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(0, 212, 255, 0.3); position: relative; }
+        .crafting-area.drag-over { border-color: var(--primary-color); background: rgba(0, 212, 255, 0.05); }
+        .result-display { position: absolute; top: 20px; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--accent-color); text-align: center; opacity: 0; transition: opacity 0.5s ease; }
+        .result-display.show { opacity: 1; }
+        .crafting-prompt { font-family: 'Orbitron', sans-serif; color: #555; font-size: 1.2rem; }
+        .selected-items-display { position: absolute; bottom: 20px; display: flex; gap: 15px; }
+        @media (max-width: 768px) { .main-area { flex-direction: column; } .sidebar { width: 100%; max-height: 150px; } .elements-grid { display: flex; overflow-x: auto; grid-template-columns: none; } .element { min-width: 100px; } }
+        
+        /* Estilos para 2048 y Memory */
+        .tile-2 { background-color: #eee4da; color: #776e65; } .tile-4 { background-color: #ede0c8; color: #776e65; }
+        .tile-8 { background-color: #f2b179; color: #f9f6f2; } .tile-16 { background-color: #f59563; color: #f9f6f2; }
+        .tile-32 { background-color: #f67c5f; color: #f9f6f2; } .tile-64 { background-color: #f65e3b; color: #f9f6f2; }
+        .tile-128 { background-color: #edcf72; color: #f9f6f2; font-size: 2rem; } .tile-256 { background-color: #edcc61; color: #f9f6f2; font-size: 2rem; }
+        .tile-512 { background-color: #edc850; color: #f9f6f2; font-size: 2rem; } .tile-1024 { background-color: #edc53f; color: #f9f6f2; font-size: 1.5rem; }
+        .tile-2048 { background-color: #edc22e; color: #f9f6f2; font-size: 1.5rem; }
+        .new-game-btn { background: var(--secondary-color); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.3s; }
+        .new-game-btn:hover { background: #ff4081; }
+        .game-board { max-width: 100%; aspect-ratio: 1 / 1; }
+        @media (max-width: 480px) { .game-board { width: 90vw; height: 90vw; } .tile, .card { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
@@ -100,7 +128,8 @@
     <div id="game-viewer" class="game-viewer hidden">
         <div class="game-header-viewer"><a href="#" onclick="backToArcade(); return false;"><span>&larr;</span><span>Volver al Arcade</span></a></div>
         <div class="game-container-viewer" id="game-container">
-            <!-- El contenido del juego se inyectará aquí dinámicamente -->
+            <!-- El contenido del juego se cargará aquí dinámicamente -->
+            <div class="loading-indicator">Cargando juego...</div>
         </div>
         <!-- Controles táctiles genéricos para juegos que lo necesiten -->
         <div class="touch-controls" id="touch-controls">
@@ -126,15 +155,18 @@ let animationFrameId = null;
 
 function launchGame(gameName) {
     // Detener el juego actual si hay uno
-    if (currentGame && typeof Games[currentGame].stop === 'function') {
-        Games[currentGame].stop();
-    }
-    if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+    if (currentGame) {
+        // Intentar detener el juego actual si existe una función de detención
+        if (typeof window.stopGame === 'function') {
+            window.stopGame();
+        }
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
     }
 
     // Limpiar contenido anterior
-    gameContainer.innerHTML = '';
+    gameContainer.innerHTML = '<div class="loading-indicator">Cargando juego...</div>';
     document.querySelectorAll('.d-pad button').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
 
     // Ocultar catálogo, mostrar visor
@@ -143,18 +175,67 @@ function launchGame(gameName) {
     
     currentGame = gameName;
     
-    // Inicializar y empezar el nuevo juego
-    Games[gameName].init();
-    Games[gameName].start();
+    // Cargar el juego desde el archivo HTML correspondiente
+    loadGameFromHTML(gameName);
+}
+
+function loadGameFromHTML(gameName) {
+    // Construir la URL del archivo del juego
+    const gameUrl = `${gameName}.html`;
+    
+    // Usar fetch para cargar el contenido del juego
+    fetch(gameUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`No se pudo cargar el juego: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Extraer el contenido del body del HTML cargado
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const gameContent = doc.body.innerHTML;
+            
+            // Extraer y ejecutar los scripts del juego
+            const scripts = doc.querySelectorAll('script');
+            
+            // Insertar el contenido del juego en el contenedor
+            gameContainer.innerHTML = gameContent;
+            
+            // Ejecutar los scripts del juego
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar el juego:', error);
+            gameContainer.innerHTML = `
+                <div class="error-message">
+                    <h2>Error al cargar el juego</h2>
+                    <p>No se pudo cargar el juego ${gameName}. Por favor, inténtalo de nuevo más tarde.</p>
+                    <button onclick="backToArcade()" class="new-game-btn">Volver al catálogo</button>
+                </div>
+            `;
+        });
 }
 
 function backToArcade() {
     // Detener el juego actual
-    if (currentGame && typeof Games[currentGame].stop === 'function') {
-        Games[currentGame].stop();
-    }
-    if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+    if (currentGame) {
+        // Intentar detener el juego actual si existe una función de detención
+        if (typeof window.stopGame === 'function') {
+            window.stopGame();
+        }
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
     }
     
     // Ocultar visor, mostrar catálogo
@@ -162,64 +243,10 @@ function backToArcade() {
     catalogView.classList.remove('hidden');
     touchControls.style.display = 'none'; // Ocultar controles táctiles por defecto
     currentGame = null;
-}
-
-// ===================================================================
-// OBJETO CENTRAL CON TODOS LOS JUEGOS (NOMBRES ACTUALIZADOS)
-// ===================================================================
-const Games = {
-    // --- JUEGO: SNAKE ---
-    'juego-snake': { /* ... (código del juego snake) ... */ },
-    // --- JUEGO: BREAKOUT ---
-    'juego-breakout': { /* ... (código del juego breakout) ... */ },
-    // --- JUEGO: MEMORY ---
-    'juego-memory': { /* ... (código del juego memory) ... */ },
-    // --- JUEGO: 2048 ---
-    'juego-2048': { /* ... (código del juego 2048) ... */ },
-    // --- JUEGO: SPACE INVADERS ---
-    'juego-spaceinvaders': { /* ... (código del juego spaceinvaders) ... */ },
-    // --- JUEGO: TETRIS ---
-    'juego-tetris': { /* ... (código del juego tetris) ... */ },
-    // --- JUEGO: ASTEROIDS ---
-    'juego-asteroids': { /* ... (código del juego asteroids) ... */ },
-    // --- JUEGO: IDLE MINER ---
-    'juego-idleminer': { /* ... (código del juego idleminer) ... */ },
-    // --- JUEGO: INFINITE CRAFT ---
-    'juego-infinitecraft': { /* ... (código del juego infinitecraft) ... */ }
-};
-
-// Añadir estilos CSS para 2048, Memory e Infinite Craft dinámicamente
-const style = document.createElement('style');
-style.textContent = `
-    /* Estilos para Infinite Craft */
-    .main-area { display: flex; gap: 20px; flex-grow: 1; }
-    .sidebar { background: var(--card-bg); border-radius: 15px; padding: 1.5rem; width: 250px; overflow-y: auto; max-height: 70vh; border: 1px solid rgba(0, 212, 255, 0.2); }
-    .sidebar h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 1rem; color: var(--primary-color); }
-    .elements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-    .element { background: rgba(0, 212, 255, 0.1); border: 1px solid var(--primary-color); color: var(--text-color); padding: 10px; border-radius: 10px; text-align: center; cursor: grab; user-select: none; transition: all 0.2s ease; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; }
-    .element:hover { background: rgba(0, 212, 255, 0.2); transform: scale(1.05); }
-    .element.selected { background: var(--secondary-color); border-color: var(--secondary-color); color: #fff; cursor: grabbing; }
-    .crafting-area { flex-grow: 1; background: var(--card-bg); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(0, 212, 255, 0.3); position: relative; }
-    .crafting-area.drag-over { border-color: var(--primary-color); background: rgba(0, 212, 255, 0.05); }
-    .result-display { position: absolute; top: 20px; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--accent-color); text-align: center; opacity: 0; transition: opacity 0.5s ease; }
-    .result-display.show { opacity: 1; }
-    .crafting-prompt { font-family: 'Orbitron', sans-serif; color: #555; font-size: 1.2rem; }
-    .selected-items-display { position: absolute; bottom: 20px; display: flex; gap: 15px; }
-    @media (max-width: 768px) { .main-area { flex-direction: column; } .sidebar { width: 100%; max-height: 150px; } .elements-grid { display: flex; overflow-x: auto; grid-template-columns: none; } .element { min-width: 100px; } }
     
-    /* Estilos para 2048 y Memory */
-    .tile-2 { background-color: #eee4da; color: #776e65; } .tile-4 { background-color: #ede0c8; color: #776e65; }
-    .tile-8 { background-color: #f2b179; color: #f9f6f2; } .tile-16 { background-color: #f59563; color: #f9f6f2; }
-    .tile-32 { background-color: #f67c5f; color: #f9f6f2; } .tile-64 { background-color: #f65e3b; color: #f9f6f2; }
-    .tile-128 { background-color: #edcf72; color: #f9f6f2; font-size: 2rem; } .tile-256 { background-color: #edcc61; color: #f9f6f2; font-size: 2rem; }
-    .tile-512 { background-color: #edc850; color: #f9f6f2; font-size: 2rem; } .tile-1024 { background-color: #edc53f; color: #f9f6f2; font-size: 1.5rem; }
-    .tile-2048 { background-color: #edc22e; color: #f9f6f2; font-size: 1.5rem; }
-    .new-game-btn { background: var(--secondary-color); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.3s; }
-    .new-game-btn:hover { background: #ff4081; }
-    .game-board { max-width: 100%; aspect-ratio: 1 / 1; }
-    @media (max-width: 480px) { .game-board { width: 90vw; height: 90vw; } .tile, .card { font-size: 1.8rem; } }
-`;
-document.head.appendChild(style);
+    // Limpiar el contenedor del juego
+    gameContainer.innerHTML = '<div class="loading-indicator">Cargando juego...</div>';
+}
 
 </script>
 
