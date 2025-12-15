@@ -3,529 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ed TV</title>
+    <title>Idle Miner - Versión Corregida</title>
     <style>
-        /* --- ESTILOS GLOBALES Y CLON DE OME TV --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* --- ESTILOS CSS (Sin cambios) --- */
+        :root {
+            --bg-color: #2c2416;
+            --panel-bg: #3e3426;
+            --text-color: #f4e4c1;
+            --gold-color: #ffd700;
+            --button-bg: #6b5d4f;
+            --button-hover-bg: #8b7d6f;
+            --disabled-bg: #4a3c2e;
+            --accent-color: #a0826d;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-        }
-
-        /* --- LADO IZQUIERDO (INTERFAZ DE USUARIO) --- */
-        .user-interface {
-            width: 30%;
-            min-width: 300px;
-            background-color: #111;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px; /* Aumenté el margen para rellenar el espacio */
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .logo i {
-            color: #ff9500;
-            margin-right: 10px;
-            font-size: 2rem;
-        }
-
-        .online-users {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-        .active-viewers {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        /* Sección de botones de descarga eliminada */
-
-        .control-buttons {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            gap: 10px;
-        }
-
-        .control-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #fff;
-            background-color: #ff9500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .control-btn:hover {
-            background-color: #e68500;
-            transform: translateY(-2px);
-        }
-
-        .control-btn.stop {
-            background-color: #d32f2f;
-        }
-
-        .control-btn.stop:hover {
-            background-color: #b71c1c;
-        }
-
-        /* --- LADO DERECHO (VIDEO Y CHAT) --- */
-        .video-chat-area {
-            flex-grow: 1;
-            position: relative;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- VIDEOS --- */
-        #strangerVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-        }
-
-        #userVideo {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 200px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #ff9500;
-            z-index: 3;
-            display: none;
-        }
-        
-        /* --- MENSAJES Y CONTROLES SOBRE EL VIDEO --- */
-        .overlay-message {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            color: #fff;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px 30px;
-            border-radius: 10px;
-            z-index: 4;
-        }
-
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 4;
-            display: none;
-        }
-
-        .top-controls button {
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 15px;
-            padding: 8px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .top-controls button:hover {
-            background-color: rgba(255,255,255,0.2);
-        }
-        .top-controls button.active {
-            color: #ff9500;
-        }
-
-        .report-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 5px;
-            z-index: 4;
-            display: none;
-        }
-        .report-btn:hover {
-            color: #d32f2f;
-        }
-
-        /* --- CHAT --- */
-        .chat-overlay {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 40%;
-            max-width: 450px;
-            height: 50%;
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 4;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message.you {
-            background-color: #007aff;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        .message.stranger {
-            background-color: #333;
-            align-self: flex-start;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #444;
-        }
-
-        .chat-input-area input {
-            flex-grow: 1;
-            padding: 8px;
-            border: 1px solid #555;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 15px;
-            outline: none;
-        }
-
-        /* --- MODALS --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 10;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #222;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .modal-content ul {
-            list-style: none;
-            text-align: left;
-            padding: 0;
-        }
-        .modal-content li {
-            padding: 10px;
-            border-bottom: 1px solid #444;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .modal-content li:hover {
-            background-color: #333;
-        }
-        .close-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal:hover { color: #fff; }
-
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        #header { width: 100%; background-color: var(--panel-bg); padding: 20px; text-align: center; border-bottom: 3px solid var(--accent-color); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #header h1 { margin: 0; font-size: 2.5em; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        #gold-display { font-size: 1.8em; margin-top: 10px; color: var(--gold-color); font-weight: bold; }
+        #game-container { display: flex; width: 100%; max-width: 1200px; flex-grow: 1; padding: 20px; gap: 20px; box-sizing: border-box; }
+        #mine-panel { flex: 2; background-color: var(--panel-bg); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #shaft-info { margin-bottom: 20px; text-align: center; }
+        #shaft-info h2 { margin: 0; font-size: 1.8em; color: var(--gold-color); }
+        #mine-button { width: 200px; height: 200px; background-color: var(--button-bg); border: 5px solid var(--accent-color); border-radius: 50%; font-size: 1.5em; font-weight: bold; color: var(--text-color); cursor: pointer; transition: transform 0.1s, background-color 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-bottom: 20px; }
+        #mine-button:hover { background-color: var(--button-hover-bg); }
+        #mine-button:active { transform: scale(0.95); }
+        .progress-container { width: 100%; background-color: var(--disabled-bg); border-radius: 15px; overflow: hidden; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.4); }
+        .progress-bar { height: 30px; width: 0%; background-color: var(--gold-color); transition: width 0.1s linear; text-align: center; line-height: 30px; font-weight: bold; }
+        #upgrade-panel { flex: 1; background-color: var(--panel-bg); border-radius: 10px; padding: 20px; overflow-y: auto; }
+        .upgrade-section { margin-bottom: 30px; }
+        .upgrade-section h3 { border-bottom: 2px solid var(--accent-color); padding-bottom: 5px; margin-top: 0; }
+        .upgrade-item { background-color: var(--button-bg); border: 2px solid var(--accent-color); border-radius: 8px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; text-align: center; }
+        .upgrade-item:hover:not(.disabled) { background-color: var(--button-hover-bg); transform: scale(1.02); }
+        .upgrade-item.disabled { background-color: var(--disabled-bg); color: #999; cursor: not-allowed; border-color: #555; }
+        .upgrade-item h4 { margin: 0 0 5px 0; }
+        .upgrade-item p { margin: 0; font-size: 0.9em; color: var(--gold-color); }
+        @media (max-width: 768px) { #game-container { flex-direction: column; } #header h1 { font-size: 2em; } #gold-display { font-size: 1.5em; } }
     </style>
-    <!-- Font Awesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <!-- Lado Izquierdo: Interfaz de Usuario -->
-    <div class="user-interface">
-        <div class="logo-section">
-            <div class="logo">
-                <i class="fas fa-tv"></i>
-                <span>Ed TV</span>
+    <div id="header">
+        <h1>Idle Miner</h1>
+        <div id="gold-display">Oro: 10</div>
+    </div>
+
+    <div id="game-container">
+        <div id="mine-panel">
+            <div id="shaft-info">
+                <h2>Mina Superficial</h2>
+                <p>Mineros: 0 (Nivel 1)</p>
+                <p>Producción: 0 oro/s</p>
             </div>
-            <div class="online-users" id="globalUsersCount">312.931 usuarios en línea</div>
-            <div class="active-viewers" id="activeViewersCount">0 espectadores activos</div>
-        </div>
-
-        <!-- SECCIÓN DE BOTONES DE DESCARGA ELIMINADA -->
-
-        <div class="control-buttons">
-            <button class="control-btn" id="startButton">Iniciar</button>
-            <button class="control-btn stop" id="stopButton">Parar</button>
-            <button class="control-btn" id="countryButton">País</button>
-            <button class="control-btn" id="iamButton">Soy</button>
-        </div>
-    </div>
-
-    <!-- Lado Derecho: Video y Chat -->
-    <div class="video-chat-area">
-        <video id="strangerVideo" autoplay muted loop>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-        <video id="userVideo" autoplay muted></video>
-
-        <button class="report-btn" id="reportButton" style="display:none;"><i class="fas fa-flag"></i></button>
-
-        <div id="startPrompt" class="overlay-message">
-            <p>Para comenzar, presiona <strong>Iniciar</strong> y acepta las reglas. Mantén tu cámara visible.</p>
-        </div>
-        
-        <div class="top-controls" id="topControls">
-            <button id="micButton"><i class="fas fa-microphone-slash"></i></button>
-            <button id="fullscreenButton"><i class="fas fa-expand"></i></button>
-            <button id="settingsButton"><i class="fas fa-cog"></i></button>
-        </div>
-
-        <div class="chat-overlay" id="chatOverlay">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-area">
-                <form id="messageForm">
-                    <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
-                </form>
+            <button id="mine-button">MINAR</button>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar">0%</div>
             </div>
+            <div id="next-shaft-info"></div>
         </div>
-    </div>
 
-    <!-- Modals -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('settingsModal')">&times;</span>
-            <h2>Configuración</h2>
-            <p>Ajusta tu experiencia aquí (solo por apariencia).</p>
-        </div>
-    </div>
-    <div id="countryModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('countryModal')">&times;</span>
-            <h2>Selecciona tu país</h2>
-            <ul>
-                <li>España</li>
-                <li>México</li>
-                <li>Argentina</li>
-                <li>Colombia</li>
-                <li>Estados Unidos</li>
-            </ul>
-        </div>
-    </div>
-    <div id="iamModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('iamModal')">&times;</span>
-            <h2>Yo soy...</h2>
-            <ul>
-                <li>Chico</li>
-                <li>Chica</li>
-                <li>Pareja</li>
-            </ul>
+        <div id="upgrade-panel">
+            <div class="upgrade-section">
+                <h3>Mejoras de Mina</h3>
+                <div id="mine-upgrades"></div>
+            </div>
+            <div class="upgrade-section">
+                <h3>Gerentes</h3>
+                <div id="manager-upgrades"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- ELEMENTOS DEL DOM ---
-            const startButton = document.getElementById('startButton');
-            const stopButton = document.getElementById('stopButton');
-            const strangerVideo = document.getElementById('strangerVideo');
-            const userVideo = document.getElementById('userVideo');
-            const startPrompt = document.getElementById('startPrompt');
-            const topControls = document.getElementById('topControls');
-            const chatOverlay = document.getElementById('chatOverlay');
-            const chatMessages = document.getElementById('chatMessages');
-            const messageForm = document.getElementById('messageForm');
-            const messageInput = document.getElementById('messageInput');
-            const micButton = document.getElementById('micButton');
-            const fullscreenButton = document.getElementById('fullscreenButton');
-            const reportButton = document.getElementById('reportButton');
+        // --- LÓGICA JAVASCRIPT ---
+        const goldDisplay = document.getElementById('gold-display');
+        const mineButton = document.getElementById('mine-button');
+        const progressBar = document.getElementById('progress-bar');
+        const shaftInfo = document.getElementById('shaft-info');
+        const mineUpgradesContainer = document.getElementById('mine-upgrades');
+        const managerUpgradesContainer = document.getElementById('manager-upgrades');
+        const nextShaftInfo = document.getElementById('next-shaft-info');
 
-            // --- ESTADO Y LÓGICA ---
-            let userStream = null;
-            let audioStream = null;
-            let conversationHistory = [];
-            const API_URL = 'http://localhost:3001/chat';
-            const WS_URL = 'ws://localhost:3001';
+        let gameState = {
+            gold: 10,
+            currentShaft: 0,
+            lastTick: Date.now(),
+            miners: { 0: 0 },
+            minerLevels: { 0: 1 },
+            managers: { doubleSpeed: false, superMiner: false }
+        };
 
-            // --- CONEXIÓN WEBSOCKET PARA CONTEO DE VISTANTES ---
-            const ws = new WebSocket(WS_URL);
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'viewerCount') {
-                    document.getElementById('activeViewersCount').textContent = `${data.count} espectadores activos`;
-                }
-            };
+        const manualMineAmount = 1;
+        let mineProgress = 0;
 
-            // --- SIMULACIÓN DE CONTEO GLOBAL DE USUARIOS ---
-            let globalUsers = 312931;
-            setInterval(() => {
-                const change = Math.floor(Math.random() * 21) - 10;
-                globalUsers += change;
-                if (globalUsers < 300000) globalUsers = 300000;
-                document.getElementById('globalUsersCount').textContent = `${globalUsers.toLocaleString('es-ES')} usuarios en línea`;
-            }, 5000);
+        const shafts = [
+            { name: 'Mina Superficial', baseCost: 15, baseGoldPerSec: 1, unlockCost: 0 },
+            { name: 'Mina de Hierro', baseCost: 250, baseGoldPerSec: 5, unlockCost: 1000 },
+            { name: 'Mina de Oro', baseCost: 3000, baseGoldPerSec: 25, unlockCost: 15000 },
+            { name: 'Mina de Diamantes', baseCost: 50000, baseGoldPerSec: 150, unlockCost: 250000 },
+            { name: 'Mina de Esmeraldas', baseCost: 1000000, baseGoldPerSec: 1000, unlockCost: 5000000 }
+        ];
 
-            // --- FUNCIONES ---
-            const addMessage = (text, sender) => {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender);
-                messageDiv.textContent = text;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            };
+        const managerData = [
+            { id: 'doubleSpeed', name: 'Duplicador de Velocidad', cost: 500, description: '¡Todas las minas son 2x más rápidas!' },
+            { id: 'superMiner', name: 'Súper Minero', cost: 10000, description: '¡Cada minero es 3x más eficiente!' }
+        ];
+
+        // --- FUNCIONES PRINCIPALES ---
+        function loadGame() { const savedState = localStorage.getItem('idleMinerGameState'); if (savedState) { gameState = JSON.parse(savedState); } if (!gameState.miners) gameState.miners = {}; if (!gameState.minerLevels) gameState.minerLevels = {}; if (!gameState.managers) gameState.managers = {}; }
+        function saveGame() { localStorage.setItem('idleMinerGameState', JSON.stringify(gameState)); }
+        function formatNumber(num) { if (num < 1000) return num.toFixed(0); if (num < 1000000) return (num / 1000).toFixed(1) + 'k'; if (num < 1000000000) return (num / 1000000).toFixed(2) + 'M'; return (num / 1000000000).toFixed(2) + 'B'; }
+
+        function getGoldPerSecond() {
+            const shaft = shafts[gameState.currentShaft];
+            const miners = gameState.miners[gameState.currentShaft] || 0;
+            const level = gameState.minerLevels[gameState.currentShaft] || 1;
+            let gps = miners * level * shaft.baseGoldPerSec;
+            if (gameState.managers.superMiner) gps *= 3;
+            if (gameState.managers.doubleSpeed) gps *= 2;
+            return gps;
+        }
+
+        function update(delta) {
+            const gps = getGoldPerSecond();
+            gameState.gold += gps * (delta / 1000);
+            mineProgress += gps * (delta / 1000);
+            if (mineProgress > 1) mineProgress = 1;
+            progressBar.style.width = `${mineProgress * 100}%`;
+            progressBar.textContent = `${(mineProgress * 100).toFixed(1)}%`;
+            render();
+        }
+
+        function render() {
+            goldDisplay.textContent = `Oro: ${formatNumber(gameState.gold)}`;
+            const shaft = shafts[gameState.currentShaft];
+            const miners = gameState.miners[gameState.currentShaft] || 0;
+            const level = gameState.minerLevels[gameState.currentShaft] || 1;
+            shaftInfo.innerHTML = `<h2>${shaft.name}</h2><p>Mineros: ${miners} (Nivel ${level})</p><p>Producción: ${formatNumber(getGoldPerSecond())} oro/s</p>`;
+            renderMineUpgrades();
+            renderManagerUpgrades();
+            renderNextShaftInfo();
+        }
+        
+        // --- ACCIONES DEL JUGADOR (CON LA CORRECCIÓN APLICADA) ---
+
+        function buyMiner() {
+            const minerCount = gameState.miners[gameState.currentShaft] || 0;
+            const shaft = shafts[gameState.currentShaft];
+            const cost = Math.floor(shaft.baseCost * Math.pow(1.15, minerCount));
             
-            const getBotResponse = async (userMessage) => {
-                conversationHistory.push({ role: 'user', content: userMessage });
-                try {
-                    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversationHistory }) });
-                    const data = await response.json();
-                    const botReply = data.reply;
-                    conversationHistory.push({ role: 'assistant', content: botReply });
-                    addMessage(botReply, 'stranger');
-                } catch (error) {
-                    console.error('Error:', error);
-                    addMessage('El extraño se ha desconectado.', 'stranger');
-                }
-            };
+            if (gameState.gold >= cost) {
+                gameState.gold -= cost; // <-- ¡AQUÍ SE RESTA EL ORO AL CONTRATAR!
+                gameState.miners[gameState.currentShaft] = minerCount + 1;
+                render();
+            }
+        }
 
-            const startMedia = async () => {
-                try {
-                    userStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    userVideo.srcObject = userStream;
-                    userVideo.style.display = 'block';
-                } catch (error) { console.error("Error de cámara:", error); userVideo.style.display = 'none'; }
-            };
-            const stopMedia = () => {
-                if (userStream) { userStream.getTracks().forEach(t => t.stop()); userStream = null; }
-                if (audioStream) { audioStream.getTracks().forEach(t => t.stop()); audioStream = null; }
-                userVideo.style.display = 'none';
-            };
+        function upgradeMiner() {
+            const minerLevel = gameState.minerLevels[gameState.currentShaft] || 1;
+            const shaft = shafts[gameState.currentShaft];
+            const cost = Math.floor(shaft.baseCost * 10 * Math.pow(1.5, minerLevel -1));
 
-            const toggleMicrophone = async () => {
-                const icon = micButton.querySelector('i');
-                if (audioStream) {
-                    audioStream.getTracks().forEach(t => t.stop());
-                    audioStream = null;
-                    icon.className = 'fas fa-microphone-slash';
-                    micButton.classList.remove('active');
-                } else {
-                    try {
-                        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        icon.className = 'fas fa-microphone';
-                        micButton.classList.add('active');
-                    } catch (error) { console.error("Error de micrófono:", error); }
-                }
-            };
+            if (gameState.gold >= cost) {
+                gameState.gold -= cost; // <-- ¡AQUÍ SE RESTA EL ORO AL MEJORAR!
+                gameState.minerLevels[gameState.currentShaft] = minerLevel + 1;
+                render();
+            }
+        }
 
-            const toggleFullscreen = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-compress';
-                } else {
-                    document.exitFullscreen();
-                    fullscreenButton.querySelector('i').className = 'fas fa-expand';
-                }
-            };
-            
-            const openModal = (modalId) => { document.getElementById(modalId).style.display = 'flex'; };
-            const closeModal = (modalId) => { document.getElementById(modalId).style.display = 'none'; };
-            window.closeModal = closeModal;
-            
-            const startChat = () => {
-                startPrompt.style.display = 'none';
-                topControls.style.display = 'block';
-                chatOverlay.style.display = 'flex';
-                reportButton.style.display = 'block';
-                
-                strangerVideo.style.display = 'block';
-                strangerVideo.play();
-                startMedia();
-                getBotResponse("Hola, ¿qué tal?");
-            };
+        function buyManager(managerId) {
+            const manager = managerData.find(m => m.id === managerId);
+            if (gameState.gold >= manager.cost && !gameState.managers[managerId]) {
+                gameState.gold -= manager.cost; // <-- ¡AQUÍ SE RESTA EL ORO AL COMPRAR UN GERENTE!
+                gameState.managers[managerId] = true;
+                render();
+            }
+        }
 
-            const stopChat = () => {
-                stopMedia();
-                strangerVideo.pause(); strangerVideo.currentTime = 0; strangerVideo.style.display = 'none';
-                conversationHistory = []; chatMessages.innerHTML = '';
-                topControls.style.display = 'none'; chatOverlay.style.display = 'none'; reportButton.style.display = 'none';
-                startPrompt.style.display = 'block';
-            };
+        function renderMineUpgrades() {
+            const minerCount = gameState.miners[gameState.currentShaft] || 0;
+            const minerLevel = gameState.minerLevels[gameState.currentShaft] || 1;
+            const shaft = shafts[gameState.currentShaft];
+            const hireCost = Math.floor(shaft.baseCost * Math.pow(1.15, minerCount));
+            const upgradeCost = Math.floor(shaft.baseCost * 10 * Math.pow(1.5, minerLevel -1));
 
-            // --- EVENT LISTENERS ---
-            startButton.addEventListener('click', startChat);
-            stopButton.addEventListener('click', stopChat);
-            micButton.addEventListener('click', toggleMicrophone);
-            fullscreenButton.addEventListener('click', toggleFullscreen);
-            document.getElementById('settingsButton').addEventListener('click', () => openModal('settingsModal'));
-            document.getElementById('countryButton').addEventListener('click', () => openModal('countryModal'));
-            document.getElementById('iamButton').addEventListener('click', () => openModal('iamModal'));
-            reportButton.addEventListener('click', () => alert('Usuario reportado. (Solo es una simulación)'));
+            mineUpgradesContainer.innerHTML = `
+                <div class="upgrade-item ${gameState.gold < hireCost ? 'disabled' : ''}" onclick="buyMiner()">
+                    <h4>Contratar Minero</h4>
+                    <p>Costo: ${formatNumber(hireCost)} oro</p>
+                </div>
+                <div class="upgrade-item ${gameState.gold < upgradeCost ? 'disabled' : ''}" onclick="upgradeMiner()">
+                    <h4>Mejorar Minero (Nivel ${minerLevel + 1})</h4>
+                    <p>Costo: ${formatNumber(upgradeCost)} oro</p>
+                </div>
+            `;
+        }
 
-            messageForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const text = messageInput.value.trim();
-                if (text) { addMessage(text, 'you'); messageInput.value = ''; getBotResponse(text); }
+        function renderManagerUpgrades() {
+            managerUpgradesContainer.innerHTML = '';
+            managerData.forEach(manager => {
+                if (gameState.managers[manager.id]) return;
+                const isDisabled = gameState.gold < manager.cost;
+                const div = document.createElement('div');
+                div.className = `upgrade-item ${isDisabled ? 'disabled' : ''}`;
+                div.onclick = () => buyManager(manager.id);
+                div.innerHTML = `<h4>${manager.name}</h4><p>${manager.description}</p><p>Costo: ${formatNumber(manager.cost)} oro</p>`;
+                managerUpgradesContainer.appendChild(div);
             });
-        });
+        }
+        
+        function unlockNextShaft() {
+            if (gameState.currentShaft >= shafts.length - 1) return;
+            const nextShaft = shafts[gameState.currentShaft + 1];
+            if (gameState.gold >= nextShaft.unlockCost) {
+                gameState.gold -= nextShaft.unlockCost; // <-- ¡Y AQUÍ TAMBIÉN SE RESTA EL ORO!
+                gameState.currentShaft++;
+                if (!gameState.miners[gameState.currentShaft]) { gameState.miners[gameState.currentShaft] = 0; gameState.minerLevels[gameState.currentShaft] = 1; }
+                render();
+            }
+        }
+        
+        function renderNextShaftInfo() {
+             if (gameState.currentShaft >= shafts.length - 1) { nextShaftInfo.innerHTML = `<p style="color: var(--gold-color);">¡Has alcanzado la mina más profunda!</p>`; return; }
+            const nextShaft = shafts[gameState.currentShaft + 1];
+            const canUnlock = gameState.gold >= nextShaft.unlockCost;
+            nextShaftInfo.innerHTML = `<div class="upgrade-item ${!canUnlock ? 'disabled' : ''}" onclick="unlockNextShaft()"><h4>Desbloquear: ${nextShaft.name}</h4><p>Costo: ${formatNumber(nextShaft.unlockCost)} oro</p></div>`;
+        }
+
+        function manualMine() { gameState.gold += manualMineAmount; mineProgress = 0; render(); }
+
+        // --- BUCLE DEL JUEGO Y EVENTOS ---
+        function gameLoop() { const now = Date.now(); const delta = now - gameState.lastTick; update(delta); gameState.lastTick = now; requestAnimationFrame(gameLoop); }
+        mineButton.addEventListener('click', manualMine);
+        window.addEventListener('beforeunload', saveGame);
+        loadGame();
+        render();
+        gameLoop();
+        setInterval(saveGame, 30000);
     </script>
 </body>
 </html>
