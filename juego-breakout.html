@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Breaker - Nexus Arcade</title>
+    <title>Neon Breaker - Ed Arcade</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #0a0a0f; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; }
         body { background-color: var(--bg-color); color: #e0e0e0; font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .game-header { position: absolute; top: 20px; left: 20px; }
+        .game-header { position: absolute; top: 20px; left: 20px; z-index: 100; }
         .game-header a { font-family: 'Orbitron', sans-serif; color: var(--primary-color); text-decoration: none; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .game-container { text-align: center; }
+        .game-container { text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 550px; }
         .game-container h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
-        #gameCanvas { border: 2px solid var(--primary-color); border-radius: 10px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); background-color: #111; }
+        #gameCanvas { border: 2px solid var(--primary-color); border-radius: 10px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); background-color: #111; max-width: 100%; height: auto; touch-action: none; }
         .game-controls { margin-top: 1.5rem; }
         .game-controls p { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; }
+        @media (max-width: 768px) { .game-controls p { display: none; } }
     </style>
 </head>
 <body>
@@ -28,8 +29,13 @@
         const brickRowCount = 5; const brickColumnCount = 8; const brickWidth = 50; const brickHeight = 20; const brickPadding = 5; const brickOffsetTop = 30; const brickOffsetLeft = 20;
         let bricks = []; for(let c=0; c<brickColumnCount; c++) { bricks[c] = []; for(let r=0; r<brickRowCount; r++) { bricks[c][r] = { x: 0, y: 0, status: 1 }; } }
         let score = 0; let lives = 3;
-        document.addEventListener("mousemove", mouseMoveHandler);
+        
         function mouseMoveHandler(e) { const relativeX = e.clientX - canvas.offsetLeft; if(relativeX > 0 && relativeX < canvas.width) { paddleX = relativeX - paddleWidth / 2; } }
+        function touchMoveHandler(e) { e.preventDefault(); const relativeX = e.touches[0].clientX - canvas.offsetLeft; if(relativeX > 0 && relativeX < canvas.width) { paddleX = relativeX - paddleWidth / 2; } }
+
+        document.addEventListener("mousemove", mouseMoveHandler);
+        canvas.addEventListener("touchmove", touchMoveHandler, { passive: false });
+
         function collisionDetection() { for(let c=0; c<brickColumnCount; c++) { for(let r=0; r<brickRowCount; r++) { const b = bricks[c][r]; if(b.status == 1) { if(ballX > b.x && ballX < b.x + brickWidth && ballY > b.y && ballY < b.y + brickHeight) { ballDY = -ballDY; b.status = 0; score++; if(score == brickRowCount * brickColumnCount) { alert("¡GANASTE!"); document.location.reload(); } } } } } }
         function drawBall() { ctx.beginPath(); ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2); ctx.fillStyle = "#00d4ff"; ctx.fill(); ctx.closePath(); }
         function drawPaddle() { ctx.beginPath(); ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight); ctx.fillStyle = "#ff006e"; ctx.fill(); ctx.closePath(); }
