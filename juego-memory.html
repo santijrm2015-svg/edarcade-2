@@ -3,399 +3,699 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Matrix - Ed Arcade</title>
-    
-    <!-- Google Fonts para un estilo atractivo -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
+    <title>Memory Matrix - MiniJuegos</title>
     <style>
-        /* --- VARIABLES DE ESTILO --- */
-        :root {
-            --bg-color: #0a0a0f;
-            --card-bg: #1a1a2e;
-            --text-color: #e0e0e0;
-            --primary-color: #00d4ff;
-            --secondary-color: #ff006e;
-            --success-color: #0f0; /* Verde para las parejas encontradas */
-            --perfect-color: #FFD700; /* Color dorado para el juego perfecto */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* --- ESTILOS GLOBALES Y DEL CONTENEDOR --- */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .game-container {
-            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
             width: 100%;
-            max-width: 500px;
-            padding: 1rem;
         }
 
-        .game-container h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            text-shadow: 0 0 10px var(--primary-color);
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #764ba2;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .game-info {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
             display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        /* --- ESTILOS DEL TABLERO DE JUEGO Y CARTAS --- */
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
             gap: 10px;
-            perspective: 1000px;
         }
 
-        .card {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            cursor: pointer;
-        }
-
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .card-front, .card-back {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            backface-visibility: hidden;
-            border-radius: 10px;
+        .info-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
             display: flex;
             align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-item span {
+            font-size: 1.2em;
+        }
+
+        .lives {
+            display: flex;
+            gap: 5px;
+        }
+
+        .heart {
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .heart.lost {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+
+        .matrix-container {
+            display: grid;
+            gap: 10px;
+            margin: 30px auto;
+            max-width: 400px;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            background: #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .cell:hover:not(.disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            animation: pulse 0.5s ease-out;
+        }
+
+        .cell.correct {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            animation: correctPulse 0.5s ease-out;
+        }
+
+        .cell.wrong {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            animation: shake 0.5s ease-out;
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        @keyframes correctPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
             justify-content: center;
-            font-size: 2.5rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-top: 30px;
         }
 
-        .card-front {
-            background: var(--card-bg);
-            border: 2px solid var(--primary-color);
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .card-back {
-            background: var(--primary-color);
-            color: var(--bg-color);
-            transform: rotateY(180deg);
-        }
-        
-        /* Estilo para las cartas que han sido emparejadas */
-        .card.matched .card-front {
-            border-color: var(--success-color);
-            box-shadow: 0 0 15px var(--success-color);
-        }
-        .card.matched {
-            /* Hacemos la carta no cliqueable una vez emparejada */
-            pointer-events: none;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* --- ESTILOS PARA LA PANTALLA DE VICTORIA Y BOTONES --- */
-        .win-screen {
-            display: none; /* Oculta por defecto */
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .message.info {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+        }
+
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 10, 15, 0.85);
-            z-index: 1000;
-            flex-direction: column;
-            align-items: center;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
             justify-content: center;
-            text-align: center;
+            align-items: center;
+            z-index: 1000;
         }
 
-        .win-screen.show {
+        .overlay.show {
             display: flex;
         }
 
-        .win-content h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 15px currentColor;
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .win-content p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .btn:hover {
-            background-color: #00a8cc;
-            transform: scale(1.05);
-        }
-
-        /* --- MEDIA QUERIES PARA DISPOSITIVOS MÓVILES --- */
-        @media (max-width: 480px) {
-            .game-board {
-                gap: 8px;
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
             }
-            .card-front, .card-back {
-                font-size: 2rem;
+            to {
+                transform: translateY(0);
+                opacity: 1;
             }
-            .game-container h1 {
-                font-size: 2rem;
+        }
+
+        .modal h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: bold;
+            color: #764ba2;
+            z-index: 100;
+            animation: countdownPulse 1s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes countdownPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
             }
-            .win-content h2 {
-                font-size: 2.5rem;
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .game-info {
+                justify-content: center;
+            }
+            
+            .matrix-container {
+                max-width: 300px;
             }
         }
     </style>
 </head>
 <body>
-
     <div class="game-container">
-        <h1>Memory Matrix</h1>
-        <div class="game-info">
-            <span>Movimientos: <span id="moves">0</span></span>
-            <button id="reset-btn" class="btn">Nuevo Juego</button>
-        </div>
-        <div class="game-board" id="gameBoard"></div>
+        <header>
+            <h1>🧠 Memory Matrix</h1>
+            <p style="color: #666;">Recuerda y reproduce el patrón</p>
+        </header>
+
+        <main>
+            <div class="game-info">
+                <div class="info-item">
+                    <span>🏆</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="info-item">
+                    <span>📊</span>
+                    <span>Nivel <span id="level">1</span></span>
+                </div>
+                <div class="info-item">
+                    <span>❤️</span>
+                    <div class="lives" id="lives">
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                        <span class="heart">❤️</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="matrix-container" id="matrix">
+                <!-- Las celdas se generarán dinámicamente -->
+            </div>
+
+            <div class="controls">
+                <button id="startBtn">Iniciar Juego</button>
+                <button id="resetBtn">Reiniciar</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </main>
     </div>
 
-    <!-- Pantalla de Victoria (inicialmente oculta) -->
-    <div class="win-screen" id="winScreen">
-        <div class="win-content">
-            <h2>¡GANASTE!</h2>
-            <p>Completaste el juego en <span id="final-moves">0</span> movimientos.</p>
-            <button id="play-again-btn" class="btn">Jugar de Nuevo</button>
+    <div class="overlay" id="gameOverOverlay">
+        <div class="modal">
+            <h2 id="gameOverTitle">¡Juego Terminado!</h2>
+            <p id="gameOverMessage">Tu puntuación final: <span id="finalScore">0</span></p>
+            <p id="gameOverStats"></p>
+            <button onclick="resetGame()">Jugar de Nuevo</button>
         </div>
     </div>
 
-<script>
-// ===================================================================
-// LÓGICA DEL JUEGO MEMORY MATRIX
-// ===================================================================
-(function() {
-    'use strict';
+    <script>
+        class MemoryMatrix {
+            constructor() {
+                this.gridSize = 4;
+                this.level = 1;
+                this.score = 0;
+                this.lives = 3;
+                this.activeCells = [];
+                this.userSelection = [];
+                this.isPlaying = false;
+                this.showingPattern = false;
+                this.correctCells = [];
+                this.wrongCells = [];
+                this.totalCorrect = 0;
+                this.totalWrong = 0;
+                
+                this.init();
+            }
 
-    // --- VARIABLES DEL JUEGO ---
-    const gameBoard = document.getElementById('gameBoard');
-    const movesDisplay = document.getElementById('moves');
-    const winScreen = document.getElementById('winScreen');
-    const finalMovesDisplay = document.getElementById('final-moves');
-    const winMessageDisplay = document.querySelector('.win-content h2');
-    const resetBtn = document.getElementById('reset-btn');
-    const playAgainBtn = document.getElementById('play-again-btn');
+            init() {
+                this.createGrid();
+                this.attachEventListeners();
+                this.updateDisplay();
+            }
 
-    // Símbolos para las cartas
-    const emojis = ['🚀', '🌟', '🎮', '🏆', '👾', '🛸', '💎', '🔮'];
-    const totalPairs = emojis.length;
-    
-    // Estado del juego
-    let cards = [];
-    let moves = 0;
-    let firstCard = null;
-    let secondCard = null;
-    let lockBoard = false;
-    let matchedPairs = 0;
-    let unflipTimeoutId = null;
+            createGrid() {
+                const matrix = document.getElementById('matrix');
+                matrix.innerHTML = '';
+                matrix.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+                matrix.style.gridTemplateRows = `repeat(${this.gridSize}, 1fr)`;
 
-    // --- FUNCIONES DEL JUEGO ---
+                for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    matrix.appendChild(cell);
+                }
+            }
 
-    /**
-     * Baraja un array utilizando el algoritmo de Fisher-Yates.
-     * @param {Array} array - El array a barajar.
-     */
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+            attachEventListeners() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
+                
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.addEventListener('click', (e) => this.handleCellClick(e));
+                });
+            }
+
+            startGame() {
+                if (this.isPlaying) return;
+                
+                this.isPlaying = true;
+                this.userSelection = [];
+                this.correctCells = [];
+                this.wrongCells = [];
+                
+                document.getElementById('startBtn').disabled = true;
+                this.showMessage('¡Prepárate!', 'info');
+                
+                setTimeout(() => {
+                    this.generatePattern();
+                    this.showPattern();
+                }, 1000);
+            }
+
+            generatePattern() {
+                const totalCells = this.gridSize * this.gridSize;
+                const patternSize = Math.min(3 + Math.floor(this.level / 2), totalCells - 2);
+                
+                this.activeCells = [];
+                const availableIndices = Array.from({length: totalCells}, (_, i) => i);
+                
+                for (let i = 0; i < patternSize; i++) {
+                    const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                    const selectedIndex = availableIndices.splice(randomIndex, 1)[0];
+                    this.activeCells.push(selectedIndex);
+                }
+            }
+
+            showPattern() {
+                this.showingPattern = true;
+                const cells = document.querySelectorAll('.cell');
+                
+                // Deshabilitar clics durante la muestra
+                cells.forEach(cell => cell.classList.add('disabled'));
+                
+                // Mostrar cuenta regresiva
+                this.showCountdown(3);
+                
+                setTimeout(() => {
+                    this.activeCells.forEach((index, i) => {
+                        setTimeout(() => {
+                            cells[index].classList.add('active');
+                            this.playSound('show');
+                        }, i * 200);
+                    });
+                    
+                    // Mantener el patrón visible según el nivel
+                    const displayTime = Math.max(2000 - (this.level * 100), 800);
+                    
+                    setTimeout(() => {
+                        cells.forEach(cell => cell.classList.remove('active'));
+                        this.showingPattern = false;
+                        cells.forEach(cell => cell.classList.remove('disabled'));
+                        this.showMessage('¡Tu turno! Reproduce el patrón', 'info');
+                    }, this.activeCells.length * 200 + displayTime);
+                }, 1000);
+            }
+
+            showCountdown(number) {
+                const matrix = document.getElementById('matrix');
+                const countdown = document.createElement('div');
+                countdown.className = 'countdown';
+                countdown.textContent = number;
+                matrix.appendChild(countdown);
+                
+                setTimeout(() => {
+                    countdown.remove();
+                }, 1000);
+            }
+
+            handleCellClick(e) {
+                if (this.showingPattern || !this.isPlaying) return;
+                
+                const cell = e.target;
+                const index = parseInt(cell.dataset.index);
+                
+                if (this.userSelection.includes(index)) return;
+                
+                this.userSelection.push(index);
+                
+                if (this.activeCells.includes(index)) {
+                    cell.classList.add('correct');
+                    this.correctCells.push(index);
+                    this.playSound('correct');
+                    this.score += 10;
+                    this.totalCorrect++;
+                    
+                    if (this.correctCells.length === this.activeCells.length) {
+                        this.levelComplete();
+                    }
+                } else {
+                    cell.classList.add('wrong');
+                    this.wrongCells.push(index);
+                    this.playSound('wrong');
+                    this.lives--;
+                    this.totalWrong++;
+                    
+                    setTimeout(() => {
+                        this.showMessage('¡Incorrecto! Pierdes una vida', 'error');
+                        this.updateLives();
+                        
+                        if (this.lives <= 0) {
+                            this.gameOver();
+                        } else {
+                            setTimeout(() => {
+                                this.nextRound();
+                            }, 1500);
+                        }
+                    }, 500);
+                }
+                
+                this.updateDisplay();
+            }
+
+            levelComplete() {
+                this.score += 50 * this.level;
+                this.showMessage(`¡Nivel ${this.level} completado! +${50 * this.level} puntos`, 'success');
+                this.playSound('levelComplete');
+                
+                setTimeout(() => {
+                    this.level++;
+                    this.nextRound();
+                }, 2000);
+            }
+
+            nextRound() {
+                this.userSelection = [];
+                this.correctCells = [];
+                this.wrongCells = [];
+                
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.classList.remove('correct', 'wrong', 'active');
+                });
+                
+                this.updateDisplay();
+                
+                if (this.isPlaying) {
+                    setTimeout(() => {
+                        this.generatePattern();
+                        this.showPattern();
+                    }, 1000);
+                }
+            }
+
+            gameOver() {
+                this.isPlaying = false;
+                document.getElementById('startBtn').disabled = false;
+                
+                const overlay = document.getElementById('gameOverOverlay');
+                const finalScore = document.getElementById('finalScore');
+                const stats = document.getElementById('gameOverStats');
+                
+                finalScore.textContent = this.score;
+                stats.innerHTML = `
+                    Nivel alcanzado: ${this.level}<br>
+                    Aciertos totales: ${this.totalCorrect}<br>
+                    Errores totales: ${this.totalWrong}
+                `;
+                
+                overlay.classList.add('show');
+                this.playSound('gameOver');
+            }
+
+            resetGame() {
+                this.level = 1;
+                this.score = 0;
+                this.lives = 3;
+                this.activeCells = [];
+                this.userSelection = [];
+                this.correctCells = [];
+                this.wrongCells = [];
+                this.totalCorrect = 0;
+                this.totalWrong = 0;
+                this.isPlaying = false;
+                this.showingPattern = false;
+                
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.classList.remove('correct', 'wrong', 'active', 'disabled');
+                });
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('gameOverOverlay').classList.remove('show');
+                
+                this.updateDisplay();
+                this.updateLives();
+                this.hideMessage();
+            }
+
+            updateDisplay() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+            }
+
+            updateLives() {
+                const hearts = document.querySelectorAll('.heart');
+                hearts.forEach((heart, index) => {
+                    if (index >= this.lives) {
+                        heart.classList.add('lost');
+                    } else {
+                        heart.classList.remove('lost');
+                    }
+                });
+            }
+
+            showMessage(text, type) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.className = `message ${type} show`;
+                
+                setTimeout(() => {
+                    this.hideMessage();
+                }, 3000);
+            }
+
+            hideMessage() {
+                const message = document.getElementById('message');
+                message.classList.remove('show');
+            }
+
+            playSound(type) {
+                // Crear sonidos usando Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                switch(type) {
+                    case 'correct':
+                        oscillator.frequency.value = 523.25; // C5
+                        gainNode.gain.value = 0.3;
+                        break;
+                    case 'wrong':
+                        oscillator.frequency.value = 220; // A3
+                        gainNode.gain.value = 0.3;
+                        break;
+                    case 'show':
+                        oscillator.frequency.value = 440; // A4
+                        gainNode.gain.value = 0.2;
+                        break;
+                    case 'levelComplete':
+                        oscillator.frequency.value = 659.25; // E5
+                        gainNode.gain.value = 0.3;
+                        break;
+                    case 'gameOver':
+                        oscillator.frequency.value = 110; // A2
+                        gainNode.gain.value = 0.3;
+                        break;
+                }
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.1);
+            }
         }
-    }
 
-    /**
-     * Maneja el evento de clic en una carta.
-     */
-    function flipCard() {
-        if (lockBoard) return;
-        if (this === firstCard) return;
+        // Inicializar el juego
+        let game;
+        document.addEventListener('DOMContentLoaded', () => {
+            game = new MemoryMatrix();
+        });
 
-        this.classList.add('flipped');
-
-        if (!firstCard) {
-            // Primer clic
-            firstCard = this;
-            return;
+        function resetGame() {
+            game.resetGame();
         }
-
-        // Segundo clic
-        secondCard = this;
-        checkForMatch();
-    }
-
-    /**
-     * Crea el elemento DOM para una carta.
-     * @param {string} emoji - El emoji que irá en la parte trasera de la carta.
-     * @returns {HTMLElement} - El elemento de la carta.
-     */
-    function createCard(emoji) {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        card.innerHTML = `
-            <div class="card-front"></div>
-            <div class="card-back">${emoji}</div>
-        `;
-        card.addEventListener('click', flipCard);
-        return card;
-    }
-
-    /**
-     * Comprueba si las dos cartas volteadas son una pareja.
-     */
-    function checkForMatch() {
-        const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent;
-        moves++;
-        movesDisplay.textContent = moves;
-
-        isMatch ? disableCards() : unflipCards();
-    }
-
-    /**
-     * Deshabilita las cartas emparejadas y comprueba la condición de victoria.
-     */
-    function disableCards() {
-        firstCard.removeEventListener('click', flipCard);
-        secondCard.removeEventListener('click', flipCard);
-
-        // Añadir clase para estilo visual de pareja encontrada
-        firstCard.classList.add('matched');
-        secondCard.classList.add('matched');
-
-        matchedPairs++;
-        if (matchedPairs === totalPairs) {
-            // Se han encontrado todas las parejas
-            setTimeout(showWinScreen, 500); // Pequeña espera para que se vea la última pareja
-        }
-
-        resetBoard();
-    }
-
-    /**
-     * Vuelve a voltear las cartas si no son una pareja.
-     */
-    function unflipCards() {
-        lockBoard = true;
-        unflipTimeoutId = setTimeout(() => {
-            firstCard.classList.remove('flipped');
-            secondCard.classList.remove('flipped');
-            resetBoard();
-        }, 1000);
-    }
-
-    /**
-     * Restablece el estado del tablero para el siguiente turno.
-     */
-    function resetBoard() {
-        [firstCard, secondCard] = [null, null];
-        lockBoard = false;
-    }
-
-    /**
-     * Muestra la pantalla de victoria con el resultado final.
-     * Incluye una verificación para un "Juego Perfecto".
-     */
-    function showWinScreen() {
-        // Medida de seguridad para evitar mostrar la pantalla de victoria si no se ha jugado.
-        if (moves === 0) {
-            console.error("Intento de mostrar pantalla de victoria con 0 movimientos. Abortando.");
-            return;
-        }
-
-        finalMovesDisplay.textContent = moves;
-
-        // Comprobar si es un juego perfecto (ganar sin fallos)
-        if (moves === totalPairs) {
-            winMessageDisplay.textContent = '¡JUEGO PERFECTO!';
-            winMessageDisplay.style.color = 'var(--perfect-color)';
-        } else {
-            winMessageDisplay.textContent = '¡GANASTE!';
-            winMessageDisplay.style.color = 'var(--success-color)';
-        }
-        
-        winScreen.classList.add('show');
-    }
-
-    /**
-     * Oculta la pantalla de victoria.
-     */
-    function hideWinScreen() {
-        winScreen.classList.remove('show');
-    }
-
-    /**
-     * Inicializa o reinicia el juego por completo.
-     */
-    function startGame() {
-        // Limpiar estado anterior
-        clearTimeout(unflipTimeoutId);
-        gameBoard.innerHTML = '';
-        hideWinScreen();
-        
-        // Restablecer variables de estado
-        cards = [...emojis, ...emojis];
-        moves = 0;
-        matchedPairs = 0;
-        movesDisplay.textContent = moves;
-        resetBoard();
-
-        // Barajar y crear las cartas en el tablero
-        shuffle(cards);
-        cards.forEach(emoji => gameBoard.appendChild(createCard(emoji)));
-    }
-    
-    // --- INICIALIZACIÓN DEL JUEGO ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Añadir listeners a los botones de reinicio
-        resetBtn.addEventListener('click', startGame);
-        playAgainBtn.addEventListener('click', startGame);
-
-        // Iniciar la primera partida
-        startGame();
-    });
-
-})(); // FIN DEL IIFE
-// ===================================================================
-
-</script>
+    </script>
 </body>
 </html>
