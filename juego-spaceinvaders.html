@@ -89,28 +89,47 @@
     const ARMAGEDDON_COOLDOWN = 30000; // 30 segundos
     let lastArmageddonTime = 0;
 
-    // Configuración de niveles
+    // --- VARIABLES PARA CONGELACIÓN DEL TIEMPO (SECRETO) ---
+    const TIME_FREEZE_DURATION = 5000; // 5 segundos
+    const TIME_FREEZE_COOLDOWN = 25000; // 25 segundos
+    let isTimeFrozen = false;
+    let timeFreezeEndTime = 0;
+    let lastTimeFreezeTime = 0;
+
+    // Configuración de niveles ampliada
     const levelConfigs = [
         // Nivel 1 - Básico
-        { rows: 5, cols: 11, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Primera Oleada", bossLevel: false },
-        // Nivel 2 - Más rápido
-        { rows: 5, cols: 11, speed: 0.7, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Velocidad Incrementada", bossLevel: false },
-        // Nivel 3 - Más invasores
-        { rows: 6, cols: 12, speed: 0.6, dropDistance: 15, shootChance: 0.0015, pattern: 'standard', name: "Reforzamiento Enemigo", bossLevel: false },
-        // Nivel 4 - Movimiento en zigzag
-        { rows: 5, cols: 11, speed: 0.7, dropDistance: 15, shootChance: 0.002, pattern: 'zigzag', name: "Patrón Zigzag", bossLevel: false },
-        // Nivel 5 - Primer jefe
-        { rows: 3, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Enfrentamiento con el Jefe", bossLevel: true, bossType: 'basic' },
-        // Nivel 6 - Más rápido con patrón de ataque
-        { rows: 6, cols: 11, speed: 0.8, dropDistance: 15, shootChance: 0.0025, pattern: 'dive', name: "Ataque en Picada", bossLevel: false },
-        // Nivel 7 - Formación densa
-        { rows: 7, cols: 13, speed: 0.6, dropDistance: 10, shootChance: 0.002, pattern: 'tight', name: "Formación Densa", bossLevel: false },
-        // Nivel 8 - Patrón aleatorio
-        { rows: 5, cols: 11, speed: 0.9, dropDistance: 15, shootChance: 0.003, pattern: 'random', name: "Movimiento Errático", bossLevel: false },
-        // Nivel 9 - Segundo jefe
-        { rows: 4, cols: 8, speed: 0.6, dropDistance: 20, shootChance: 0.002, pattern: 'standard', name: "Confrontación Final", bossLevel: true, bossType: 'advanced' },
-        // Nivel 10+ - Niveles infinitos con dificultad creciente
-        { rows: 5, cols: 11, speed: 1.0, dropDistance: 15, shootChance: 0.003, pattern: 'mixed', name: "Sobrevivencia Extrema", bossLevel: false, infinite: true }
+        { rows: 4, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Nivel 1: Invasión Inicial", bossLevel: false },
+        // Nivel 2 - Más invasores
+        { rows: 4, cols: 10, speed: 0.6, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Nivel 2: Refuerzos Enemigos", bossLevel: false },
+        // Nivel 3 - Más rápido
+        { rows: 5, cols: 10, speed: 0.7, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Nivel 3: Aceleración", bossLevel: false },
+        // Nivel 4 - Formación densa
+        { rows: 5, cols: 11, speed: 0.6, dropDistance: 15, shootChance: 0.002, pattern: 'tight', name: "Nivel 4: Formación Densa", bossLevel: false },
+        // Nivel 5 - Movimiento en zigzag
+        { rows: 5, cols: 11, speed: 0.7, dropDistance: 15, shootChance: 0.002, pattern: 'zigzag', name: "Nivel 5: Patrón Zigzag", bossLevel: false },
+        // Nivel 6 - Primer jefe
+        { rows: 3, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Nivel 6: Enfrentamiento con el Jefe", bossLevel: true, bossType: 'basic' },
+        // Nivel 7 - Más rápido con patrón de ataque
+        { rows: 5, cols: 11, speed: 0.8, dropDistance: 15, shootChance: 0.0025, pattern: 'dive', name: "Nivel 7: Ataque en Picada", bossLevel: false },
+        // Nivel 8 - Formación muy densa
+        { rows: 6, cols: 12, speed: 0.7, dropDistance: 10, shootChance: 0.0025, pattern: 'tight', name: "Nivel 8: Muro de Invasores", bossLevel: false },
+        // Nivel 9 - Patrón aleatorio
+        { rows: 5, cols: 11, speed: 0.9, dropDistance: 15, shootChance: 0.003, pattern: 'random', name: "Nivel 9: Movimiento Errático", bossLevel: false },
+        // Nivel 10 - Segundo jefe
+        { rows: 4, cols: 8, speed: 0.6, dropDistance: 20, shootChance: 0.002, pattern: 'standard', name: "Nivel 10: Confrontación Final", bossLevel: true, bossType: 'advanced' },
+        // Nivel 11 - Patrón mixto
+        { rows: 5, cols: 11, speed: 1.0, dropDistance: 15, shootChance: 0.003, pattern: 'mixed', name: "Nivel 11: Ataque Coordinado", bossLevel: false },
+        // Nivel 12 - Más invasores y rápido
+        { rows: 7, cols: 13, speed: 1.1, dropDistance: 10, shootChance: 0.0035, pattern: 'tight', name: "Nivel 12: Superpoblación", bossLevel: false },
+        // Nivel 13 - Patrón aleatorio extremo
+        { rows: 6, cols: 12, speed: 1.2, dropDistance: 15, shootChance: 0.004, pattern: 'random', name: "Nivel 13: Caos Total", bossLevel: false },
+        // Nivel 14 - Tercer jefe
+        { rows: 5, cols: 10, speed: 0.8, dropDistance: 20, shootChance: 0.003, pattern: 'standard', name: "Nivel 14: El Destructor", bossLevel: true, bossType: 'ultimate' },
+        // Nivel 15 - Nivel final
+        { rows: 8, cols: 14, speed: 1.3, dropDistance: 10, shootChance: 0.005, pattern: 'mixed', name: "Nivel 15: La Batalla Final", bossLevel: false },
+        // Nivel 16+ - Niveles infinitos con dificultad creciente
+        { rows: 8, cols: 14, speed: 1.3, dropDistance: 10, shootChance: 0.005, pattern: 'mixed', name: "Nivel Infinito: Sobrevivencia Extrema", bossLevel: false, infinite: true }
     ];
 
     // Entidades del juego
@@ -160,7 +179,10 @@
         shield = false;
         boss = null;
         bossLevel = false;
-        lastArmageddonTime = 0; // Resetear cooldown de Armagedón
+        lastArmageddonTime = 0;
+        isTimeFrozen = false;
+        timeFreezeEndTime = 0;
+        lastTimeFreezeTime = 0;
         loadLevel(level);
     }
 
@@ -168,6 +190,7 @@
         if (levelNumber <= levelConfigs.length) {
             currentLevelConfig = {...levelConfigs[levelNumber - 1]};
         } else {
+            // Para niveles más allá de los predefinidos, usar el último con dificultad creciente
             currentLevelConfig = {...levelConfigs[levelConfigs.length - 1]};
             currentLevelConfig.speed += 0.1 * (levelNumber - levelConfigs.length);
             currentLevelConfig.shootChance += 0.0005 * (levelNumber - levelConfigs.length);
@@ -195,7 +218,12 @@
         level++;
         levelTransitionTime = Date.now();
         loadLevel(level);
-        gameState = 'playing';
+        
+        // Mostrar mensaje de nivel completado
+        gameState = 'levelComplete';
+        setTimeout(() => {
+            gameState = 'playing';
+        }, 2000);
     }
     
     function createStars() {
@@ -233,13 +261,37 @@
 
     function createBoss(type) {
         const bossType = type || 'basic';
+        let health, maxHealth, width, height;
+        
+        switch(bossType) {
+            case 'basic':
+                health = maxHealth = 10;
+                width = 100;
+                height = 60;
+                break;
+            case 'advanced':
+                health = maxHealth = 20;
+                width = 120;
+                height = 70;
+                break;
+            case 'ultimate':
+                health = maxHealth = 30;
+                width = 140;
+                height = 80;
+                break;
+            default:
+                health = maxHealth = 10;
+                width = 100;
+                height = 60;
+        }
+        
         boss = {
-            x: canvas.width / 2 - 50,
+            x: canvas.width / 2 - width / 2,
             y: 50,
-            width: 100,
-            height: 60,
-            health: bossType === 'advanced' ? 20 : 10,
-            maxHealth: bossType === 'advanced' ? 20 : 10,
+            width: width,
+            height: height,
+            health: health,
+            maxHealth: maxHealth,
             type: bossType,
             moveDirection: 1,
             shootTimer: 0,
@@ -290,29 +342,33 @@
 
     // --- FUNCIÓN ARMAGEDÓN (SECRETA) ---
     function activateArmageddon() {
-        // Efecto visual: Destello blanco en pantalla
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         let armageddonScore = 0;
-        // Destruir todos los invasores
         invaders.forEach(inv => {
             if (inv.alive) {
                 inv.alive = false;
                 armageddonScore += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
-                // Crear una explosión especial y más grande
                 createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2, '#fff');
             }
         });
 
-        // Destruir al jefe si está presente
         if (bossLevel && boss && boss.alive) {
             boss.alive = false;
-            armageddonScore += 500; // Bonus por matar al jefe
+            armageddonScore += 500;
             createExplosion(boss.x + boss.width / 2, boss.y + boss.height / 2, '#fff');
         }
         
-        score += armageddonScore + 100; // Añadir puntuación y un bonus extra
+        score += armageddonScore + 100;
+    }
+
+    // --- FUNCIÓN CONGELACIÓN DEL TIEMPO (SECRETA) ---
+    function activateTimeFreeze() {
+        isTimeFrozen = true;
+        timeFreezeEndTime = Date.now() + TIME_FREEZE_DURATION;
+        ctx.fillStyle = 'rgba(0, 150, 255, 0.3)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     // --- BUCLE PRINCIPAL DEL JUEGO ---
@@ -326,6 +382,11 @@
     // --- LÓGICA DE ACTUALIZACIÓN ---
     function update() {
         invaderAnimationFrame = (invaderAnimationFrame + 1) % 60;
+        
+        // Comprobar si la congelación del tiempo debe terminar
+        if (isTimeFrozen && Date.now() > timeFreezeEndTime) {
+            isTimeFrozen = false;
+        }
         
         stars.forEach(star => {
             star.brightness += (Math.random() - 0.5) * 0.1;
@@ -341,23 +402,29 @@
         bullets = bullets.filter(b => b.y > 0 && !b.hit);
         bullets.forEach(b => b.y -= 10);
 
-        alienBullets = alienBullets.filter(b => b.y < canvas.height);
-        alienBullets.forEach(b => b.y += 5);
-
-        if (bossLevel && boss && boss.alive) {
-            updateBoss();
+        // El movimiento de las balas alienígenas se detiene si el tiempo está congelado
+        if (!isTimeFrozen) {
+            alienBullets = alienBullets.filter(b => b.y < canvas.height);
+            alienBullets.forEach(b => b.y += 5);
         }
 
-        if (!bossLevel) {
-            invaders.forEach(inv => {
-                if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
-                    alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
-                }
-            });
-        }
+        // El movimiento de los invasores y el jefe se detiene si el tiempo está congelado
+        if (!isTimeFrozen) {
+            if (bossLevel && boss && boss.alive) {
+                updateBoss();
+            }
 
-        if (!bossLevel) {
-            moveInvaders();
+            if (!bossLevel) {
+                invaders.forEach(inv => {
+                    if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
+                        alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
+                    }
+                });
+            }
+
+            if (!bossLevel) {
+                moveInvaders();
+            }
         }
         
         particles = particles.filter(p => p.life > 0);
@@ -371,13 +438,11 @@
 
         if (bossLevel) {
             if (!boss.alive) {
-                gameState = 'levelComplete';
-                setTimeout(() => nextLevel(), 2000);
+                nextLevel();
             }
         } else {
             if (invaders.filter(inv => inv.alive).length === 0) {
-                gameState = 'levelComplete';
-                setTimeout(() => nextLevel(), 2000);
+                nextLevel();
             }
         }
 
@@ -438,18 +503,24 @@
         if (boss.shootTimer > 60) {
             alienBullets.push({ x: boss.x + boss.width / 2 - 2, y: boss.y + boss.height });
             
-            if (boss.type === 'advanced') {
+            if (boss.type === 'advanced' || boss.type === 'ultimate') {
                 alienBullets.push({ x: boss.x + boss.width / 4 - 2, y: boss.y + boss.height });
                 alienBullets.push({ x: boss.x + 3 * boss.width / 4 - 2, y: boss.y + boss.height });
+            }
+            
+            if (boss.type === 'ultimate') {
+                alienBullets.push({ x: boss.x + boss.width / 6 - 2, y: boss.y + boss.height });
+                alienBullets.push({ x: boss.x + 5 * boss.width / 6 - 2, y: boss.y + boss.height });
             }
             
             boss.shootTimer = 0;
         }
         
-        if (boss.type === 'advanced') {
+        if (boss.type === 'advanced' || boss.type === 'ultimate') {
             boss.specialAttackTimer++;
             if (boss.specialAttackTimer > 180) {
-                for (let i = 0; i < 5; i++) {
+                const bulletCount = boss.type === 'ultimate' ? 8 : 5;
+                for (let i = 0; i < bulletCount; i++) {
                     setTimeout(() => {
                         alienBullets.push({ x: boss.x + boss.width / 2 - 2 + (Math.random() - 0.5) * 40, y: boss.y + boss.height });
                     }, i * 100);
@@ -709,6 +780,13 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         drawStars();
+        
+        // Efecto visual cuando el tiempo está congelado
+        if (isTimeFrozen) {
+            ctx.fillStyle = 'rgba(100, 200, 255, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
         drawBunkers();
         drawPlayer();
         
@@ -772,7 +850,7 @@
         invaders.forEach(inv => {
             if (inv.alive) {
                 const frame = Math.floor(invaderAnimationFrame / 30) % 2;
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = isTimeFrozen ? '#88f' : '#fff';
                 drawInvaderShape(inv, frame);
             }
         });
@@ -781,13 +859,13 @@
     function drawBoss() {
         if (!boss || !boss.alive) return;
         
-        ctx.fillStyle = boss.type === 'advanced' ? '#f00' : '#ff0';
+        ctx.fillStyle = isTimeFrozen ? '#88f' : (boss.type === 'ultimate' ? '#f0f' : (boss.type === 'advanced' ? '#f00' : '#ff0'));
         ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
         
         ctx.fillStyle = '#000';
         ctx.fillRect(boss.x + 20, boss.y + 10, 10, 10);
-        ctx.fillRect(boss.x + 70, boss.y + 10, 10, 10);
-        ctx.fillRect(boss.x + 40, boss.y + 30, 20, 10);
+        ctx.fillRect(boss.x + boss.width - 30, boss.y + 10, 10, 10);
+        ctx.fillRect(boss.x + boss.width/2 - 10, boss.y + 30, 20, 10);
         
         const healthPercentage = boss.health / boss.maxHealth;
         ctx.fillStyle = '#0f0';
@@ -851,7 +929,7 @@
     function drawBullets() {
         ctx.fillStyle = '#ff0';
         bullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
-        ctx.fillStyle = '#f00';
+        ctx.fillStyle = isTimeFrozen ? '#88f' : '#f00';
         alienBullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
     }
     
@@ -923,10 +1001,10 @@
         ctx.fillStyle = '#0ff';
         ctx.font = '50px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText('SPACE INVADERS', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.fillText('SPACE INVADERS', canvas.width / 2, canvas.height / 2 - 70);
         ctx.font = '20px Orbitron';
         ctx.fillText('Presiona ENTER para Jugar', canvas.width / 2, canvas.height / 2 + 20);
-        ctx.fillText('¡Derrota a los invasores y sobrevive a todos los niveles!', canvas.width / 2, canvas.height / 2 + 50);
+        ctx.fillText('¡Derrota a los invasores y avanza por los niveles!', canvas.width / 2, canvas.height / 2 + 50);
     }
 
     function drawGameOverScreen() {
@@ -950,9 +1028,10 @@
         ctx.fillStyle = '#0f0';
         ctx.font = '50px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText(`NIVEL ${level} COMPLETADO`, canvas.width / 2, canvas.height / 2);
+        ctx.fillText(`NIVEL ${level} COMPLETADO`, canvas.width / 2, canvas.height / 2 - 30);
         ctx.font = '25px Orbitron';
-        ctx.fillText(`Puntuación: ${score}`, canvas.width / 2, canvas.height / 2 + 40);
+        ctx.fillText(`Puntuación: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText('Prepárate para el siguiente nivel...', canvas.width / 2, canvas.height / 2 + 50);
     }
 
     // --- MANEJO DE EVENTOS ---
@@ -972,6 +1051,15 @@
             if (now - lastArmageddonTime > ARMAGEDDON_COOLDOWN) {
                 activateArmageddon();
                 lastArmageddonTime = now;
+            }
+        }
+
+        // --- MANEJO DE LA TECLA Z PARA CONGELACIÓN DEL TIEMPO (SECRETO) ---
+        if ((e.key === 'z' || e.key === 'Z')) {
+            const now = Date.now();
+            if (now - lastTimeFreezeTime > TIME_FREEZE_COOLDOWN) {
+                activateTimeFreeze();
+                lastTimeFreezeTime = now;
             }
         }
 
