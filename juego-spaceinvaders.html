@@ -95,6 +95,9 @@
     let isTimeFrozen = false;
     let timeFreezeEndTime = 0;
     let lastTimeFreezeTime = 0;
+    
+    // --- NUEVA VARIABLE PARA CONTROLAR LA TRANSICIÓN DE NIVEL ---
+    let levelCompleteTime = 0;
 
     // Configuración de niveles ampliada
     const levelConfigs = [
@@ -183,6 +186,7 @@
         isTimeFrozen = false;
         timeFreezeEndTime = 0;
         lastTimeFreezeTime = 0;
+        levelCompleteTime = 0; // Resetear el tiempo de completado
         loadLevel(level);
     }
 
@@ -190,7 +194,6 @@
         if (levelNumber <= levelConfigs.length) {
             currentLevelConfig = {...levelConfigs[levelNumber - 1]};
         } else {
-            // Para niveles más allá de los predefinidos, usar el último con dificultad creciente
             currentLevelConfig = {...levelConfigs[levelConfigs.length - 1]};
             currentLevelConfig.speed += 0.1 * (levelNumber - levelConfigs.length);
             currentLevelConfig.shootChance += 0.0005 * (levelNumber - levelConfigs.length);
@@ -218,12 +221,7 @@
         level++;
         levelTransitionTime = Date.now();
         loadLevel(level);
-        
-        // Mostrar mensaje de nivel completado
-        gameState = 'levelComplete';
-        setTimeout(() => {
-            gameState = 'playing';
-        }, 2000);
+        gameState = 'playing'; // Volver al juego inmediatamente después de cargar el nivel
     }
     
     function createStars() {
@@ -436,14 +434,24 @@
         
         checkCollisions();
 
-        if (bossLevel) {
-            if (!boss.alive) {
-                nextLevel();
+        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA (CORREGIDA) ---
+        if (gameState === 'playing') {
+            if (bossLevel) {
+                if (!boss.alive) {
+                    gameState = 'levelComplete';
+                    levelCompleteTime = Date.now(); // Marcar el tiempo de completado
+                }
+            } else {
+                if (invaders.filter(inv => inv.alive).length === 0) {
+                    gameState = 'levelComplete';
+                    levelCompleteTime = Date.now(); // Marcar el tiempo de completado
+                }
             }
-        } else {
-            if (invaders.filter(inv => inv.alive).length === 0) {
-                nextLevel();
-            }
+        }
+
+        // Transición al siguiente nivel después de una pausa
+        if (gameState === 'levelComplete' && Date.now() - levelCompleteTime > 2000) {
+            nextLevel();
         }
 
         if (lives <= 0) {
