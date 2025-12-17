@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Memory Matrix</title>
+    <title>Memory Matrix</title>
     <style>
-        /* --- Estilos Generales --- */
+        /* --- ESTILOS CSS --- */
+
+        /* --- Estilos Generales y Fondo --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a2e;
-            color: #eee;
+            background-color: #1a1a2e; /* Fondo oscuro */
+            color: #eee; /* Texto claro */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,7 +22,7 @@
 
         /* --- Contenedor Principal del Juego --- */
         .game-container {
-            background-color: #16213e;
+            background-color: #16213e; /* Un tono más claro que el fondo */
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -29,7 +31,7 @@
         }
 
         h1 {
-            color: #0f3460;
+            color: #4fc3f7; /* Color azul brillante para el título */
             margin-bottom: 20px;
         }
 
@@ -43,16 +45,16 @@
 
         .info-item span {
             font-weight: bold;
-            color: #e94560;
+            color: #e94560; /* Color rojo para resaltar los números */
         }
 
-        /* --- Área del Mensaje --- */
+        /* --- Área del Mensaje para el Jugador --- */
         #message {
             height: 30px;
             font-size: 1.3em;
             font-weight: bold;
             margin-bottom: 20px;
-            color: #4fc3f7; /* Color para mensajes neutrales */
+            color: #4fc3f7; /* Color por defecto */
             transition: color 0.3s ease;
         }
 
@@ -64,19 +66,19 @@
             color: #ef5350; /* Rojo para error */
         }
 
-        /* --- Grid del Juego --- */
+        /* --- Grid del Juego (donde aparecen los cuadrados) --- */
         #game-grid {
             display: grid;
-            gap: 10px;
+            gap: 10px; /* Espacio entre las celdas */
             margin: 0 auto 25px auto;
             width: 100%;
             max-width: 400px;
             aspect-ratio: 1 / 1; /* Hace que el grid sea siempre un cuadrado */
         }
 
-        /* --- Celdas del Grid --- */
+        /* --- Celdas Individuales del Grid --- */
         .cell {
-            background-color: #0f3460;
+            background-color: #0f3460; /* Color base de las celdas */
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.2s ease;
@@ -86,12 +88,13 @@
             font-size: 2em;
         }
 
+        /* Efecto al pasar el ratón sobre una celda (si no está activa ni seleccionada) */
         .cell:hover:not(.active):not(.selected) {
             background-color: #1e5090;
             transform: scale(1.05);
         }
 
-        /* Estados de las celdas */
+        /* --- Estados de las Celdas --- */
         .cell.active {
             /* Color cuando se muestra el patrón a memorizar */
             background-color: #4fc3f7;
@@ -104,15 +107,16 @@
         }
 
         .cell.correct-flash {
-            /* Parpadeo verde para acierto */
+            /* Parpadeo verde para un acierto */
             background-color: #66bb6a !important;
         }
 
         .cell.incorrect-flash {
-            /* Parpadeo rojo para error */
+            /* Parpadeo rojo para un error */
             background-color: #ef5350 !important;
         }
 
+        /* --- Animaciones --- */
         @keyframes pulse {
             from { opacity: 0.7; }
             to { opacity: 1; }
@@ -134,11 +138,6 @@
             background-color: #c23652;
             transform: scale(1.05);
         }
-
-        #start-button:active {
-            transform: scale(0.98);
-        }
-
     </style>
 </head>
 <body>
@@ -160,15 +159,17 @@
     </div>
 
     <script>
+        // --- CÓDIGO JAVASCRIPT ---
+
         // --- Variables de Estado del Juego ---
         let gridSize = 3; // Tamaño inicial del grid (3x3)
         let level = 1;
         let score = 0;
         let lives = 3;
-        let pattern = []; // Almacena los índices de las celdas del patrón
+        let pattern = []; // Almacena los índices de las celdas del patrón correcto
         let playerPattern = []; // Almacena los índices seleccionados por el jugador
-        let isShowingPattern = false; // Bandera para evitar clics durante la muestra
-        let isPlayerTurn = false; // Bandera para permitir clics en el turno del jugador
+        let isShowingPattern = false; // Bandera para evitar clics durante la muestra del patrón
+        let isPlayerTurn = false; // Bandera para permitir clics solo en el turno del jugador
 
         // --- Referencias a Elementos del DOM ---
         const gameGrid = document.getElementById('game-grid');
@@ -194,9 +195,9 @@
             isPlayerTurn = false;
             updateDisplay();
             messageDisplay.textContent = '¡Presiona Iniciar para Jugar!';
-            messageDisplay.className = '';
-            gameGrid.innerHTML = '';
-            startButton.style.display = 'block';
+            messageDisplay.className = ''; // Limpia clases de color
+            gameGrid.innerHTML = ''; // Limpia el grid visual
+            startButton.style.display = 'block'; // Muestra el botón de inicio
         }
 
         /**
@@ -213,7 +214,7 @@
          */
         function nextLevel() {
             levelDisplay.textContent = level;
-            playerPattern = [];
+            playerPattern = []; // Resetea el patrón del jugador
             messageDisplay.textContent = `Nivel ${level}: ¡Memoriza!`;
             messageDisplay.className = '';
 
@@ -224,14 +225,15 @@
             }
             
             createGrid(gridSize);
-            generatePattern(level + 2); // El patrón tiene 'nivel + 2' celdas
+            // El número de celdas en el patrón es 'nivel + 2'
+            generatePattern(level + 2); 
             
             // Pequeño retraso antes de mostrar el patrón
             setTimeout(showPattern, 1000);
         }
 
         /**
-         * Crea el grid visual de celdas.
+         * Crea el grid visual de celdas en el DOM.
          * @param {number} size - El tamaño del grid (ej: 3 para 3x3).
          */
         function createGrid(size) {
@@ -242,7 +244,7 @@
             for (let i = 0; i < size * size; i++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
-                cell.dataset.index = i; // Guardar el índice de la celda
+                cell.dataset.index = i; // Guardar el índice de la celda para identificarla
                 cell.addEventListener('click', handleCellClick);
                 gameGrid.appendChild(cell);
             }
@@ -257,7 +259,7 @@
             const totalCells = gridSize * gridSize;
             const indices = Array.from({ length: totalCells }, (_, i) => i);
 
-            // Algoritmo de Fisher-Yates para barajar
+            // Algoritmo de Fisher-Yates para barajar el array de índices
             for (let i = indices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -278,7 +280,7 @@
                 cell.classList.add('active');
             });
 
-            // Duración de la muestra del patrón (puede disminuir con el nivel)
+            // Duración de la muestra del patrón (disminuye ligeramente con el nivel)
             const showTime = Math.max(1500, 2500 - (level * 100));
             
             setTimeout(() => {
@@ -311,7 +313,8 @@
          * @param {Event} event - El evento de clic.
          */
         function handleCellClick(event) {
-            if (!isPlayerTurn) return;
+            // Ignorar clics si no es el turno del jugador o si ya se está mostrando el patrón
+            if (!isPlayerTurn || isShowingPattern) return;
 
             const cell = event.target;
             const index = parseInt(cell.dataset.index);
@@ -322,7 +325,7 @@
             cell.classList.add('selected');
             playerPattern.push(index);
 
-            // Comprobar si el jugador ya ha seleccionado todas las celdas
+            // Comprobar si el jugador ya ha seleccionado todas las celdas del patrón
             if (playerPattern.length === pattern.length) {
                 isPlayerTurn = false; // Detener más clics
                 checkPattern();
@@ -352,7 +355,7 @@
         function levelComplete() {
             messageDisplay.textContent = '¡Correcto!';
             messageDisplay.className = 'success';
-            score += level * 10;
+            score += level * 10; // La puntuación aumenta con el nivel
             updateDisplay();
             
             // Flash verde en las celdas correctas
@@ -411,7 +414,7 @@
         }
 
         /**
-         * Actualiza los elementos de información en pantalla.
+         * Actualiza los elementos de información en pantalla (Nivel, Puntos, Vidas).
          */
         function updateDisplay() {
             levelDisplay.textContent = level;
