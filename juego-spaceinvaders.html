@@ -84,122 +84,33 @@
     let rapidFireEndTime = 0;
     let shield = false;
     let shieldEndTime = 0;
+    
+    // --- VARIABLES PARA ARMAGEDÓN (SECRETO) ---
+    const ARMAGEDDON_COOLDOWN = 30000; // 30 segundos
+    let lastArmageddonTime = 0;
 
     // Configuración de niveles
     const levelConfigs = [
         // Nivel 1 - Básico
-        {
-            rows: 5,
-            cols: 11,
-            speed: 0.5,
-            dropDistance: 20,
-            shootChance: 0.001,
-            pattern: 'standard',
-            name: "Primera Oleada",
-            bossLevel: false
-        },
+        { rows: 5, cols: 11, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Primera Oleada", bossLevel: false },
         // Nivel 2 - Más rápido
-        {
-            rows: 5,
-            cols: 11,
-            speed: 0.7,
-            dropDistance: 20,
-            shootChance: 0.0015,
-            pattern: 'standard',
-            name: "Velocidad Incrementada",
-            bossLevel: false
-        },
+        { rows: 5, cols: 11, speed: 0.7, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Velocidad Incrementada", bossLevel: false },
         // Nivel 3 - Más invasores
-        {
-            rows: 6,
-            cols: 12,
-            speed: 0.6,
-            dropDistance: 15,
-            shootChance: 0.0015,
-            pattern: 'standard',
-            name: "Reforzamiento Enemigo",
-            bossLevel: false
-        },
+        { rows: 6, cols: 12, speed: 0.6, dropDistance: 15, shootChance: 0.0015, pattern: 'standard', name: "Reforzamiento Enemigo", bossLevel: false },
         // Nivel 4 - Movimiento en zigzag
-        {
-            rows: 5,
-            cols: 11,
-            speed: 0.7,
-            dropDistance: 15,
-            shootChance: 0.002,
-            pattern: 'zigzag',
-            name: "Patrón Zigzag",
-            bossLevel: false
-        },
+        { rows: 5, cols: 11, speed: 0.7, dropDistance: 15, shootChance: 0.002, pattern: 'zigzag', name: "Patrón Zigzag", bossLevel: false },
         // Nivel 5 - Primer jefe
-        {
-            rows: 3,
-            cols: 8,
-            speed: 0.5,
-            dropDistance: 20,
-            shootChance: 0.001,
-            pattern: 'standard',
-            name: "Enfrentamiento con el Jefe",
-            bossLevel: true,
-            bossType: 'basic'
-        },
+        { rows: 3, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Enfrentamiento con el Jefe", bossLevel: true, bossType: 'basic' },
         // Nivel 6 - Más rápido con patrón de ataque
-        {
-            rows: 6,
-            cols: 11,
-            speed: 0.8,
-            dropDistance: 15,
-            shootChance: 0.0025,
-            pattern: 'dive',
-            name: "Ataque en Picada",
-            bossLevel: false
-        },
+        { rows: 6, cols: 11, speed: 0.8, dropDistance: 15, shootChance: 0.0025, pattern: 'dive', name: "Ataque en Picada", bossLevel: false },
         // Nivel 7 - Formación densa
-        {
-            rows: 7,
-            cols: 13,
-            speed: 0.6,
-            dropDistance: 10,
-            shootChance: 0.002,
-            pattern: 'tight',
-            name: "Formación Densa",
-            bossLevel: false
-        },
+        { rows: 7, cols: 13, speed: 0.6, dropDistance: 10, shootChance: 0.002, pattern: 'tight', name: "Formación Densa", bossLevel: false },
         // Nivel 8 - Patrón aleatorio
-        {
-            rows: 5,
-            cols: 11,
-            speed: 0.9,
-            dropDistance: 15,
-            shootChance: 0.003,
-            pattern: 'random',
-            name: "Movimiento Errático",
-            bossLevel: false
-        },
+        { rows: 5, cols: 11, speed: 0.9, dropDistance: 15, shootChance: 0.003, pattern: 'random', name: "Movimiento Errático", bossLevel: false },
         // Nivel 9 - Segundo jefe
-        {
-            rows: 4,
-            cols: 8,
-            speed: 0.6,
-            dropDistance: 20,
-            shootChance: 0.002,
-            pattern: 'standard',
-            name: "Confrontación Final",
-            bossLevel: true,
-            bossType: 'advanced'
-        },
+        { rows: 4, cols: 8, speed: 0.6, dropDistance: 20, shootChance: 0.002, pattern: 'standard', name: "Confrontación Final", bossLevel: true, bossType: 'advanced' },
         // Nivel 10+ - Niveles infinitos con dificultad creciente
-        {
-            rows: 5,
-            cols: 11,
-            speed: 1.0,
-            dropDistance: 15,
-            shootChance: 0.003,
-            pattern: 'mixed',
-            name: "Sobrevivencia Extrema",
-            bossLevel: false,
-            infinite: true
-        }
+        { rows: 5, cols: 11, speed: 1.0, dropDistance: 15, shootChance: 0.003, pattern: 'mixed', name: "Sobrevivencia Extrema", bossLevel: false, infinite: true }
     ];
 
     // Entidades del juego
@@ -249,15 +160,14 @@
         shield = false;
         boss = null;
         bossLevel = false;
+        lastArmageddonTime = 0; // Resetear cooldown de Armagedón
         loadLevel(level);
     }
 
     function loadLevel(levelNumber) {
-        // Obtener configuración del nivel
         if (levelNumber <= levelConfigs.length) {
             currentLevelConfig = {...levelConfigs[levelNumber - 1]};
         } else {
-            // Para niveles más allá de los predefinidos, usar el último con dificultad creciente
             currentLevelConfig = {...levelConfigs[levelConfigs.length - 1]};
             currentLevelConfig.speed += 0.1 * (levelNumber - levelConfigs.length);
             currentLevelConfig.shootChance += 0.0005 * (levelNumber - levelConfigs.length);
@@ -285,7 +195,7 @@
         level++;
         levelTransitionTime = Date.now();
         loadLevel(level);
-        gameState = 'playing'; // Continúa al siguiente nivel
+        gameState = 'playing';
     }
     
     function createStars() {
@@ -311,9 +221,8 @@
                     y: r * (INVADER_HEIGHT + 15) + 50,
                     width: INVADER_WIDTH,
                     height: INVADER_HEIGHT,
-                    type: r < 1 ? 'squid' : (r < 3 ? 'crab' : 'octopus'), // Diferentes tipos
+                    type: r < 1 ? 'squid' : (r < 3 ? 'crab' : 'octopus'),
                     alive: true,
-                    // Para patrones especiales
                     originalX: c * (INVADER_WIDTH + 10) + 35,
                     originalY: r * (INVADER_HEIGHT + 15) + 50,
                     moveTimer: 0
@@ -355,7 +264,6 @@
     }
 
     function createBunkerBlocks() {
-        // Matriz para representar los bloques del búnker (1 = bloque, 0 = vacío)
         return [
             [0,0,1,1,1,1,1,1,0,0],
             [0,1,1,1,1,1,1,1,1,0],
@@ -380,6 +288,33 @@
         });
     }
 
+    // --- FUNCIÓN ARMAGEDÓN (SECRETA) ---
+    function activateArmageddon() {
+        // Efecto visual: Destello blanco en pantalla
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        let armageddonScore = 0;
+        // Destruir todos los invasores
+        invaders.forEach(inv => {
+            if (inv.alive) {
+                inv.alive = false;
+                armageddonScore += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
+                // Crear una explosión especial y más grande
+                createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2, '#fff');
+            }
+        });
+
+        // Destruir al jefe si está presente
+        if (bossLevel && boss && boss.alive) {
+            boss.alive = false;
+            armageddonScore += 500; // Bonus por matar al jefe
+            createExplosion(boss.x + boss.width / 2, boss.y + boss.height / 2, '#fff');
+        }
+        
+        score += armageddonScore + 100; // Añadir puntuación y un bonus extra
+    }
+
     // --- BUCLE PRINCIPAL DEL JUEGO ---
     function gameLoop() {
         if (gameState !== 'playing') return;
@@ -390,37 +325,29 @@
 
     // --- LÓGICA DE ACTUALIZACIÓN ---
     function update() {
-        // Actualizar animaciones
         invaderAnimationFrame = (invaderAnimationFrame + 1) % 60;
         
-        // Actualizar estrellas
         stars.forEach(star => {
             star.brightness += (Math.random() - 0.5) * 0.1;
             star.brightness = Math.max(0.3, Math.min(1, star.brightness));
         });
 
-        // Actualizar jugador
         if (player.isHit && Date.now() - player.invulnerableTime > 2000) {
             player.isHit = false;
         }
 
-        // Actualizar power-ups
         updatePowerUps();
 
-        // Mover balas del jugador
         bullets = bullets.filter(b => b.y > 0 && !b.hit);
         bullets.forEach(b => b.y -= 10);
 
-        // Mover balas de los alienígenas
         alienBullets = alienBullets.filter(b => b.y < canvas.height);
         alienBullets.forEach(b => b.y += 5);
 
-        // Actualizar jefe si existe
         if (bossLevel && boss && boss.alive) {
             updateBoss();
         }
 
-        // Lógica de disparo de los alienígenas
         if (!bossLevel) {
             invaders.forEach(inv => {
                 if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
@@ -429,12 +356,10 @@
             });
         }
 
-        // Mover invasores según el patrón del nivel
         if (!bossLevel) {
             moveInvaders();
         }
         
-        // Actualizar partículas de explosión
         particles = particles.filter(p => p.life > 0);
         particles.forEach(p => {
             p.x += p.vx;
@@ -442,19 +367,17 @@
             p.life--;
         });
         
-        // --- DETECCIÓN DE COLISIONES ---
         checkCollisions();
 
-        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA ---
         if (bossLevel) {
             if (!boss.alive) {
                 gameState = 'levelComplete';
-                setTimeout(() => nextLevel(), 2000); // Pausa antes del siguiente nivel
+                setTimeout(() => nextLevel(), 2000);
             }
         } else {
             if (invaders.filter(inv => inv.alive).length === 0) {
                 gameState = 'levelComplete';
-                setTimeout(() => nextLevel(), 2000); // Pausa antes del siguiente nivel
+                setTimeout(() => nextLevel(), 2000);
             }
         }
 
@@ -464,24 +387,17 @@
     }
 
     function updatePowerUps() {
-        // Mover power-ups hacia abajo
         powerUps = powerUps.filter(p => p.y < canvas.height);
         powerUps.forEach(p => p.y += p.speed);
 
-        // Comprobar si el jugador recoge un power-up
         powerUps.forEach(p => {
             if (p.x < player.x + player.width && 
                 p.x + p.width > player.x && 
                 p.y < player.y + player.height && 
                 p.y + p.height > player.y) {
                 
-                // Aplicar efecto del power-up
                 applyPowerUp(p.type);
-                
-                // Eliminar el power-up
                 powerUps = powerUps.filter(powerUp => powerUp !== p);
-                
-                // Crear efecto visual
                 createExplosion(p.x + p.width/2, p.y + p.height/2, '#0ff');
             }
         });
@@ -491,17 +407,16 @@
         switch(type) {
             case 'rapidFire':
                 rapidFire = true;
-                rapidFireEndTime = Date.now() + 10000; // 10 segundos
+                rapidFireEndTime = Date.now() + 10000;
                 break;
             case 'shield':
                 shield = true;
-                shieldEndTime = Date.now() + 15000; // 15 segundos
+                shieldEndTime = Date.now() + 15000;
                 break;
             case 'extraLife':
                 lives++;
                 break;
             case 'multiShot':
-                // Disparar tres balas a la vez
                 bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2 - 10, y: player.y, hit: false });
                 bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
                 bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2 + 10, y: player.y, hit: false });
@@ -512,50 +427,31 @@
     function updateBoss() {
         if (!boss || !boss.alive) return;
         
-        // Movimiento horizontal
         boss.x += boss.moveDirection * 2;
         
-        // Cambiar dirección al llegar a los bordes
         if (boss.x <= 0 || boss.x + boss.width >= canvas.width) {
             boss.moveDirection *= -1;
-            boss.y += 20; // Bajar un poco
+            boss.y += 20;
         }
         
-        // Temporizador de disparo
         boss.shootTimer++;
-        if (boss.shootTimer > 60) { // Disparar cada segundo (60 frames)
-            // Disparo básico
-            alienBullets.push({ 
-                x: boss.x + boss.width / 2 - 2, 
-                y: boss.y + boss.height 
-            });
+        if (boss.shootTimer > 60) {
+            alienBullets.push({ x: boss.x + boss.width / 2 - 2, y: boss.y + boss.height });
             
-            // Si es un jefe avanzado, añadir disparos adicionales
             if (boss.type === 'advanced') {
-                alienBullets.push({ 
-                    x: boss.x + boss.width / 4 - 2, 
-                    y: boss.y + boss.height 
-                });
-                alienBullets.push({ 
-                    x: boss.x + 3 * boss.width / 4 - 2, 
-                    y: boss.y + boss.height 
-                });
+                alienBullets.push({ x: boss.x + boss.width / 4 - 2, y: boss.y + boss.height });
+                alienBullets.push({ x: boss.x + 3 * boss.width / 4 - 2, y: boss.y + boss.height });
             }
             
             boss.shootTimer = 0;
         }
         
-        // Ataque especial para jefe avanzado
         if (boss.type === 'advanced') {
             boss.specialAttackTimer++;
-            if (boss.specialAttackTimer > 180) { // Cada 3 segundos
-                // Disparar una ráfaga de balas
+            if (boss.specialAttackTimer > 180) {
                 for (let i = 0; i < 5; i++) {
                     setTimeout(() => {
-                        alienBullets.push({ 
-                            x: boss.x + boss.width / 2 - 2 + (Math.random() - 0.5) * 40, 
-                            y: boss.y + boss.height 
-                        });
+                        alienBullets.push({ x: boss.x + boss.width / 2 - 2 + (Math.random() - 0.5) * 40, y: boss.y + boss.height });
                     }, i * 100);
                 }
                 boss.specialAttackTimer = 0;
@@ -567,33 +463,17 @@
         const pattern = currentLevelConfig.pattern;
         
         switch(pattern) {
-            case 'standard':
-                moveInvadersStandard();
-                break;
-            case 'zigzag':
-                moveInvadersZigzag();
-                break;
-            case 'dive':
-                moveInvadersDive();
-                break;
-            case 'tight':
-                moveInvadersTight();
-                break;
-            case 'random':
-                moveInvadersRandom();
-                break;
+            case 'standard': moveInvadersStandard(); break;
+            case 'zigzag': moveInvadersZigzag(); break;
+            case 'dive': moveInvadersDive(); break;
+            case 'tight': moveInvadersTight(); break;
+            case 'random': moveInvadersRandom(); break;
             case 'mixed':
-                // Cambiar patrón cada cierto tiempo
-                if (Math.floor(invaderAnimationFrame / 180) % 3 === 0) {
-                    moveInvadersStandard();
-                } else if (Math.floor(invaderAnimationFrame / 180) % 3 === 1) {
-                    moveInvadersZigzag();
-                } else {
-                    moveInvadersDive();
-                }
+                if (Math.floor(invaderAnimationFrame / 180) % 3 === 0) moveInvadersStandard();
+                else if (Math.floor(invaderAnimationFrame / 180) % 3 === 1) moveInvadersZigzag();
+                else moveInvadersDive();
                 break;
-            default:
-                moveInvadersStandard();
+            default: moveInvadersStandard();
         }
     }
 
@@ -615,7 +495,6 @@
         let edge = false;
         invaders.forEach(inv => {
             if (inv.alive) {
-                // Movimiento en zigzag
                 inv.moveTimer++;
                 if (inv.moveTimer % 60 < 30) {
                     inv.x += invaderDirection * invaderSpeed;
@@ -623,7 +502,6 @@
                     inv.x -= invaderDirection * invaderSpeed;
                 }
                 
-                // Bajar gradualmente
                 if (inv.moveTimer % 120 === 0) {
                     inv.y += invaderDropDistance / 2;
                 }
@@ -643,10 +521,8 @@
             if (inv.alive) {
                 inv.moveTimer++;
                 
-                // Movimiento normal
                 inv.x += invaderDirection * invaderSpeed;
                 
-                // Algunos invasores se lanzan en picada
                 if (inv.moveTimer % 180 === 0 && Math.random() < 0.2) {
                     inv.dive = true;
                     inv.diveSpeed = 2 + Math.random() * 2;
@@ -656,7 +532,6 @@
                     inv.y += inv.diveSpeed;
                     inv.x += invaderDirection * invaderSpeed * 0.5;
                     
-                    // Volver a la formación después de un tiempo
                     if (inv.y > canvas.height / 2 || inv.y > player.y - 100) {
                         inv.dive = false;
                         inv.y = inv.originalY;
@@ -679,13 +554,13 @@
         let edge = false;
         invaders.forEach(inv => {
             if (inv.alive) {
-                inv.x += invaderDirection * invaderSpeed * 0.8; // Más lento pero más cohesionado
+                inv.x += invaderDirection * invaderSpeed * 0.8;
                 if (inv.x <= 0 || inv.x + inv.width >= canvas.width) edge = true;
             }
         });
         if (edge) {
             invaderDirection *= -1;
-            invaders.forEach(inv => inv.y += invaderDropDistance * 0.7); // Bajada más pequeña
+            invaders.forEach(inv => inv.y += invaderDropDistance * 0.7);
         }
     }
 
@@ -693,15 +568,12 @@
         let edge = false;
         invaders.forEach(inv => {
             if (inv.alive) {
-                // Movimiento base
                 inv.x += invaderDirection * invaderSpeed;
                 
-                // Movimiento aleatorio adicional
                 if (Math.random() < 0.1) {
                     inv.x += (Math.random() - 0.5) * 10;
                 }
                 
-                // Bajada aleatoria ocasional
                 if (Math.random() < 0.02) {
                     inv.y += invaderDropDistance * 0.5;
                 }
@@ -716,10 +588,8 @@
     }
 
     function checkCollisions() {
-        // 1. Balas del jugador vs. Invasores/Jefe
         bullets.forEach(b => {
             if (bossLevel && boss && boss.alive) {
-                // Colisión con el jefe
                 if (b.x < boss.x + boss.width && b.x + BULLET_WIDTH > boss.x && 
                     b.y < boss.y + boss.height && b.y + BULLET_HEIGHT > boss.y) {
                     boss.health--;
@@ -727,20 +597,17 @@
                     score += 50;
                     createExplosion(b.x, b.y, '#f00');
                     
-                    // Si el jefe es derrotado
                     if (boss.health <= 0) {
                         boss.alive = false;
-                        score += 500; // Bonus por derrotar al jefe
+                        score += 500;
                         createExplosion(boss.x + boss.width / 2, boss.y + boss.height / 2, '#ff0');
                         
-                        // Posibilidad de soltar un power-up
                         if (Math.random() < 0.7) {
                             createPowerUp(boss.x + boss.width / 2, boss.y + boss.height / 2);
                         }
                     }
                 }
             } else {
-                // Colisión con invasores normales
                 invaders.forEach(inv => {
                     if (inv.alive && b.x < inv.x + inv.width && b.x + BULLET_WIDTH > inv.x && b.y < inv.y + inv.height && b.y + BULLET_HEIGHT > inv.y) {
                         inv.alive = false;
@@ -748,8 +615,7 @@
                         score += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
                         createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2);
                         
-                        // Posibilidad de soltar un power-up
-                        if (Math.random() < 0.05) { // 5% de probabilidad
+                        if (Math.random() < 0.05) {
                             createPowerUp(inv.x + inv.width / 2, inv.y + inv.height / 2);
                         }
                     }
@@ -757,11 +623,9 @@
             }
         });
 
-        // 2. Balas de invasores/Jefe vs. Jugador
         if (!player.isHit) {
             alienBullets.forEach(b => {
                 if (b.x < player.x + player.width && b.x + BULLET_WIDTH > player.x && b.y < player.y + player.height && b.y + BULLET_HEIGHT > player.y) {
-                    // Si el jugador tiene un escudo, absorbe el impacto
                     if (shield) {
                         shield = false;
                         alienBullets = alienBullets.filter(bullet => bullet !== b);
@@ -770,14 +634,13 @@
                         lives--;
                         player.isHit = true;
                         player.invulnerableTime = Date.now();
-                        alienBullets = alienBullets.filter(bullet => bullet !== b); // Eliminar la bala que impactó
+                        alienBullets = alienBullets.filter(bullet => bullet !== b);
                         createExplosion(player.x + player.width / 2, player.y + player.height / 2);
                     }
                 }
             });
         }
 
-        // 3. Invasores/Jefe vs. Jugador (si llegan a tu línea)
         if (bossLevel && boss && boss.alive) {
             if (boss.y + boss.height >= player.y) {
                 gameState = 'gameOver';
@@ -790,7 +653,6 @@
             });
         }
 
-        // 4. Balas vs. Búnkeres
         bullets.forEach(b => {
             bunkers.forEach(bunker => {
                 checkBunkerCollision(bunker, b);
@@ -812,8 +674,7 @@
         if (bRow >= 0 && bRow < bunker.blocks.length && bCol >= 0 && bCol < bunker.blocks[0].length) {
             if (bunker.blocks[bRow][bCol] === 1) {
                 bunker.blocks[bRow][bCol] = 0;
-                bullet.hit = true; // Marcar la bala para ser eliminada
-                // Pequeña explosión en el bloque
+                bullet.hit = true;
                 for(let i = 0; i < 3; i++) {
                     particles.push({
                         x: bullet.x,
@@ -829,7 +690,7 @@
     }
 
     function createExplosion(x, y, color = null) {
-        const explosionColor = color || `hsl(${Math.random() * 60 + 15}, 100%, 50%)`; // Colores amarillo/naranja por defecto
+        const explosionColor = color || `hsl(${Math.random() * 60 + 15}, 100%, 50%)`;
         for(let i = 0; i < 15; i++) {
             particles.push({
                 x: x,
@@ -844,14 +705,10 @@
 
     // --- LÓGICA DE DIBUJO ---
     function draw() {
-        // Limpiar lienzo
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Dibujar estrellas de fondo
         drawStars();
-
-        // Dibujar entidades del juego
         drawBunkers();
         drawPlayer();
         
@@ -866,7 +723,6 @@
         drawPowerUps();
         drawUI();
 
-        // Dibujar pantallas de estado
         if (gameState === 'start') drawStartScreen();
         if (gameState === 'gameOver') drawGameOverScreen();
         if (gameState === 'levelComplete') drawLevelCompleteScreen();
@@ -883,10 +739,9 @@
 
     function drawPlayer() {
         if (player.isHit && Math.floor(Date.now() / 100) % 2 === 0) {
-            return; // Efecto de parpadeo cuando es vulnerable
+            return;
         }
         
-        // Dibujar escudo si está activo
         if (shield) {
             ctx.strokeStyle = '#0ff';
             ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 100) * 0.2;
@@ -896,12 +751,9 @@
             ctx.globalAlpha = 1;
         }
         
-        ctx.fillStyle = '#0ff'; // Cian brillante
-        // Base de la nave
+        ctx.fillStyle = '#0ff';
         ctx.fillRect(player.x + 10, player.y + 15, 20, 10);
-        // Cañón
         ctx.fillRect(player.x + 18, player.y + 5, 4, 15);
-        // Alas
         ctx.beginPath();
         ctx.moveTo(player.x, player.y + 15);
         ctx.lineTo(player.x + 10, player.y + 15);
@@ -930,17 +782,13 @@
         if (!boss || !boss.alive) return;
         
         ctx.fillStyle = boss.type === 'advanced' ? '#f00' : '#ff0';
-        
-        // Cuerpo principal del jefe
         ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
         
-        // Detalles del jefe
         ctx.fillStyle = '#000';
         ctx.fillRect(boss.x + 20, boss.y + 10, 10, 10);
         ctx.fillRect(boss.x + 70, boss.y + 10, 10, 10);
         ctx.fillRect(boss.x + 40, boss.y + 30, 20, 10);
         
-        // Barra de vida
         const healthPercentage = boss.health / boss.maxHealth;
         ctx.fillStyle = '#0f0';
         ctx.fillRect(boss.x, boss.y - 15, boss.width * healthPercentage, 5);
@@ -955,7 +803,6 @@
         ctx.translate(x + invader.width / 2, y + invader.height / 2);
 
         if (invader.type === 'squid') {
-            // Dibujo simplificado de un 'calamar'
             ctx.fillRect(-10, -5, 20, 3);
             ctx.fillRect(-8, -2, 3, 5);
             ctx.fillRect(5, -2, 3, 5);
@@ -965,7 +812,6 @@
                 ctx.fillRect(7, -8, 3, 3);
             }
         } else if (invader.type === 'crab') {
-            // Dibujo simplificado de un 'cangrejo'
             ctx.fillRect(-10, -5, 20, 3);
             ctx.fillRect(-10, 0, 20, 3);
             ctx.fillRect(-12, -5, 3, 8);
@@ -974,8 +820,7 @@
                 ctx.fillRect(-5, 3, 3, 3);
                 ctx.fillRect(2, 3, 3, 3);
             }
-        } else { // octopus
-            // Dibujo simplificado de un 'pulpo'
+        } else {
             ctx.fillRect(-10, -5, 20, 5);
             ctx.fillRect(-5, 0, 10, 5);
             if (frame === 1) {
@@ -989,7 +834,7 @@
     }
 
     function drawBunkers() {
-        ctx.fillStyle = '#0f0'; // Verde clásico de los búnkeres
+        ctx.fillStyle = '#0f0';
         bunkers.forEach(bunker => {
             const blockWidth = bunker.width / bunker.blocks[0].length;
             const blockHeight = bunker.height / bunker.blocks.length;
@@ -1004,11 +849,9 @@
     }
 
     function drawBullets() {
-        // Balas del jugador
-        ctx.fillStyle = '#ff0'; // Amarillo neón
+        ctx.fillStyle = '#ff0';
         bullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
-        // Balas de los invasores
-        ctx.fillStyle = '#f00'; // Rojo neón
+        ctx.fillStyle = '#f00';
         alienBullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
     }
     
@@ -1028,18 +871,10 @@
             ctx.rotate(Date.now() / 500);
             
             switch(p.type) {
-                case 'rapidFire':
-                    ctx.fillStyle = '#f0f'; // Magenta
-                    break;
-                case 'shield':
-                    ctx.fillStyle = '#0ff'; // Cian
-                    break;
-                case 'extraLife':
-                    ctx.fillStyle = '#0f0'; // Verde
-                    break;
-                case 'multiShot':
-                    ctx.fillStyle = '#ff0'; // Amarillo
-                    break;
+                case 'rapidFire': ctx.fillStyle = '#f0f'; break;
+                case 'shield': ctx.fillStyle = '#0ff'; break;
+                case 'extraLife': ctx.fillStyle = '#0f0'; break;
+                case 'multiShot': ctx.fillStyle = '#ff0'; break;
             }
             
             ctx.fillRect(-p.width/2, -p.height/2, p.width, p.height);
@@ -1056,7 +891,6 @@
         ctx.fillText(`NIVEL: ${level}`, canvas.width - 10, 30);
         ctx.fillText(`VIDAS: ${lives}`, canvas.width - 10, 55);
         
-        // Mostrar nombre del nivel
         if (currentLevelConfig && Date.now() - levelTransitionTime < 3000) {
             ctx.fillStyle = '#0ff';
             ctx.font = '25px Orbitron';
@@ -1066,7 +900,6 @@
             ctx.globalAlpha = 1;
         }
         
-        // Indicadores de power-ups activos
         if (rapidFire) {
             const timeLeft = Math.ceil((rapidFireEndTime - Date.now()) / 1000);
             ctx.fillStyle = '#f0f';
@@ -1133,14 +966,21 @@
 
         if (gameState !== 'playing') return;
 
+        // --- MANEJO DE LA TECLA O PARA ARMAGEDÓN (SECRETO) ---
+        if ((e.key === 'o' || e.key === 'O')) {
+            const now = Date.now();
+            if (now - lastArmageddonTime > ARMAGEDDON_COOLDOWN) {
+                activateArmageddon();
+                lastArmageddonTime = now;
+            }
+        }
+
         if (e.key === 'ArrowLeft' && player.x > 0) player.x -= player.speed;
         if (e.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += player.speed;
         
         if (e.key === ' ') {
-            e.preventDefault(); // Evita que la página se desplace
+            e.preventDefault();
             const now = Date.now();
-            
-            // Tiempo de enfriamiento reducido si tiene el power-up de disparo rápido
             const cooldown = rapidFire ? 100 : SHOT_COOLDOWN;
             
             if (now - lastShotTime > cooldown) {
@@ -1156,8 +996,6 @@
         else if (action === 'right' && player.x < canvas.width - player.width) player.x += player.speed;
         else if (action === 'fire') {
             const now = Date.now();
-            
-            // Tiempo de enfriamiento reducido si tiene el power-up de disparo rápido
             const cooldown = rapidFire ? 100 : SHOT_COOLDOWN;
             
             if (now - lastShotTime > cooldown) {
@@ -1175,7 +1013,6 @@
         });
     };
 
-    // --- FUNCIÓN DE LIMPIEZA ---
     window.stopGame = function() {
         console.log("Deteniendo Space Invaders...");
         gameState = 'stopped';
@@ -1186,9 +1023,8 @@
         });
     };
 
-    // --- INICIALIZACIÓN ---
     init();
-    draw(); // Dibuja la pantalla de inicio inicialmente
+    draw();
 
 })(); // FIN DEL IIFE
 // ===================================================================
