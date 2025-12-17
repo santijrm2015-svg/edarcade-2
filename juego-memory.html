@@ -3,948 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Matrix</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Juego de Memory Matrix</title>
     <style>
-        /* --- VARIABLES Y ESTILOS GLOBALES --- */
-        :root {
-            --bg-color: #0a0a0f; 
-            --card-bg: #1a1a2e; 
-            --text-color: #e0e0e0;
-            --primary-color: #00d4ff; 
-            --secondary-color: #ff006e; 
-            --accent-color: #fb5607; 
-            --purple-accent: #8338ec;
-            --success-color: #4caf50;
-            --error-color: #f44336;
-            --warning-color: #ff9800;
-        }
-        
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            font-family: 'Roboto', sans-serif; 
-            line-height: 1.6; 
-            overflow-x: hidden; 
+        /* --- Estilos Generales --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #eee;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-        }
-        
-        .hidden { 
-            display: none !important; 
-        }
-
-        /* --- ESTILOS DEL VISOR DE JUEGOS --- */
-        .game-viewer { 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 1rem; 
-            background-color: var(--bg-color);
-        }
-        
-        .game-header-viewer { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
-            z-index: 100; 
-        }
-        
-        .game-header-viewer a { 
-            font-family: 'Orbitron', sans-serif; 
-            color: var(--primary-color); 
-            text-decoration: none; 
-            font-size: 1.2rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        
-        .game-container-viewer { 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            width: 100%; 
-            max-width: 600px;
-        }
-
-        /* --- ESTILOS ESPECÍFICOS DE MEMORY MATRIX --- */
-        .memory-start-screen {
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            border-radius: 20px;
-            padding: 60px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 212, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .memory-start-screen::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .game-title-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brain-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .game-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3em;
-            font-weight: 900;
-            color: var(--primary-color);
-            text-shadow: 
-                0 0 10px var(--primary-color),
-                0 0 20px var(--primary-color),
-                0 0 30px var(--primary-color),
-                0 0 40px var(--primary-color);
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .game-subtitle {
-            color: #888;
-            font-size: 1.2em;
-            margin-bottom: 50px;
-            position: relative;
-            z-index: 1;
-            font-weight: 300;
-        }
-
-        .game-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .game-btn {
-            background: linear-gradient(135deg, var(--primary-color), #0099cc);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .game-btn:hover::before {
-            left: 100%;
-        }
-
-        .game-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
-        }
-
-        .game-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .game-btn.secondary {
-            background: linear-gradient(135deg, #666, #444);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .game-btn.secondary:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        /* --- ESTILOS DEL JUEGO ACTIVO --- */
-        .game-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 212, 255, 0.1);
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            display: none;
-        }
-
-        .game-container.active {
-            display: block;
-        }
-
-        .game-container header {
+            margin: 0;
             text-align: center;
-            margin-bottom: 30px;
         }
 
-        .game-container h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--primary-color);
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px var(--primary-color);
+        /* --- Contenedor Principal del Juego --- */
+        .game-container {
+            background-color: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
         }
 
-        .game-info {
-            display: flex;
-            justify-content: space-between;
+        h1 {
+            color: #0f3460;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .info-item {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--bg-color);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
+        /* --- Panel de Información (Nivel, Puntuación, Vidas) --- */
+        .info-panel {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            justify-content: space-around;
+            margin-bottom: 25px;
+            font-size: 1.2em;
         }
 
         .info-item span {
-            font-size: 1.2em;
+            font-weight: bold;
+            color: #e94560;
         }
 
-        .lives {
-            display: flex;
-            gap: 5px;
+        /* --- Área del Mensaje --- */
+        #message {
+            height: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #4fc3f7; /* Color para mensajes neutrales */
+            transition: color 0.3s ease;
         }
 
-        .heart {
-            font-size: 1.5em;
-            transition: transform 0.3s;
+        #message.success {
+            color: #66bb6a; /* Verde para éxito */
         }
 
-        .heart.lost {
-            opacity: 0.3;
-            transform: scale(0.8);
+        #message.error {
+            color: #ef5350; /* Rojo para error */
         }
 
-        .matrix-container {
+        /* --- Grid del Juego --- */
+        #game-grid {
             display: grid;
             gap: 10px;
-            margin: 30px auto;
+            margin: 0 auto 25px auto;
+            width: 100%;
             max-width: 400px;
-            aspect-ratio: 1;
+            aspect-ratio: 1 / 1; /* Hace que el grid sea siempre un cuadrado */
         }
 
+        /* --- Celdas del Grid --- */
         .cell {
-            background: #2a2a3e;
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 10px;
+            background-color: #0f3460;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cell:hover:not(.disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
-            border-color: var(--primary-color);
-        }
-
-        .cell.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            animation: pulse 0.5s ease-out;
-            border-color: var(--primary-color);
-        }
-
-        .cell.correct {
-            background: linear-gradient(135deg, var(--success-color), #45a049);
-            animation: correctPulse 0.5s ease-out;
-            border-color: var(--success-color);
-        }
-
-        .cell.wrong {
-            background: linear-gradient(135deg, var(--error-color), #d32f2f);
-            animation: shake 0.5s ease-out;
-            border-color: var(--error-color);
-        }
-
-        .cell.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
-            }
-            50% {
-                transform: scale(1.1);
-                box-shadow: 0 0 20px 10px rgba(0, 212, 255, 0);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
-            }
-        }
-
-        @keyframes correctPulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.15);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            10%, 30%, 50%, 70%, 90% {
-                transform: translateX(-5px);
-            }
-            20%, 40%, 60%, 80% {
-                transform: translateX(5px);
-            }
-        }
-
-        .controls {
+            transition: background-color 0.2s ease, transform 0.2s ease;
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .message {
-            text-align: center;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-weight: bold;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s;
-        }
-
-        .message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .message.success {
-            background: linear-gradient(135deg, var(--success-color), #45a049);
-            color: white;
-        }
-
-        .message.error {
-            background: linear-gradient(135deg, var(--error-color), #d32f2f);
-            color: white;
-        }
-
-        .message.info {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-        }
-
-        .overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            animation: slideIn 0.3s ease-out;
-            border: 1px solid var(--primary-color);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
             font-size: 2em;
         }
 
-        .modal p {
-            margin-bottom: 20px;
+        .cell:hover:not(.active):not(.selected) {
+            background-color: #1e5090;
+            transform: scale(1.05);
+        }
+
+        /* Estados de las celdas */
+        .cell.active {
+            /* Color cuando se muestra el patrón a memorizar */
+            background-color: #4fc3f7;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        .cell.selected {
+            /* Color cuando el jugador hace clic en una celda */
+            background-color: #f8b500;
+        }
+
+        .cell.correct-flash {
+            /* Parpadeo verde para acierto */
+            background-color: #66bb6a !important;
+        }
+
+        .cell.incorrect-flash {
+            /* Parpadeo rojo para error */
+            background-color: #ef5350 !important;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+
+        /* --- Botón de Inicio --- */
+        #start-button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 15px 30px;
             font-size: 1.2em;
-            color: var(--text-color);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .countdown {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4em;
-            font-weight: bold;
-            color: var(--primary-color);
-            z-index: 100;
-            animation: countdownPulse 1s ease-out;
-            pointer-events: none;
+        #start-button:hover {
+            background-color: #c23652;
+            transform: scale(1.05);
         }
 
-        @keyframes countdownPulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0;
-            }
+        #start-button:active {
+            transform: scale(0.98);
         }
 
-        @media (max-width: 600px) {
-            .game-title {
-                font-size: 2em;
-            }
-            
-            .game-container h1 {
-                font-size: 2em;
-            }
-            
-            .game-info {
-                justify-content: center;
-            }
-            
-            .matrix-container {
-                max-width: 300px;
-            }
-
-            .memory-start-screen {
-                padding: 40px 20px;
-            }
-
-            .game-buttons {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .game-btn {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- VISTA DEL JUEGO -->
-    <div id="game-viewer" class="game-viewer">
-        <div class="game-header-viewer">
-            <a href="#" onclick="backToArcade(); return false;">
-                <span>&larr;</span>
-                <span>Volver al Arcade</span>
-            </a>
-        </div>
+
+    <div class="game-container">
+        <h1>Memory Matrix</h1>
         
-        <div class="game-container-viewer" id="game-container">
-            <!-- PANTALLA DE INICIO -->
-            <div id="start-screen" class="memory-start-screen">
-                <div class="game-title-container">
-                    <div class="brain-icon">🧠</div>
-                    <h1 class="game-title">Memory Matrix</h1>
-                </div>
-                <p class="game-subtitle">Recuerda y reproduce el patrón</p>
-                <div class="game-buttons">
-                    <button id="startBtn" class="game-btn">Iniciar Juego</button>
-                    <button id="resetBtn" class="game-btn secondary">Reiniciar</button>
-                </div>
-            </div>
-
-            <!-- PANTALLA DEL JUEGO -->
-            <div id="game-screen" class="game-container">
-                <header>
-                    <h1>🧠 Memory Matrix</h1>
-                    <p style="color: #888;">Recuerda y reproduce el patrón</p>
-                </header>
-
-                <div class="game-info">
-                    <div class="info-item">
-                        <span>🏆</span>
-                        <span id="score">0</span>
-                    </div>
-                    <div class="info-item">
-                        <span>📊</span>
-                        <span>Nivel <span id="level">1</span></span>
-                    </div>
-                    <div class="info-item">
-                        <span>❤️</span>
-                        <div class="lives" id="lives">
-                            <span class="heart">❤️</span>
-                            <span class="heart">❤️</span>
-                            <span class="heart">❤️</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="matrix-container" id="matrix">
-                    <!-- Las celdas se generarán dinámicamente -->
-                </div>
-
-                <div class="controls">
-                    <button id="backToMenuBtn" class="game-btn secondary">Volver al Menú</button>
-                    <button id="restartBtn" class="game-btn">Reiniciar Juego</button>
-                </div>
-
-                <div id="message" class="message"></div>
-            </div>
+        <div class="info-panel">
+            <div class="info-item">Nivel: <span id="level">1</span></div>
+            <div class="info-item">Puntuación: <span id="score">0</span></div>
+            <div class="info-item">Vidas: <span id="lives">3</span></div>
         </div>
 
-        <!-- MODAL DE GAME OVER -->
-        <div class="overlay" id="gameOverOverlay">
-            <div class="modal">
-                <h2 id="gameOverTitle">¡Juego Terminado!</h2>
-                <p id="gameOverMessage">Tu puntuación final: <span id="finalScore">0</span></p>
-                <p id="gameOverStats"></p>
-                <button onclick="backToMenu()" class="game-btn">Volver al Menú</button>
-                <button onclick="restartGame()" class="game-btn secondary">Jugar de Nuevo</button>
-            </div>
-        </div>
+        <div id="message">¡Presiona Iniciar para Jugar!</div>
+
+        <div id="game-grid"></div>
+
+        <button id="start-button">Iniciar Juego</button>
     </div>
 
     <script>
-        class MemoryMatrix {
-            constructor() {
-                this.gridSize = 4;
-                this.level = 1;
-                this.score = 0;
-                this.lives = 3;
-                this.activeCells = [];
-                this.userSelection = [];
-                this.isPlaying = false;
-                this.showingPattern = false;
-                this.correctCells = [];
-                this.wrongCells = [];
-                this.totalCorrect = 0;
-                this.totalWrong = 0;
-                
-                this.init();
+        // --- Variables de Estado del Juego ---
+        let gridSize = 3; // Tamaño inicial del grid (3x3)
+        let level = 1;
+        let score = 0;
+        let lives = 3;
+        let pattern = []; // Almacena los índices de las celdas del patrón
+        let playerPattern = []; // Almacena los índices seleccionados por el jugador
+        let isShowingPattern = false; // Bandera para evitar clics durante la muestra
+        let isPlayerTurn = false; // Bandera para permitir clics en el turno del jugador
+
+        // --- Referencias a Elementos del DOM ---
+        const gameGrid = document.getElementById('game-grid');
+        const levelDisplay = document.getElementById('level');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const messageDisplay = document.getElementById('message');
+        const startButton = document.getElementById('start-button');
+
+        // --- Funciones Principales del Juego ---
+
+        /**
+         * Inicializa o reinicia el juego a su estado inicial.
+         */
+        function initGame() {
+            gridSize = 3;
+            level = 1;
+            score = 0;
+            lives = 3;
+            pattern = [];
+            playerPattern = [];
+            isShowingPattern = false;
+            isPlayerTurn = false;
+            updateDisplay();
+            messageDisplay.textContent = '¡Presiona Iniciar para Jugar!';
+            messageDisplay.className = '';
+            gameGrid.innerHTML = '';
+            startButton.style.display = 'block';
+        }
+
+        /**
+         * Comienza una nueva partida.
+         */
+        function startGame() {
+            initGame();
+            startButton.style.display = 'none';
+            nextLevel();
+        }
+
+        /**
+         * Prepara y ejecuta el siguiente nivel.
+         */
+        function nextLevel() {
+            levelDisplay.textContent = level;
+            playerPattern = [];
+            messageDisplay.textContent = `Nivel ${level}: ¡Memoriza!`;
+            messageDisplay.className = '';
+
+            // Aumentar la dificultad
+            // El tamaño del grid aumenta cada 3 niveles
+            if (level > 1 && (level - 1) % 3 === 0) {
+                gridSize++;
+            }
+            
+            createGrid(gridSize);
+            generatePattern(level + 2); // El patrón tiene 'nivel + 2' celdas
+            
+            // Pequeño retraso antes de mostrar el patrón
+            setTimeout(showPattern, 1000);
+        }
+
+        /**
+         * Crea el grid visual de celdas.
+         * @param {number} size - El tamaño del grid (ej: 3 para 3x3).
+         */
+        function createGrid(size) {
+            gameGrid.innerHTML = ''; // Limpiar grid anterior
+            gameGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+            gameGrid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+            for (let i = 0; i < size * size; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i; // Guardar el índice de la celda
+                cell.addEventListener('click', handleCellClick);
+                gameGrid.appendChild(cell);
+            }
+        }
+
+        /**
+         * Genera un patrón aleatorio de celdas a memorizar.
+         * @param {number} count - El número de celdas en el patrón.
+         */
+        function generatePattern(count) {
+            pattern = [];
+            const totalCells = gridSize * gridSize;
+            const indices = Array.from({ length: totalCells }, (_, i) => i);
+
+            // Algoritmo de Fisher-Yates para barajar
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
             }
 
-            init() {
-                this.attachEventListeners();
-                this.updateDisplay();
+            pattern = indices.slice(0, count);
+        }
+
+        /**
+         * Muestra el patrón al jugador por un tiempo limitado.
+         */
+        function showPattern() {
+            isShowingPattern = true;
+            isPlayerTurn = false;
+
+            pattern.forEach(index => {
+                const cell = gameGrid.querySelector(`[data-index="${index}"]`);
+                cell.classList.add('active');
+            });
+
+            // Duración de la muestra del patrón (puede disminuir con el nivel)
+            const showTime = Math.max(1500, 2500 - (level * 100));
+            
+            setTimeout(() => {
+                hidePattern();
+            }, showTime);
+        }
+
+        /**
+         * Oculta el patrón y comienza el turno del jugador.
+         */
+        function hidePattern() {
+            document.querySelectorAll('.cell.active').forEach(cell => {
+                cell.classList.remove('active');
+            });
+            
+            isShowingPattern = false;
+            startPlayerTurn();
+        }
+
+        /**
+         * Inicia el turno del jugador, permitiéndole hacer clic.
+         */
+        function startPlayerTurn() {
+            isPlayerTurn = true;
+            messageDisplay.textContent = '¡Tu turno! Reproduce el patrón.';
+        }
+
+        /**
+         * Maneja el evento de clic en una celda.
+         * @param {Event} event - El evento de clic.
+         */
+        function handleCellClick(event) {
+            if (!isPlayerTurn) return;
+
+            const cell = event.target;
+            const index = parseInt(cell.dataset.index);
+
+            // Evitar seleccionar la misma celda dos veces
+            if (playerPattern.includes(index)) return;
+
+            cell.classList.add('selected');
+            playerPattern.push(index);
+
+            // Comprobar si el jugador ya ha seleccionado todas las celdas
+            if (playerPattern.length === pattern.length) {
+                isPlayerTurn = false; // Detener más clics
+                checkPattern();
             }
+        }
 
-            attachEventListeners() {
-                document.getElementById('startBtn').addEventListener('click', () => this.startGame());
-                document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
-                document.getElementById('backToMenuBtn').addEventListener('click', () => this.backToMenu());
-                document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
+        /**
+         * Comprueba si el patrón del jugador es correcto.
+         */
+        function checkPattern() {
+            // Ordenamos ambos arrays para que el orden de clic no importe
+            const sortedPattern = [...pattern].sort((a, b) => a - b);
+            const sortedPlayerPattern = [...playerPattern].sort((a, b) => a - b);
+            
+            const isCorrect = JSON.stringify(sortedPattern) === JSON.stringify(sortedPlayerPattern);
+
+            if (isCorrect) {
+                levelComplete();
+            } else {
+                levelFailed();
             }
+        }
 
-            startGame() {
-                // Ocultar pantalla de inicio y mostrar pantalla de juego
-                document.getElementById('start-screen').style.display = 'none';
-                document.getElementById('game-screen').classList.add('active');
-                
-                // Crear el grid del juego
-                this.createGrid();
-                
-                this.isPlaying = true;
-                this.userSelection = [];
-                this.correctCells = [];
-                this.wrongCells = [];
-                
-                this.showMessage('¡Prepárate!', 'info');
-                
-                setTimeout(() => {
-                    this.generatePattern();
-                    this.showPattern();
-                }, 1000);
-            }
+        /**
+         * Acciones a realizar cuando el jugador completa un nivel.
+         */
+        function levelComplete() {
+            messageDisplay.textContent = '¡Correcto!';
+            messageDisplay.className = 'success';
+            score += level * 10;
+            updateDisplay();
+            
+            // Flash verde en las celdas correctas
+            pattern.forEach(index => {
+                const cell = gameGrid.querySelector(`[data-index="${index}"]`);
+                cell.classList.add('correct-flash');
+            });
 
-            createGrid() {
-                const matrix = document.getElementById('matrix');
-                matrix.innerHTML = '';
-                matrix.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
-                matrix.style.gridTemplateRows = `repeat(${this.gridSize}, 1fr)`;
+            setTimeout(() => {
+                level++;
+                nextLevel();
+            }, 1500);
+        }
 
-                for (let i = 0; i < this.gridSize * this.gridSize; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell';
-                    cell.dataset.index = i;
-                    cell.addEventListener('click', (e) => this.handleCellClick(e));
-                    matrix.appendChild(cell);
+        /**
+         * Acciones a realizar cuando el jugador falla.
+         */
+        function levelFailed() {
+            lives--;
+            updateDisplay();
+
+            messageDisplay.textContent = `¡Incorrecto! Te quedan ${lives} vidas.`;
+            messageDisplay.className = 'error';
+
+            // Flash rojo en las celdas incorrectas
+            document.querySelectorAll('.cell.selected').forEach(cell => {
+                if (!pattern.includes(parseInt(cell.dataset.index))) {
+                    cell.classList.add('incorrect-flash');
                 }
-            }
-
-            generatePattern() {
-                const totalCells = this.gridSize * this.gridSize;
-                const patternSize = Math.min(3 + Math.floor(this.level / 2), totalCells - 2);
-                
-                this.activeCells = [];
-                const availableIndices = Array.from({length: totalCells}, (_, i) => i);
-                
-                for (let i = 0; i < patternSize; i++) {
-                    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-                    const selectedIndex = availableIndices.splice(randomIndex, 1)[0];
-                    this.activeCells.push(selectedIndex);
-                }
-            }
-
-            showPattern() {
-                this.showingPattern = true;
-                const cells = document.querySelectorAll('.cell');
-                
-                // Deshabilitar clics durante la muestra
-                cells.forEach(cell => cell.classList.add('disabled'));
-                
-                // Mostrar cuenta regresiva
-                this.showCountdown(3);
-                
-                setTimeout(() => {
-                    this.activeCells.forEach((index, i) => {
-                        setTimeout(() => {
-                            cells[index].classList.add('active');
-                            this.playSound('show');
-                        }, i * 200);
+            });
+            
+            setTimeout(() => {
+                if (lives > 0) {
+                    // Dar otra oportunidad: mostrar el patrón de nuevo
+                    messageDisplay.textContent = 'Intenta de nuevo...';
+                    playerPattern = [];
+                    document.querySelectorAll('.cell.selected').forEach(cell => {
+                        cell.classList.remove('selected', 'incorrect-flash', 'correct-flash');
                     });
-                    
-                    // Mantener el patrón visible según el nivel
-                    const displayTime = Math.max(2000 - (this.level * 100), 800);
-                    
-                    setTimeout(() => {
-                        cells.forEach(cell => cell.classList.remove('active'));
-                        this.showingPattern = false;
-                        cells.forEach(cell => cell.classList.remove('disabled'));
-                        this.showMessage('¡Tu turno! Reproduce el patrón', 'info');
-                    }, this.activeCells.length * 200 + displayTime);
-                }, 1000);
-            }
-
-            showCountdown(number) {
-                const matrix = document.getElementById('matrix');
-                const countdown = document.createElement('div');
-                countdown.className = 'countdown';
-                countdown.textContent = number;
-                matrix.appendChild(countdown);
-                
-                setTimeout(() => {
-                    countdown.remove();
-                }, 1000);
-            }
-
-            handleCellClick(e) {
-                if (this.showingPattern || !this.isPlaying) return;
-                
-                const cell = e.target;
-                const index = parseInt(cell.dataset.index);
-                
-                if (this.userSelection.includes(index)) return;
-                
-                this.userSelection.push(index);
-                
-                if (this.activeCells.includes(index)) {
-                    cell.classList.add('correct');
-                    this.correctCells.push(index);
-                    this.playSound('correct');
-                    this.score += 10;
-                    this.totalCorrect++;
-                    
-                    if (this.correctCells.length === this.activeCells.length) {
-                        this.levelComplete();
-                    }
+                    setTimeout(showPattern, 1500);
                 } else {
-                    cell.classList.add('wrong');
-                    this.wrongCells.push(index);
-                    this.playSound('wrong');
-                    this.lives--;
-                    this.totalWrong++;
-                    
-                    setTimeout(() => {
-                        this.showMessage('¡Incorrecto! Pierdes una vida', 'error');
-                        this.updateLives();
-                        
-                        if (this.lives <= 0) {
-                            this.gameOver();
-                        } else {
-                            setTimeout(() => {
-                                this.nextRound();
-                            }, 1500);
-                        }
-                    }, 500);
+                    gameOver();
                 }
-                
-                this.updateDisplay();
-            }
-
-            levelComplete() {
-                this.score += 50 * this.level;
-                this.showMessage(`¡Nivel ${this.level} completado! +${50 * this.level} puntos`, 'success');
-                this.playSound('levelComplete');
-                
-                setTimeout(() => {
-                    this.level++;
-                    this.nextRound();
-                }, 2000);
-            }
-
-            nextRound() {
-                this.userSelection = [];
-                this.correctCells = [];
-                this.wrongCells = [];
-                
-                document.querySelectorAll('.cell').forEach(cell => {
-                    cell.classList.remove('correct', 'wrong', 'active');
-                });
-                
-                this.updateDisplay();
-                
-                if (this.isPlaying) {
-                    setTimeout(() => {
-                        this.generatePattern();
-                        this.showPattern();
-                    }, 1000);
-                }
-            }
-
-            gameOver() {
-                this.isPlaying = false;
-                
-                const overlay = document.getElementById('gameOverOverlay');
-                const finalScore = document.getElementById('finalScore');
-                const stats = document.getElementById('gameOverStats');
-                
-                finalScore.textContent = this.score;
-                stats.innerHTML = `
-                    Nivel alcanzado: ${this.level}<br>
-                    Aciertos totales: ${this.totalCorrect}<br>
-                    Errores totales: ${this.totalWrong}
-                `;
-                
-                overlay.classList.add('show');
-                this.playSound('gameOver');
-            }
-
-            resetGame() {
-                this.level = 1;
-                this.score = 0;
-                this.lives = 3;
-                this.activeCells = [];
-                this.userSelection = [];
-                this.correctCells = [];
-                this.wrongCells = [];
-                this.totalCorrect = 0;
-                this.totalWrong = 0;
-                this.isPlaying = false;
-                this.showingPattern = false;
-                
-                document.getElementById('gameOverOverlay').classList.remove('show');
-                
-                this.updateDisplay();
-                this.updateLives();
-                this.hideMessage();
-            }
-
-            restartGame() {
-                this.resetGame();
-                document.getElementById('gameOverOverlay').classList.remove('show');
-                this.startGame();
-            }
-
-            backToMenu() {
-                // Mostrar pantalla de inicio y ocultar pantalla de juego
-                document.getElementById('start-screen').style.display = 'block';
-                document.getElementById('game-screen').classList.remove('active');
-                
-                this.resetGame();
-                
-                // Limpiar el grid
-                const matrix = document.getElementById('matrix');
-                matrix.innerHTML = '';
-            }
-
-            updateDisplay() {
-                document.getElementById('score').textContent = this.score;
-                document.getElementById('level').textContent = this.level;
-            }
-
-            updateLives() {
-                const hearts = document.querySelectorAll('.heart');
-                hearts.forEach((heart, index) => {
-                    if (index >= this.lives) {
-                        heart.classList.add('lost');
-                    } else {
-                        heart.classList.remove('lost');
-                    }
-                });
-            }
-
-            showMessage(text, type) {
-                const message = document.getElementById('message');
-                message.textContent = text;
-                message.className = `message ${type} show`;
-                
-                setTimeout(() => {
-                    this.hideMessage();
-                }, 3000);
-            }
-
-            hideMessage() {
-                const message = document.getElementById('message');
-                message.classList.remove('show');
-            }
-
-            playSound(type) {
-                // Crear sonidos usando Web Audio API
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                switch(type) {
-                    case 'correct':
-                        oscillator.frequency.value = 523.25; // C5
-                        gainNode.gain.value = 0.3;
-                        break;
-                    case 'wrong':
-                        oscillator.frequency.value = 220; // A3
-                        gainNode.gain.value = 0.3;
-                        break;
-                    case 'show':
-                        oscillator.frequency.value = 440; // A4
-                        gainNode.gain.value = 0.2;
-                        break;
-                    case 'levelComplete':
-                        oscillator.frequency.value = 659.25; // E5
-                        gainNode.gain.value = 0.3;
-                        break;
-                    case 'gameOver':
-                        oscillator.frequency.value = 110; // A2
-                        gainNode.gain.value = 0.3;
-                        break;
-                }
-                
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.1);
-            }
+            }, 2000);
         }
 
-        // Función global para detener el juego (usada por el index)
-        window.stopGame = function() {
-            // Detener cualquier animación o proceso en ejecución
-        };
-
-        function backToArcade() {
-            if (typeof window.backToArcade === 'function') {
-                window.backToArcade();
-            }
+        /**
+         * Termina el juego.
+         */
+        function gameOver() {
+            isPlayerTurn = false;
+            messageDisplay.textContent = `¡Juego Terminado! Puntuación Final: ${score}`;
+            messageDisplay.className = 'error';
+            startButton.textContent = 'Jugar de Nuevo';
+            startButton.style.display = 'block';
         }
 
-        function backToMenu() {
-            if (window.game) {
-                window.game.backToMenu();
-            }
+        /**
+         * Actualiza los elementos de información en pantalla.
+         */
+        function updateDisplay() {
+            levelDisplay.textContent = level;
+            scoreDisplay.textContent = score;
+            livesDisplay.textContent = lives;
         }
 
-        function restartGame() {
-            if (window.game) {
-                window.game.restartGame();
-            }
-        }
+        // --- Event Listeners ---
+        startButton.addEventListener('click', startGame);
 
-        // Inicializar el juego cuando se carga
-        document.addEventListener('DOMContentLoaded', () => {
-            window.game = new MemoryMatrix();
-        });
+        // --- Inicialización ---
+        // Mostrar el estado inicial al cargar la página
+        initGame();
+
     </script>
 </body>
 </html>
