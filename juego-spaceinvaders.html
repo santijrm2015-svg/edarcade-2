@@ -313,7 +313,7 @@
 
     function createBunkerBlocks() {
         return [
-            [0,0,1,1,1,1,1,0,0],
+            [0,0,1,1,1,1,1,1,0,0],
             [0,1,1,1,1,1,1,1,0],
             [1,1,1,1,1,1,1,1,1],
             [1,1,1,1,1,1,1,1,1],
@@ -377,15 +377,6 @@
 
         if (player.isHit && Date.now() - player.invulnerableTime > 2000) {
             player.isHit = false;
-        }
-
-        // Comprobar si los power-ups han expirado
-        const now = Date.now();
-        if (rapidFire && now > rapidFireEndTime) {
-            rapidFire = false;
-        }
-        if (shield && now > shieldEndTime) {
-            shield = false;
         }
 
         updatePowerUps();
@@ -901,27 +892,27 @@
             ctx.globalAlpha = 1;
         }
         
-        // CORRECCIÓN DEL BUG DE TIEMPO NEGATIVO
+        // --- CORRECCIÓN DEFINITIVA DEL BUG DE TIEMPO NEGATIVO ---
         const now = Date.now();
-        
-        if (rapidFire && now < rapidFireEndTime) {
+
+        if (now < rapidFireEndTime) {
             const timeLeft = Math.ceil((rapidFireEndTime - now) / 1000);
-            if (timeLeft > 0) {
-                ctx.fillStyle = '#f0f';
-                ctx.font = '16px Orbitron';
-                ctx.textAlign = 'left';
-                ctx.fillText(`DISPARO RÁPIDO: ${timeLeft}s`, 10, 55);
-            }
+            ctx.fillStyle = '#f0f';
+            ctx.font = '16px Orbitron';
+            ctx.textAlign = 'left';
+            ctx.fillText(`DISPARO RÁPIDO: ${timeLeft}s`, 10, 55);
+        } else {
+            rapidFire = false; // Aseguramos que el estado sea consistente
         }
         
-        if (shield && now < shieldEndTime) {
+        if (now < shieldEndTime) {
             const timeLeft = Math.ceil((shieldEndTime - now) / 1000);
-            if (timeLeft > 0) {
-                ctx.fillStyle = '#0ff';
-                ctx.font = '16px Orbitron';
-                ctx.textAlign = 'left';
-                ctx.fillText(`ESCUDO: ${timeLeft}s`, 10, 75);
-            }
+            ctx.fillStyle = '#0ff';
+            ctx.font = '16px Orbitron';
+            ctx.textAlign = 'left';
+            ctx.fillText(`ESCUDO: ${timeLeft}s`, 10, 75);
+        } else {
+            shield = false; // Aseguramos que el estado sea consistente
         }
     }
 
