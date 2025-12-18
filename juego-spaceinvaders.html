@@ -314,9 +314,9 @@
     function createBunkerBlocks() {
         return [
             [0,0,1,1,1,1,1,1,0,0],
-            [0,1,1,1,1,1,1,1,0],
-            [1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1],
+            [0,1,1,1,1,1,1,1,1,0],
+            [1,1,1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1],
             [1,1,1,0,0,0,0,1,1,1],
             [1,1,0,0,0,0,0,0,1,1]
         ];
@@ -377,6 +377,14 @@
 
         if (player.isHit && Date.now() - player.invulnerableTime > 2000) {
             player.isHit = false;
+        }
+
+        // --- CORRECCIÓN DEL BUG DE TIEMPO NEGATIVO ---
+        if (rapidFire && Date.now() > rapidFireEndTime) {
+            rapidFire = false;
+        }
+        if (shield && Date.now() > shieldEndTime) {
+            shield = false;
         }
 
         updatePowerUps();
@@ -472,17 +480,9 @@
 
     function applyPowerUp(type) {
         switch(type) {
-            case 'rapidFire': 
-                rapidFire = true; 
-                rapidFireEndTime = Date.now() + 15000; 
-                break;
-            case 'shield': 
-                shield = true; 
-                shieldEndTime = Date.now() + 15000; 
-                break;
-            case 'extraLife': 
-                lives++; 
-                break;
+            case 'rapidFire': rapidFire = true; rapidFireEndTime = Date.now() + 15000; break;
+            case 'shield': shield = true; shieldEndTime = Date.now() + 15000; break;
+            case 'extraLife': lives++; break;
             case 'multiShot':
                 bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2 - 10, y: player.y, hit: false });
                 bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
@@ -892,27 +892,20 @@
             ctx.globalAlpha = 1;
         }
         
-        // --- CORRECCIÓN DEFINITIVA DEL BUG DE TIEMPO NEGATIVO ---
-        const now = Date.now();
-
-        if (now < rapidFireEndTime) {
-            const timeLeft = Math.ceil((rapidFireEndTime - now) / 1000);
+        if (rapidFire) {
+            const timeLeft = Math.ceil((rapidFireEndTime - Date.now()) / 1000);
             ctx.fillStyle = '#f0f';
             ctx.font = '16px Orbitron';
             ctx.textAlign = 'left';
             ctx.fillText(`DISPARO RÁPIDO: ${timeLeft}s`, 10, 55);
-        } else {
-            rapidFire = false; // Aseguramos que el estado sea consistente
         }
         
-        if (now < shieldEndTime) {
-            const timeLeft = Math.ceil((shieldEndTime - now) / 1000);
+        if (shield) {
+            const timeLeft = Math.ceil((shieldEndTime - Date.now()) / 1000);
             ctx.fillStyle = '#0ff';
             ctx.font = '16px Orbitron';
             ctx.textAlign = 'left';
             ctx.fillText(`ESCUDO: ${timeLeft}s`, 10, 75);
-        } else {
-            shield = false; // Aseguramos que el estado sea consistente
         }
     }
 
