@@ -2,59 +2,45 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Invaders - Arcade Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #0a0a0f; --card-bg: #1a1a2e; --text-color: #e0e0e0; --primary-color: #00d4ff; --secondary-color: #ff006e; --accent-color: #fb5607; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         h1, h2, h3 { font-family: 'Orbitron', sans-serif; font-weight: 700; }
-        .game-container { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100vh; position: relative; }
-        .game-container h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); position: absolute; top: 10px; z-index: 10;}
-        #gameCanvas { display: block; background-color: #000; image-rendering: pixelated; }
-        .game-controls { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-family: 'Orbitron', sans-serif; font-size: 1rem; z-index: 10; }
-        
-        /* Controles Táctiles para Móvil y Tablets */
-        .touch-controls { display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; z-index: 20; }
-        .d-pad { position: absolute; bottom: 20px; left: 20px; width: 150px; height: 150px; }
-        .d-pad button { position: absolute; background: rgba(0, 212, 255, 0.3); border: 2px solid var(--primary-color); border-radius: 10px; color: var(--primary-color); font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; -webkit-tap-highlight-color: transparent; }
-        .d-pad button.active { background: rgba(0, 212, 255, 0.7); }
-        .d-pad .up { top: 0; left: 50px; width: 50px; height: 50px; } .d-pad .down { bottom: 0; left: 50px; width: 50px; height: 50px; }
-        .d-pad .left { top: 50px; left: 0; width: 50px; height: 50px; } .d-pad .right { top: 50px; right: 0; width: 50px; height: 50px; }
-        .fire-button { position: absolute; bottom: 50px; right: 20px; width: 80px; height: 80px; background: rgba(255, 0, 110, 0.3); border: 2px solid var(--secondary-color); border-radius: 50%; color: var(--secondary-color); font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; -webkit-tap-highlight-color: transparent; }
-        .fire-button.active { background: rgba(255, 0, 110, 0.7); }
-
-        @media (max-width: 768px) {
-            .game-controls { display: none; }
-            .touch-controls { display: block; }
-            .game-container h1 { font-size: 1.8rem; }
-        }
-        
-        @media screen and (orientation: portrait) and (max-width: 768px) {
-            .game-container::before {
-                content: "Por favor, gira tu dispositivo para una mejor experiencia";
-                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                color: white; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-align: center; z-index: 100;
-            }
-            #gameCanvas, .touch-controls, .game-controls { display: none; }
-        }
+        .game-container { text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; }
+        .game-container h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
+        #gameCanvas { border: 2px solid var(--primary-color); border-radius: 10px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.5); background-color: #000; max-width: 100%; height: auto; }
+        .game-controls { margin-top: 1.5rem; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; }
+        /* Controles Táctiles para Móvil */
+        .touch-controls { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .d-pad { position: relative; width: 150px; height: 150px; }
+        .d-pad button { position: absolute; width: 50px; height: 50px; background: rgba(0, 212, 255, 0.3); border: 2px solid var(--primary-color); border-radius: 10px; color: var(--primary-color); font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+        .d-pad button:active { background: rgba(0, 212, 255, 0.6); }
+        .d-pad .up { top: 0; left: 50px; } .d-pad .down { bottom: 0; left: 50px; }
+        .d-pad .left { top: 50px; left: 0; } .d-pad .right { top: 50px; right: 0; }
+        .d-pad .fire { top: 50px; left: 50px; background: rgba(255, 0, 110, 0.3); border-color: var(--secondary-color); color: var(--secondary-color); width: 50px; height: 50px; border-radius: 50%; }
+        .d-pad .fire:active { background: rgba(255, 0, 110, 0.6); }
+        @media (max-width: 768px) { .touch-controls { display: block; } .game-controls { display: none; } }
     </style>
 </head>
 <body>
     <div class="game-container">
         <h1>Space Invaders</h1>
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" width="600" height="500"></canvas>
         <div class="game-controls"><p>Flechas para mover, Espacio para disparar</p></div>
-        
-        <div class="touch-controls">
-            <div class="d-pad">
-                <button class="up" data-direction="up">↑</button>
-                <button class="down" data-direction="down">↓</button>
-                <button class="left" data-direction="left">←</button>
-                <button class="right" data-direction="right">→</button>
-            </div>
-            <button class="fire-button" data-direction="fire">FUEGO</button>
+    </div>
+
+    <!-- Controles Táctiles para Móvil -->
+    <div class="touch-controls">
+        <div class="d-pad">
+            <button class="up" data-direction="up">↑</button>
+            <button class="down" data-direction="down">↓</button>
+            <button class="left" data-direction="left">←</button>
+            <button class="right" data-direction="right">→</button>
+            <button class="fire" data-direction="fire">FUEGO</button>
         </div>
     </div>
 
@@ -69,9 +55,7 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
-    // Constantes del juego (dimensiones base)
-    const GAME_WIDTH = 600;
-    const GAME_HEIGHT = 500;
+    // Constantes del juego
     const PLAYER_WIDTH = 40;
     const PLAYER_HEIGHT = 25;
     const INVADER_WIDTH = 25;
@@ -92,50 +76,11 @@
     let invaderAnimationFrame = 0;
     let lastShotTime = 0;
     const SHOT_COOLDOWN = 300; // en milisegundos
-    let levelTransitionTime = 0;
-    let bossLevel = false;
-    let boss = null;
-    let powerUps = [];
-    let rapidFire = false;
-    let rapidFireEndTime = 0;
-    let shield = false;
-    let shieldEndTime = 0;
-    
-    // --- VARIABLES PARA ARMAGEDÓN (SECRETO) ---
-    const ARMAGEDDON_COOLDOWN = 30000; // 30 segundos
-    let lastArmageddonTime = 0;
-    
-    // --- VARIABLE PARA CONTROLAR LA TRANSICIÓN DE NIVEL ---
-    let levelCompleteTime = 0;
-
-    // --- NUEVAS VARIABLES PARA CONTROLES TÁCTILES ---
-    let activeKeys = {};
-    let activeTouches = new Set();
-
-    // Configuración de niveles ampliada
-    const levelConfigs = [
-        { rows: 4, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Nivel 1: Invasión Inicial", bossLevel: false },
-        { rows: 4, cols: 10, speed: 0.6, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Nivel 2: Refuerzos Enemigos", bossLevel: false },
-        { rows: 5, cols: 10, speed: 0.7, dropDistance: 20, shootChance: 0.0015, pattern: 'standard', name: "Nivel 3: Aceleración", bossLevel: false },
-        { rows: 5, cols: 11, speed: 0.6, dropDistance: 15, shootChance: 0.002, pattern: 'tight', name: "Nivel 4: Formación Densa", bossLevel: false },
-        { rows: 5, cols: 11, speed: 0.7, dropDistance: 15, shootChance: 0.002, pattern: 'zigzag', name: "Nivel 5: Patrón Zigzag", bossLevel: false },
-        { rows: 3, cols: 8, speed: 0.5, dropDistance: 20, shootChance: 0.001, pattern: 'standard', name: "Nivel 6: Enfrentamiento con el Jefe", bossLevel: true, bossType: 'basic' },
-        { rows: 5, cols: 11, speed: 0.8, dropDistance: 15, shootChance: 0.0025, pattern: 'dive', name: "Nivel 7: Ataque en Picada", bossLevel: false },
-        { rows: 6, cols: 12, speed: 0.7, dropDistance: 10, shootChance: 0.0025, pattern: 'tight', name: "Nivel 8: Muro de Invasores", bossLevel: false },
-        { rows: 5, cols: 11, speed: 0.9, dropDistance: 15, shootChance: 0.003, pattern: 'random', name: "Nivel 9: Movimiento Errático", bossLevel: false },
-        { rows: 4, cols: 8, speed: 0.6, dropDistance: 20, shootChance: 0.002, pattern: 'standard', name: "Nivel 10: Confrontación Final", bossLevel: true, bossType: 'advanced' },
-        { rows: 5, cols: 11, speed: 1.0, dropDistance: 15, shootChance: 0.003, pattern: 'mixed', name: "Nivel 11: Ataque Coordinado", bossLevel: false },
-        { rows: 7, cols: 13, speed: 1.1, dropDistance: 10, shootChance: 0.0035, pattern: 'tight', name: "Nivel 12: Superpoblación", bossLevel: false },
-        { rows: 6, cols: 12, speed: 1.2, dropDistance: 15, shootChance: 0.004, pattern: 'random', name: "Nivel 13: Caos Total", bossLevel: false },
-        { rows: 5, cols: 10, speed: 0.8, dropDistance: 20, shootChance: 0.003, pattern: 'standard', name: "Nivel 14: El Destructor", bossLevel: true, bossType: 'ultimate' },
-        { rows: 8, cols: 14, speed: 1.3, dropDistance: 10, shootChance: 0.005, pattern: 'mixed', name: "Nivel 15: La Batalla Final", bossLevel: false },
-        { rows: 8, cols: 14, speed: 1.3, dropDistance: 10, shootChance: 0.005, pattern: 'mixed', name: "Nivel Infinito: Sobrevivencia Extrema", bossLevel: false, infinite: true }
-    ];
 
     // Entidades del juego
     const player = {
-        x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2,
-        y: GAME_HEIGHT - 60,
+        x: canvas.width / 2 - PLAYER_WIDTH / 2,
+        y: canvas.height - 60,
         width: PLAYER_WIDTH,
         height: PLAYER_HEIGHT,
         speed: 5,
@@ -147,32 +92,13 @@
     let alienBullets = [];
     let invaders = [];
     let bunkers = [];
-    let particles = [];
-    let stars = [];
-    let currentLevelConfig = null;
+    let particles = []; // Para efectos de explosión
+    let stars = []; // Para el fondo de estrellas
 
-    // --- FUNCIONES DE INICIALIZACIÓN Y ESCALADO ---
-    function resizeCanvas() {
-        const container = document.querySelector('.game-container');
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        
-        const scaleX = containerWidth / GAME_WIDTH;
-        const scaleY = containerHeight / GAME_HEIGHT;
-        const scale = Math.min(scaleX, scaleY);
-
-        canvas.style.width = `${GAME_WIDTH * scale}px`;
-        canvas.style.height = `${GAME_HEIGHT * scale}px`;
-        canvas.width = GAME_WIDTH;
-        canvas.height = GAME_HEIGHT;
-        
-        ctx.scale(scale, scale);
-    }
-
+    // --- FUNCIONES DE INICIALIZACIÓN ---
     function init() {
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
         createStars();
+        createBunkers();
         setupControls();
         resetGame();
     }
@@ -187,61 +113,33 @@
         score = 0;
         lives = 3;
         level = 1;
-        player.x = GAME_WIDTH / 2 - PLAYER_WIDTH / 2;
+        invaderSpeed = 0.5;
+        player.x = canvas.width / 2 - PLAYER_WIDTH / 2;
         player.isHit = false;
         player.invulnerableTime = 0;
         bullets = [];
         alienBullets = [];
         particles = [];
-        powerUps = [];
-        rapidFire = false;
-        shield = false;
-        boss = null;
-        bossLevel = false;
-        lastArmageddonTime = 0;
-        levelCompleteTime = 0;
-        loadLevel(level);
-    }
-
-    function loadLevel(levelNumber) {
-        if (levelNumber <= levelConfigs.length) {
-            currentLevelConfig = {...levelConfigs[levelNumber - 1]};
-        } else {
-            currentLevelConfig = {...levelConfigs[levelConfigs.length - 1]};
-            currentLevelConfig.speed += 0.1 * (levelNumber - levelConfigs.length);
-            currentLevelConfig.shootChance += 0.0005 * (levelNumber - levelConfigs.length);
-            currentLevelConfig.name = `Nivel ${levelNumber}: Sobrevivencia Extrema`;
-        }
-        
-        invaderSpeed = currentLevelConfig.speed;
-        invaderDropDistance = currentLevelConfig.dropDistance;
-        bossLevel = currentLevelConfig.bossLevel || false;
-        
-        bullets = [];
-        alienBullets = [];
-        particles = [];
-        
-        if (bossLevel) {
-            createBoss(currentLevelConfig.bossType);
-            createBunkers();
-        } else {
-            createInvaders();
-            createBunkers();
-        }
+        createInvaders();
+        createBunkers();
     }
 
     function nextLevel() {
         level++;
-        levelTransitionTime = Date.now();
-        loadLevel(level);
-        gameState = 'playing';
+        invaderSpeed += 0.3; // Aumenta la dificultad
+        bullets = [];
+        alienBullets = [];
+        particles = [];
+        createInvaders();
+        createBunkers();
+        gameState = 'playing'; // Continúa al siguiente nivel
     }
     
     function createStars() {
         for (let i = 0; i < 100; i++) {
             stars.push({
-                x: Math.random() * GAME_WIDTH,
-                y: Math.random() * GAME_HEIGHT,
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
                 size: Math.random() * 2,
                 brightness: Math.random()
             });
@@ -250,60 +148,28 @@
 
     function createInvaders() {
         invaders = [];
-        const rows = currentLevelConfig.rows;
-        const cols = currentLevelConfig.cols;
-        
-        for(let r = 0; r < rows; r++) {
-            for(let c = 0; c < cols; c++) {
+        for(let r = 0; r < 5; r++) {
+            for(let c = 0; c < 11; c++) {
                 invaders.push({
                     x: c * (INVADER_WIDTH + 10) + 35,
                     y: r * (INVADER_HEIGHT + 15) + 50,
                     width: INVADER_WIDTH,
                     height: INVADER_HEIGHT,
-                    type: r < 1 ? 'squid' : (r < 3 ? 'crab' : 'octopus'),
-                    alive: true,
-                    originalX: c * (INVADER_WIDTH + 10) + 35,
-                    originalY: r * (INVADER_HEIGHT + 15) + 50,
-                    moveTimer: 0
+                    type: r < 1 ? 'squid' : (r < 3 ? 'crab' : 'octopus'), // Diferentes tipos
+                    alive: true
                 });
             }
         }
-    }
-
-    function createBoss(type) {
-        const bossType = type || 'basic';
-        let health, maxHealth, width, height;
-        
-        switch(bossType) {
-            case 'basic': health = maxHealth = 10; width = 100; height = 60; break;
-            case 'advanced': health = maxHealth = 20; width = 120; height = 70; break;
-            case 'ultimate': health = maxHealth = 30; width = 140; height = 80; break;
-            default: health = maxHealth = 10; width = 100; height = 60;
-        }
-        
-        boss = {
-            x: GAME_WIDTH / 2 - width / 2,
-            y: 50,
-            width: width,
-            height: height,
-            health: health,
-            maxHealth: maxHealth,
-            type: bossType,
-            moveDirection: 1,
-            shootTimer: 0,
-            specialAttackTimer: 0,
-            alive: true
-        };
     }
     
     function createBunkers() {
         bunkers = [];
         const bunkerCount = 4;
-        const spacing = GAME_WIDTH / (bunkerCount + 1);
+        const spacing = canvas.width / (bunkerCount + 1);
         for (let i = 1; i <= bunkerCount; i++) {
             bunkers.push({
                 x: spacing * i - BUNKER_WIDTH / 2,
-                y: GAME_HEIGHT - 150,
+                y: canvas.height - 150,
                 width: BUNKER_WIDTH,
                 height: BUNKER_HEIGHT,
                 blocks: createBunkerBlocks()
@@ -312,6 +178,7 @@
     }
 
     function createBunkerBlocks() {
+        // Matriz para representar los bloques del búnker (1 = bloque, 0 = vacío)
         return [
             [0,0,1,1,1,1,1,1,0,0],
             [0,1,1,1,1,1,1,1,1,0],
@@ -322,45 +189,9 @@
         ];
     }
 
-    function createPowerUp(x, y) {
-        const types = ['rapidFire', 'shield', 'extraLife', 'multiShot'];
-        const type = types[Math.floor(Math.random() * types.length)];
-        
-        powerUps.push({
-            x: x,
-            y: y,
-            width: 20,
-            height: 20,
-            type: type,
-            speed: 2
-        });
-    }
-
-    function activateArmageddon() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-        
-        let armageddonScore = 0;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.alive = false;
-                armageddonScore += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
-                createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2, '#fff');
-            }
-        });
-
-        if (bossLevel && boss && boss.alive) {
-            boss.alive = false;
-            armageddonScore += 500;
-            createExplosion(boss.x + boss.width / 2, boss.y + boss.height / 2, '#fff');
-        }
-        
-        score += armageddonScore + 100;
-    }
-
     // --- BUCLE PRINCIPAL DEL JUEGO ---
     function gameLoop() {
-        if (gameState !== 'playing' && gameState !== 'levelComplete') return;
+        if (gameState !== 'playing') return;
         update();
         draw();
         requestAnimationFrame(gameLoop);
@@ -368,50 +199,49 @@
 
     // --- LÓGICA DE ACTUALIZACIÓN ---
     function update() {
+        // Actualizar animaciones
         invaderAnimationFrame = (invaderAnimationFrame + 1) % 60;
         
+        // Actualizar estrellas
         stars.forEach(star => {
             star.brightness += (Math.random() - 0.5) * 0.1;
             star.brightness = Math.max(0.3, Math.min(1, star.brightness));
         });
 
+        // Actualizar jugador
         if (player.isHit && Date.now() - player.invulnerableTime > 2000) {
             player.isHit = false;
         }
 
-        // --- CORRECCIÓN DEL BUG DE TIEMPO NEGATIVO ---
-        if (rapidFire && Date.now() > rapidFireEndTime) {
-            rapidFire = false;
-        }
-        if (shield && Date.now() > shieldEndTime) {
-            shield = false;
-        }
-
-        updatePowerUps();
-        handleInput();
-
+        // Mover balas del jugador
         bullets = bullets.filter(b => b.y > 0 && !b.hit);
         bullets.forEach(b => b.y -= 10);
 
-        alienBullets = alienBullets.filter(b => b.y < GAME_HEIGHT);
+        // Mover balas de los alienígenas
+        alienBullets = alienBullets.filter(b => b.y < canvas.height);
         alienBullets.forEach(b => b.y += 5);
 
-        if (bossLevel && boss && boss.alive) {
-            updateBoss();
-        }
+        // Lógica de disparo de los alienígenas (más frecuente en niveles altos)
+        invaders.forEach(inv => {
+            if (inv.alive && Math.random() < 0.001 * level) {
+                alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
+            }
+        });
 
-        if (!bossLevel) {
-            invaders.forEach(inv => {
-                if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
-                    alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
-                }
-            });
-        }
-
-        if (!bossLevel) {
-            moveInvaders();
+        // Mover invasores
+        let edge = false;
+        invaders.forEach(inv => {
+            if (inv.alive) {
+                inv.x += invaderDirection * invaderSpeed;
+                if (inv.x <= 0 || inv.x + inv.width >= canvas.width) edge = true;
+            }
+        });
+        if (edge) {
+            invaderDirection *= -1;
+            invaders.forEach(inv => inv.y += invaderDropDistance);
         }
         
+        // Actualizar partículas de explosión
         particles = particles.filter(p => p.life > 0);
         particles.forEach(p => {
             p.x += p.vx;
@@ -419,24 +249,13 @@
             p.life--;
         });
         
+        // --- DETECCIÓN DE COLISIONES ---
         checkCollisions();
 
-        if (gameState === 'playing') {
-            if (bossLevel) {
-                if (!boss.alive) {
-                    gameState = 'levelComplete';
-                    levelCompleteTime = Date.now();
-                }
-            } else {
-                if (invaders.filter(inv => inv.alive).length === 0) {
-                    gameState = 'levelComplete';
-                    levelCompleteTime = Date.now();
-                }
-            }
-        }
-
-        if (gameState === 'levelComplete' && Date.now() - levelCompleteTime > 2000) {
-            nextLevel();
+        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA ---
+        if (invaders.filter(inv => inv.alive).length === 0) {
+            gameState = 'levelComplete';
+            setTimeout(() => nextLevel(), 2000); // Pausa antes del siguiente nivel
         }
 
         if (lives <= 0) {
@@ -444,242 +263,40 @@
         }
     }
 
-    function handleInput() {
-        if (activeKeys['ArrowLeft'] || activeTouches.has('left')) {
-            if (player.x > 0) player.x -= player.speed;
-        }
-        if (activeKeys['ArrowRight'] || activeTouches.has('right')) {
-            if (player.x < GAME_WIDTH - player.width) player.x += player.speed;
-        }
-        if (activeKeys[' '] || activeTouches.has('fire')) {
-            const now = Date.now();
-            const cooldown = rapidFire ? 100 : SHOT_COOLDOWN;
-            if (now - lastShotTime > cooldown) {
-                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
-                lastShotTime = now;
-            }
-        }
-    }
-
-    function updatePowerUps() {
-        powerUps = powerUps.filter(p => p.y < GAME_HEIGHT);
-        powerUps.forEach(p => p.y += p.speed);
-
-        powerUps.forEach(p => {
-            if (p.x < player.x + player.width && 
-                p.x + p.width > player.x && 
-                p.y < player.y + player.height && 
-                p.y + p.height > player.y) {
-                
-                applyPowerUp(p.type);
-                powerUps = powerUps.filter(powerUp => powerUp !== p);
-                createExplosion(p.x + p.width/2, p.y + p.height/2, '#0ff');
-            }
-        });
-    }
-
-    function applyPowerUp(type) {
-        switch(type) {
-            case 'rapidFire': rapidFire = true; rapidFireEndTime = Date.now() + 15000; break;
-            case 'shield': shield = true; shieldEndTime = Date.now() + 15000; break;
-            case 'extraLife': lives++; break;
-            case 'multiShot':
-                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2 - 10, y: player.y, hit: false });
-                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
-                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2 + 10, y: player.y, hit: false });
-                break;
-        }
-    }
-
-    function updateBoss() {
-        if (!boss || !boss.alive) return;
-        
-        boss.x += boss.moveDirection * 2;
-        
-        if (boss.x <= 0 || boss.x + boss.width >= GAME_WIDTH) {
-            boss.moveDirection *= -1;
-            boss.y += 20;
-        }
-        
-        boss.shootTimer++;
-        if (boss.shootTimer > 60) {
-            alienBullets.push({ x: boss.x + boss.width / 2 - 2, y: boss.y + boss.height });
-            if (boss.type === 'advanced' || boss.type === 'ultimate') {
-                alienBullets.push({ x: boss.x + boss.width / 4 - 2, y: boss.y + boss.height });
-                alienBullets.push({ x: boss.x + 3 * boss.width / 4 - 2, y: boss.y + boss.height });
-            }
-            if (boss.type === 'ultimate') {
-                alienBullets.push({ x: boss.x + boss.width / 6 - 2, y: boss.y + boss.height });
-                alienBullets.push({ x: boss.x + 5 * boss.width / 6 - 2, y: boss.y + boss.height });
-            }
-            boss.shootTimer = 0;
-        }
-        
-        if (boss.type === 'advanced' || boss.type === 'ultimate') {
-            boss.specialAttackTimer++;
-            if (boss.specialAttackTimer > 180) {
-                const bulletCount = boss.type === 'ultimate' ? 8 : 5;
-                for (let i = 0; i < bulletCount; i++) {
-                    setTimeout(() => {
-                        alienBullets.push({ x: boss.x + boss.width / 2 - 2 + (Math.random() - 0.5) * 40, y: boss.y + boss.height });
-                    }, i * 100);
-                }
-                boss.specialAttackTimer = 0;
-            }
-        }
-    }
-
-    function moveInvaders() {
-        const pattern = currentLevelConfig.pattern;
-        
-        switch(pattern) {
-            case 'standard': moveInvadersStandard(); break;
-            case 'zigzag': moveInvadersZigzag(); break;
-            case 'dive': moveInvadersDive(); break;
-            case 'tight': moveInvadersTight(); break;
-            case 'random': moveInvadersRandom(); break;
-            case 'mixed':
-                if (Math.floor(invaderAnimationFrame / 180) % 3 === 0) moveInvadersStandard();
-                else if (Math.floor(invaderAnimationFrame / 180) % 3 === 1) moveInvadersZigzag();
-                else moveInvadersDive();
-                break;
-            default: moveInvadersStandard();
-        }
-    }
-
-    function moveInvadersStandard() {
-        let edge = false;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.x += invaderDirection * invaderSpeed;
-                if (inv.x <= 0 || inv.x + inv.width >= GAME_WIDTH) edge = true;
-            }
-        });
-        if (edge) {
-            invaderDirection *= -1;
-            invaders.forEach(inv => inv.y += invaderDropDistance);
-        }
-    }
-
-    function moveInvadersZigzag() {
-        let edge = false;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.moveTimer++;
-                if (inv.moveTimer % 60 < 30) inv.x += invaderDirection * invaderSpeed;
-                else inv.x -= invaderDirection * invaderSpeed;
-                if (inv.moveTimer % 120 === 0) inv.y += invaderDropDistance / 2;
-                if (inv.x <= 0 || inv.x + inv.width >= GAME_WIDTH) edge = true;
-            }
-        });
-        if (edge) {
-            invaderDirection *= -1;
-            invaders.forEach(inv => inv.y += invaderDropDistance / 2);
-        }
-    }
-
-    function moveInvadersDive() {
-        let edge = false;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.moveTimer++;
-                inv.x += invaderDirection * invaderSpeed;
-                if (inv.moveTimer % 180 === 0 && Math.random() < 0.2) {
-                    inv.dive = true; inv.diveSpeed = 2 + Math.random() * 2;
-                }
-                if (inv.dive) {
-                    inv.y += inv.diveSpeed;
-                    inv.x += invaderDirection * invaderSpeed * 0.5;
-                    if (inv.y > GAME_HEIGHT / 2 || inv.y > player.y - 100) {
-                        inv.dive = false; inv.y = inv.originalY; inv.x = inv.originalX;
-                    }
-                }
-                if (inv.x <= 0 || inv.x + inv.width >= GAME_WIDTH) edge = true;
-            }
-        });
-        if (edge) {
-            invaderDirection *= -1;
-            invaders.forEach(inv => {
-                if (!inv.dive) inv.y += invaderDropDistance;
-            });
-        }
-    }
-
-    function moveInvadersTight() {
-        let edge = false;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.x += invaderDirection * invaderSpeed * 0.8;
-                if (inv.x <= 0 || inv.x + inv.width >= GAME_WIDTH) edge = true;
-            }
-        });
-        if (edge) {
-            invaderDirection *= -1;
-            invaders.forEach(inv => inv.y += invaderDropDistance * 0.7);
-        }
-    }
-
-    function moveInvadersRandom() {
-        let edge = false;
-        invaders.forEach(inv => {
-            if (inv.alive) {
-                inv.x += invaderDirection * invaderSpeed;
-                if (Math.random() < 0.1) inv.x += (Math.random() - 0.5) * 10;
-                if (Math.random() < 0.02) inv.y += invaderDropDistance * 0.5;
-                if (inv.x <= 0 || inv.x + inv.width >= GAME_WIDTH) edge = true;
-            }
-        });
-        if (edge) {
-            invaderDirection *= -1;
-            invaders.forEach(inv => inv.y += invaderDropDistance);
-        }
-    }
-
     function checkCollisions() {
+        // 1. Balas del jugador vs. Invasores
         bullets.forEach(b => {
-            if (bossLevel && boss && boss.alive) {
-                if (b.x < boss.x + boss.width && b.x + BULLET_WIDTH > boss.x && 
-                    b.y < boss.y + boss.height && b.y + BULLET_HEIGHT > boss.y) {
-                    boss.health--; b.hit = true; score += 50; createExplosion(b.x, b.y, '#f00');
-                    if (boss.health <= 0) {
-                        boss.alive = false; score += 500; createExplosion(boss.x + boss.width / 2, boss.y + boss.height / 2, '#ff0');
-                        if (Math.random() < 0.7) createPowerUp(boss.x + boss.width / 2, boss.y + boss.height / 2);
-                    }
+            invaders.forEach(inv => {
+                if (inv.alive && b.x < inv.x + inv.width && b.x + BULLET_WIDTH > inv.x && b.y < inv.y + inv.height && b.y + BULLET_HEIGHT > inv.y) {
+                    inv.alive = false;
+                    b.hit = true;
+                    score += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
+                    createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2);
                 }
-            } else {
-                invaders.forEach(inv => {
-                    if (inv.alive && b.x < inv.x + inv.width && b.x + BULLET_WIDTH > inv.x && b.y < inv.y + inv.height && b.y + BULLET_HEIGHT > inv.y) {
-                        inv.alive = false; b.hit = true; score += (inv.type === 'squid' ? 30 : (inv.type === 'crab' ? 20 : 10));
-                        createExplosion(inv.x + inv.width / 2, inv.y + inv.height / 2);
-                        if (Math.random() < 0.05) createPowerUp(inv.x + inv.width / 2, inv.y + inv.height / 2);
-                    }
-                });
-            }
+            });
         });
 
+        // 2. Balas de invasores vs. Jugador
         if (!player.isHit) {
             alienBullets.forEach(b => {
                 if (b.x < player.x + player.width && b.x + BULLET_WIDTH > player.x && b.y < player.y + player.height && b.y + BULLET_HEIGHT > player.y) {
-                    if (shield) {
-                        shield = false; alienBullets = alienBullets.filter(bullet => bullet !== b);
-                        createExplosion(player.x + player.width / 2, player.y + player.height / 2, '#0ff');
-                    } else {
-                        lives--; player.isHit = true; player.invulnerableTime = Date.now();
-                        alienBullets = alienBullets.filter(bullet => bullet !== b);
-                        createExplosion(player.x + player.width / 2, player.y + player.height / 2);
-                    }
+                    lives--;
+                    player.isHit = true;
+                    player.invulnerableTime = Date.now();
+                    alienBullets = alienBullets.filter(bullet => bullet !== b); // Eliminar la bala que impactó
+                    createExplosion(player.x + player.width / 2, player.y + player.height / 2);
                 }
             });
         }
 
-        if (bossLevel && boss && boss.alive) {
-            if (boss.y + boss.height >= player.y) gameState = 'gameOver';
-        } else {
-            invaders.forEach(inv => {
-                if (inv.alive && inv.y + inv.height >= player.y) gameState = 'gameOver';
-            });
-        }
+        // 3. Invasores vs. Jugador (si llegan a tu línea)
+        invaders.forEach(inv => {
+            if (inv.alive && inv.y + inv.height >= player.y) {
+                gameState = 'gameOver';
+            }
+        });
 
+        // 4. Balas vs. Búnkeres
         bullets.forEach(b => {
             bunkers.forEach(bunker => {
                 checkBunkerCollision(bunker, b);
@@ -700,41 +317,54 @@
 
         if (bRow >= 0 && bRow < bunker.blocks.length && bCol >= 0 && bCol < bunker.blocks[0].length) {
             if (bunker.blocks[bRow][bCol] === 1) {
-                bunker.blocks[bRow][bCol] = 0; bullet.hit = true;
+                bunker.blocks[bRow][bCol] = 0;
+                bullet.hit = true; // Marcar la bala para ser eliminada
+                // Pequeña explosión en el bloque
                 for(let i = 0; i < 3; i++) {
-                    particles.push({ x: bullet.x, y: bullet.y, vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2, life: 15, color: '#0f0' });
+                    particles.push({
+                        x: bullet.x,
+                        y: bullet.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 15,
+                        color: '#0f0'
+                    });
                 }
             }
         }
     }
 
-    function createExplosion(x, y, color = null) {
-        const explosionColor = color || `hsl(${Math.random() * 60 + 15}, 100%, 50%)`;
+    function createExplosion(x, y) {
         for(let i = 0; i < 15; i++) {
-            particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, life: 30, color: explosionColor });
+            particles.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 30,
+                color: `hsl(${Math.random() * 60 + 15}, 100%, 50%)` // Colores amarillo/naranja
+            });
         }
     }
 
     // --- LÓGICA DE DIBUJO ---
     function draw() {
+        // Limpiar lienzo
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // Dibujar estrellas de fondo
         drawStars();
+
+        // Dibujar entidades del juego
         drawBunkers();
         drawPlayer();
-        
-        if (bossLevel) {
-            drawBoss();
-        } else {
-            drawInvaders();
-        }
-        
+        drawInvaders();
         drawBullets();
         drawParticles();
-        drawPowerUps();
         drawUI();
 
+        // Dibujar pantallas de estado
         if (gameState === 'start') drawStartScreen();
         if (gameState === 'gameOver') drawGameOverScreen();
         if (gameState === 'levelComplete') drawLevelCompleteScreen();
@@ -750,20 +380,16 @@
     }
 
     function drawPlayer() {
-        if (player.isHit && Math.floor(Date.now() / 100) % 2 === 0) return;
-        
-        if (shield) {
-            ctx.strokeStyle = '#0ff';
-            ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 100) * 0.2;
-            ctx.beginPath();
-            ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+        if (player.isHit && Math.floor(Date.now() / 100) % 2 === 0) {
+            return; // Efecto de parpadeo cuando es vulnerable
         }
         
-        ctx.fillStyle = '#0ff';
+        ctx.fillStyle = '#0ff'; // Cian brillante
+        // Base de la nave
         ctx.fillRect(player.x + 10, player.y + 15, 20, 10);
+        // Cañón
         ctx.fillRect(player.x + 18, player.y + 5, 4, 15);
+        // Alas
         ctx.beginPath();
         ctx.moveTo(player.x, player.y + 15);
         ctx.lineTo(player.x + 10, player.y + 15);
@@ -788,24 +414,6 @@
         });
     }
 
-    function drawBoss() {
-        if (!boss || !boss.alive) return;
-        
-        ctx.fillStyle = boss.type === 'ultimate' ? '#f0f' : (boss.type === 'advanced' ? '#f00' : '#ff0');
-        ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
-        
-        ctx.fillStyle = '#000';
-        ctx.fillRect(boss.x + 20, boss.y + 10, 10, 10);
-        ctx.fillRect(boss.x + boss.width - 30, boss.y + 10, 10, 10);
-        ctx.fillRect(boss.x + boss.width/2 - 10, boss.y + 30, 20, 10);
-        
-        const healthPercentage = boss.health / boss.maxHealth;
-        ctx.fillStyle = '#0f0';
-        ctx.fillRect(boss.x, boss.y - 15, boss.width * healthPercentage, 5);
-        ctx.strokeStyle = '#fff';
-        ctx.strokeRect(boss.x, boss.y - 15, boss.width, 5);
-    }
-
     function drawInvaderShape(invader, frame) {
         const x = invader.x;
         const y = invader.y;
@@ -813,20 +421,41 @@
         ctx.translate(x + invader.width / 2, y + invader.height / 2);
 
         if (invader.type === 'squid') {
-            ctx.fillRect(-10, -5, 20, 3); ctx.fillRect(-8, -2, 3, 5); ctx.fillRect(5, -2, 3, 5); ctx.fillRect(-5, 3, 10, 3);
-            if (frame === 1) { ctx.fillRect(-10, -8, 3, 3); ctx.fillRect(7, -8, 3, 3); }
+            // Dibujo simplificado de un 'calamar'
+            ctx.fillRect(-10, -5, 20, 3);
+            ctx.fillRect(-8, -2, 3, 5);
+            ctx.fillRect(5, -2, 3, 5);
+            ctx.fillRect(-5, 3, 10, 3);
+            if (frame === 1) {
+                ctx.fillRect(-10, -8, 3, 3);
+                ctx.fillRect(7, -8, 3, 3);
+            }
         } else if (invader.type === 'crab') {
-            ctx.fillRect(-10, -5, 20, 3); ctx.fillRect(-10, 0, 20, 3); ctx.fillRect(-12, -5, 3, 8); ctx.fillRect(9, -5, 3, 8);
-            if (frame === 1) { ctx.fillRect(-5, 3, 3, 3); ctx.fillRect(2, 3, 3, 3); }
-        } else {
-            ctx.fillRect(-10, -5, 20, 5); ctx.fillRect(-5, 0, 10, 5);
-            if (frame === 1) { ctx.fillRect(-12, -5, 3, 3); ctx.fillRect(9, -5, 3, 3); ctx.fillRect(-12, 2, 3, 3); ctx.fillRect(9, 2, 3, 3); }
+            // Dibujo simplificado de un 'cangrejo'
+            ctx.fillRect(-10, -5, 20, 3);
+            ctx.fillRect(-10, 0, 20, 3);
+            ctx.fillRect(-12, -5, 3, 8);
+            ctx.fillRect(9, -5, 3, 8);
+            if (frame === 1) {
+                ctx.fillRect(-5, 3, 3, 3);
+                ctx.fillRect(2, 3, 3, 3);
+            }
+        } else { // octopus
+            // Dibujo simplificado de un 'pulpo'
+            ctx.fillRect(-10, -5, 20, 5);
+            ctx.fillRect(-5, 0, 10, 5);
+            if (frame === 1) {
+                ctx.fillRect(-12, -5, 3, 3);
+                ctx.fillRect(9, -5, 3, 3);
+                ctx.fillRect(-12, 2, 3, 3);
+                ctx.fillRect(9, 2, 3, 3);
+            }
         }
         ctx.restore();
     }
 
     function drawBunkers() {
-        ctx.fillStyle = '#0f0';
+        ctx.fillStyle = '#0f0'; // Verde clásico de los búnkeres
         bunkers.forEach(bunker => {
             const blockWidth = bunker.width / bunker.blocks[0].length;
             const blockHeight = bunker.height / bunker.blocks.length;
@@ -841,9 +470,11 @@
     }
 
     function drawBullets() {
-        ctx.fillStyle = '#ff0';
+        // Balas del jugador
+        ctx.fillStyle = '#ff0'; // Amarillo neón
         bullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
-        ctx.fillStyle = '#f00';
+        // Balas de los invasores
+        ctx.fillStyle = '#f00'; // Rojo neón
         alienBullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
     }
     
@@ -856,96 +487,48 @@
         ctx.globalAlpha = 1;
     }
 
-    function drawPowerUps() {
-        powerUps.forEach(p => {
-            ctx.save();
-            ctx.translate(p.x + p.width/2, p.y + p.height/2);
-            ctx.rotate(Date.now() / 500);
-            
-            switch(p.type) {
-                case 'rapidFire': ctx.fillStyle = '#f0f'; break;
-                case 'shield': ctx.fillStyle = '#0ff'; break;
-                case 'extraLife': ctx.fillStyle = '#0f0'; break;
-                case 'multiShot': ctx.fillStyle = '#ff0'; break;
-            }
-            
-            ctx.fillRect(-p.width/2, -p.height/2, p.width, p.height);
-            ctx.restore();
-        });
-    }
-
     function drawUI() {
         ctx.fillStyle = '#fff';
         ctx.font = '20px Orbitron';
         ctx.textAlign = 'left';
         ctx.fillText(`PUNTUACIÓN: ${score}`, 10, 30);
         ctx.textAlign = 'right';
-        ctx.fillText(`NIVEL: ${level}`, GAME_WIDTH - 10, 30);
-        ctx.fillText(`VIDAS: ${lives}`, GAME_WIDTH - 10, 55);
-        
-        if (currentLevelConfig && Date.now() - levelTransitionTime < 3000) {
-            ctx.fillStyle = '#0ff';
-            ctx.font = '25px Orbitron';
-            ctx.textAlign = 'center';
-            ctx.globalAlpha = Math.max(0, 1 - (Date.now() - levelTransitionTime) / 3000);
-            ctx.fillText(currentLevelConfig.name, GAME_WIDTH / 2, GAME_HEIGHT / 2);
-            ctx.globalAlpha = 1;
-        }
-        
-        if (rapidFire) {
-            const timeLeft = Math.ceil((rapidFireEndTime - Date.now()) / 1000);
-            ctx.fillStyle = '#f0f';
-            ctx.font = '16px Orbitron';
-            ctx.textAlign = 'left';
-            ctx.fillText(`DISPARO RÁPIDO: ${timeLeft}s`, 10, 55);
-        }
-        
-        if (shield) {
-            const timeLeft = Math.ceil((shieldEndTime - Date.now()) / 1000);
-            ctx.fillStyle = '#0ff';
-            ctx.font = '16px Orbitron';
-            ctx.textAlign = 'left';
-            ctx.fillText(`ESCUDO: ${timeLeft}s`, 10, 75);
-        }
+        ctx.fillText(`NIVEL: ${level}`, canvas.width - 10, 30);
+        ctx.fillText(`VIDAS: ${lives}`, canvas.width - 10, 55);
     }
 
     function drawStartScreen() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0ff';
         ctx.font = '50px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText('SPACE INVADERS', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 70);
+        ctx.fillText('SPACE INVADERS', canvas.width / 2, canvas.height / 2 - 50);
         ctx.font = '20px Orbitron';
-        ctx.fillText('Presiona ENTER para Jugar', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
-        ctx.fillText('¡Derrota a los invasores y avanza por los niveles!', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+        ctx.fillText('Presiona ENTER para Jugar', canvas.width / 2, canvas.height / 2 + 20);
     }
 
     function drawGameOverScreen() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#f00';
         ctx.font = '60px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 30);
         ctx.fillStyle = '#fff';
         ctx.font = '25px Orbitron';
-        ctx.fillText(`Puntuación Final: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
-        ctx.fillText(`Niveles Completados: ${level - 1}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+        ctx.fillText(`Puntuación Final: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
         ctx.font = '20px Orbitron';
-        ctx.fillText('Presiona ENTER para Jugar de Nuevo', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 90);
+        ctx.fillText('Presiona ENTER para Jugar de Nuevo', canvas.width / 2, canvas.height / 2 + 60);
     }
 
     function drawLevelCompleteScreen() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0f0';
         ctx.font = '50px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText(`NIVEL ${level} COMPLETADO`, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
-        ctx.font = '25px Orbitron';
-        ctx.fillText(`Puntuación: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20);
-        ctx.fillText('Prepárate para el siguiente nivel...', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+        ctx.fillText(`NIVEL ${level} COMPLETADO`, canvas.width / 2, canvas.height / 2);
     }
 
     // --- MANEJO DE EVENTOS ---
@@ -956,64 +539,57 @@
             }
             return;
         }
+
         if (gameState !== 'playing') return;
 
-        activeKeys[e.key] = true;
-
-        if ((e.key === 'o' || e.key === 'O')) {
+        if (e.key === 'ArrowLeft' && player.x > 0) player.x -= player.speed;
+        if (e.key === 'ArrowRight' && player.x < canvas.width - player.width) player.x += player.speed;
+        
+        if (e.key === ' ') {
+            e.preventDefault(); // Evita que la página se desplace
             const now = Date.now();
-            if (now - lastArmageddonTime > ARMAGEDDON_COOLDOWN) {
-                activateArmageddon();
-                lastArmageddonTime = now;
+            if (now - lastShotTime > SHOT_COOLDOWN) {
+                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
+                lastShotTime = now;
             }
         }
     };
 
-    const handleKeyUp = (e) => {
-        delete activeKeys[e.key];
-    };
-
-    const handleTouchStart = (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const element = document.elementFromPoint(touch.clientX, touch.clientY);
-
-        if (element && element.classList.contains('fire-button') || touch.clientX > window.innerWidth / 2) {
-            activeTouches.add('fire');
-            document.querySelector('.fire-button')?.classList.add('active');
-        } else if (element && element.dataset.direction) {
-            activeTouches.add(element.dataset.direction);
-            element.classList.add('active');
+    const handleInput = (action) => {
+        if (gameState !== 'playing') return;
+        if (action === 'left' && player.x > 0) player.x -= player.speed;
+        else if (action === 'right' && player.x < canvas.width - player.width) player.x += player.speed;
+        else if (action === 'fire') {
+            const now = Date.now();
+            if (now - lastShotTime > SHOT_COOLDOWN) {
+                bullets.push({ x: player.x + player.width / 2 - BULLET_WIDTH / 2, y: player.y, hit: false });
+                lastShotTime = now;
+            }
         }
-    };
-
-    const handleTouchEnd = (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-        activeTouches.clear();
     };
     
     const setupControls = () => {
         document.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keyup', handleKeyUp);
-
-        document.addEventListener('touchstart', handleTouchStart, { passive: false });
-        document.addEventListener('touchend', handleTouchEnd, { passive: false });
-        document.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+        document.querySelectorAll('.d-pad button').forEach(button => {
+            button.addEventListener('click', () => handleInput(button.dataset.direction));
+            button.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput(button.dataset.direction); });
+        });
     };
 
+    // --- FUNCIÓN DE LIMPIEZA ---
     window.stopGame = function() {
         console.log("Deteniendo Space Invaders...");
         gameState = 'stopped';
         document.removeEventListener('keydown', handleKeyDown);
-        document.removeEventListener('keyup', handleKeyUp);
-        document.removeEventListener('touchstart', handleTouchStart);
-        document.removeEventListener('touchend', handleTouchEnd);
-        document.removeEventListener('touchcancel', handleTouchEnd);
+        document.querySelectorAll('.d-pad button').forEach(button => {
+            button.removeEventListener('click', () => handleInput(button.dataset.direction));
+            button.removeEventListener('touchstart', (e) => { e.preventDefault(); handleInput(button.dataset.direction); });
+        });
     };
 
+    // --- INICIALIZACIÓN ---
     init();
-    draw();
+    draw(); // Dibuja la pantalla de inicio inicialmente
 
 })(); // FIN DEL IIFE
 // ===================================================================
