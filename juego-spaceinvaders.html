@@ -88,15 +88,8 @@
     // --- VARIABLES PARA ARMAGEDÓN (SECRETO) ---
     const ARMAGEDDON_COOLDOWN = 30000; // 30 segundos
     let lastArmageddonTime = 0;
-
-    // --- VARIABLES PARA CONGELACIÓN DEL TIEMPO (SECRETO) ---
-    const TIME_FREEZE_DURATION = 5000; // 5 segundos
-    const TIME_FREEZE_COOLDOWN = 25000; // 25 segundos
-    let isTimeFrozen = false;
-    let timeFreezeEndTime = 0;
-    let lastTimeFreezeTime = 0;
     
-    // --- NUEVA VARIABLE PARA CONTROLAR LA TRANSICIÓN DE NIVEL ---
+    // --- VARIABLE PARA CONTROLAR LA TRANSICIÓN DE NIVEL ---
     let levelCompleteTime = 0;
 
     // Configuración de niveles ampliada
@@ -183,10 +176,7 @@
         boss = null;
         bossLevel = false;
         lastArmageddonTime = 0;
-        isTimeFrozen = false;
-        timeFreezeEndTime = 0;
-        lastTimeFreezeTime = 0;
-        levelCompleteTime = 0; // Resetear el tiempo de completado
+        levelCompleteTime = 0;
         loadLevel(level);
     }
 
@@ -221,7 +211,7 @@
         level++;
         levelTransitionTime = Date.now();
         loadLevel(level);
-        gameState = 'playing'; // Volver al juego inmediatamente después de cargar el nivel
+        gameState = 'playing';
     }
     
     function createStars() {
@@ -361,17 +351,9 @@
         score += armageddonScore + 100;
     }
 
-    // --- FUNCIÓN CONGELACIÓN DEL TIEMPO (SECRETA) ---
-    function activateTimeFreeze() {
-        isTimeFrozen = true;
-        timeFreezeEndTime = Date.now() + TIME_FREEZE_DURATION;
-        ctx.fillStyle = 'rgba(0, 150, 255, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
     // --- BUCLE PRINCIPAL DEL JUEGO ---
     function gameLoop() {
-        if (gameState !== 'playing') return;
+        if (gameState !== 'playing' && gameState !== 'levelComplete') return;
         update();
         draw();
         requestAnimationFrame(gameLoop);
@@ -380,11 +362,6 @@
     // --- LÓGICA DE ACTUALIZACIÓN ---
     function update() {
         invaderAnimationFrame = (invaderAnimationFrame + 1) % 60;
-        
-        // Comprobar si la congelación del tiempo debe terminar
-        if (isTimeFrozen && Date.now() > timeFreezeEndTime) {
-            isTimeFrozen = false;
-        }
         
         stars.forEach(star => {
             star.brightness += (Math.random() - 0.5) * 0.1;
@@ -400,29 +377,23 @@
         bullets = bullets.filter(b => b.y > 0 && !b.hit);
         bullets.forEach(b => b.y -= 10);
 
-        // El movimiento de las balas alienígenas se detiene si el tiempo está congelado
-        if (!isTimeFrozen) {
-            alienBullets = alienBullets.filter(b => b.y < canvas.height);
-            alienBullets.forEach(b => b.y += 5);
+        alienBullets = alienBullets.filter(b => b.y < canvas.height);
+        alienBullets.forEach(b => b.y += 5);
+
+        if (bossLevel && boss && boss.alive) {
+            updateBoss();
         }
 
-        // El movimiento de los invasores y el jefe se detiene si el tiempo está congelado
-        if (!isTimeFrozen) {
-            if (bossLevel && boss && boss.alive) {
-                updateBoss();
-            }
+        if (!bossLevel) {
+            invaders.forEach(inv => {
+                if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
+                    alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
+                }
+            });
+        }
 
-            if (!bossLevel) {
-                invaders.forEach(inv => {
-                    if (inv.alive && Math.random() < currentLevelConfig.shootChance) {
-                        alienBullets.push({ x: inv.x + inv.width / 2 - 2, y: inv.y + inv.height });
-                    }
-                });
-            }
-
-            if (!bossLevel) {
-                moveInvaders();
-            }
+        if (!bossLevel) {
+            moveInvaders();
         }
         
         particles = particles.filter(p => p.life > 0);
@@ -434,22 +405,22 @@
         
         checkCollisions();
 
-        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA (CORREGIDA) ---
+        // --- COMPROBACIÓN DE CONDICIONES DE VICTORIA/DERROTA ---
         if (gameState === 'playing') {
             if (bossLevel) {
                 if (!boss.alive) {
                     gameState = 'levelComplete';
-                    levelCompleteTime = Date.now(); // Marcar el tiempo de completado
+                    levelCompleteTime = Date.now();
                 }
             } else {
                 if (invaders.filter(inv => inv.alive).length === 0) {
                     gameState = 'levelComplete';
-                    levelCompleteTime = Date.now(); // Marcar el tiempo de completado
+                    levelCompleteTime = Date.now();
                 }
             }
         }
 
-        // Transición al siguiente nivel después de una pausa
+        // --- LÓGICA DE TRANSICIÓN DE NIVEL (CORREGIDA Y MOVIDA AQUÍ) ---
         if (gameState === 'levelComplete' && Date.now() - levelCompleteTime > 2000) {
             nextLevel();
         }
@@ -788,13 +759,6 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         drawStars();
-        
-        // Efecto visual cuando el tiempo está congelado
-        if (isTimeFrozen) {
-            ctx.fillStyle = 'rgba(100, 200, 255, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
         drawBunkers();
         drawPlayer();
         
@@ -858,7 +822,7 @@
         invaders.forEach(inv => {
             if (inv.alive) {
                 const frame = Math.floor(invaderAnimationFrame / 30) % 2;
-                ctx.fillStyle = isTimeFrozen ? '#88f' : '#fff';
+                ctx.fillStyle = '#fff';
                 drawInvaderShape(inv, frame);
             }
         });
@@ -867,7 +831,7 @@
     function drawBoss() {
         if (!boss || !boss.alive) return;
         
-        ctx.fillStyle = isTimeFrozen ? '#88f' : (boss.type === 'ultimate' ? '#f0f' : (boss.type === 'advanced' ? '#f00' : '#ff0'));
+        ctx.fillStyle = boss.type === 'ultimate' ? '#f0f' : (boss.type === 'advanced' ? '#f00' : '#ff0');
         ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
         
         ctx.fillStyle = '#000';
@@ -937,7 +901,7 @@
     function drawBullets() {
         ctx.fillStyle = '#ff0';
         bullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
-        ctx.fillStyle = isTimeFrozen ? '#88f' : '#f00';
+        ctx.fillStyle = '#f00';
         alienBullets.forEach(b => ctx.fillRect(b.x, b.y, BULLET_WIDTH, BULLET_HEIGHT));
     }
     
@@ -1059,15 +1023,6 @@
             if (now - lastArmageddonTime > ARMAGEDDON_COOLDOWN) {
                 activateArmageddon();
                 lastArmageddonTime = now;
-            }
-        }
-
-        // --- MANEJO DE LA TECLA Z PARA CONGELACIÓN DEL TIEMPO (SECRETO) ---
-        if ((e.key === 'z' || e.key === 'Z')) {
-            const now = Date.now();
-            if (now - lastTimeFreezeTime > TIME_FREEZE_COOLDOWN) {
-                activateTimeFreeze();
-                lastTimeFreezeTime = now;
             }
         }
 
