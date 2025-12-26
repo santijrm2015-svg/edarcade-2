@@ -673,17 +673,16 @@
             </section>
             <section class="game-grid">
                 <div class="grid-container">
-                    <!-- Las tarjetas ahora llaman a launchGame('juego-nombredeljuego') -->
                     <div class="game-card" onclick="launchGame('juego-snake')"> <img src="https://z-cdn-media.chatglm.cn/files/3f5bede6-fcef-4683-9991-d10777fcfe56.jpg?auth_key=1865750407-bf43d0c514d24a8c9f94321a38ea9b94-0-5adecf4931d9c5a5a71a086ffd9ba36d" alt="Snake Classic"> <div class="game-info"> <h3>Snake Classic</h3> <p>El clásico juego de la serpiente.</p> <span class="play-btn">JUGAR</span> </div> </div>
                     <div class="game-card" onclick="launchGame('juego-breakout')"> <img src="https://z-cdn-media.chatglm.cn/files/5b170d5c-0a02-45f3-a218-d1664bcacf16.png?auth_key=1865750874-a7b1ed827aab4eb2b361cfcf5b9de0aa-0-84a7fe2980f11e104f345c386e4baf8a" alt="Neon Breaker"> <div class="game-info"> <h3>Neon Breaker</h3> <p>Rompe todos los ladrillos.</p> <span class="play-btn">JUGAR</span> </div> </div>
                     <div class="game-card" onclick="launchGame('juego-spaceinvaders')"> <img src="https://z-cdn-media.chatglm.cn/files/79d99534-3bb5-4f52-a3bc-12fe1430e535.png?auth_key=1865770802-e17a7f9e878f4f11aa1ec353a72022cc-0-78145370a78f05c46e101be682729477" alt="Space Invaders"> <div class="game-info"> <h3>Space Invaders</h3> <p>Defiende la Tierra.</p> <span class="play-btn">JUGAR</span> </div> </div>
+                    <div class="game-card" onclick="launchGame('juego-tresenraya')"> <img src="https://z-cdn-media.chatglm.cn/files/79d99534-3bb5-4f52-a3bc-12fe1430e535.png?auth_key=1865770802-e17a7f9e878f4f11aa1ec353a72022cc-0-78145370a78f05c46e101be682729477" alt="Tres en Raya"> <div class="game-info"> <h3>Tres en Raya</h3> <p>Gana el juego.</p> <span class="play-btn">JUGAR</span> </div> </div>
                 </div>
             </section>
         </main>
         <footer class="footer"> <p>&copy; 2023 Ed Arcade. Todos los derechos reservados.</p> </footer>
     </div>
 
-    <!-- VISTA DEL JUEGO (INICIALMENTE OCULTA) -->
     <div id="game-viewer" class="game-viewer hidden">
         <div class="game-header-viewer"><a href="#" onclick="backToArcade(); return false;"><span>&larr;</span><span>Volver al Arcade</span></a></div>
         <div class="game-container-viewer" id="game-container">
