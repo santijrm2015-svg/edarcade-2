@@ -75,12 +75,10 @@
         let gameActive = true;
         let gameState = ['', '', '', '', '', '', '', '', ''];
 
-        // Mensajes
         const winningMessage = () => `¡Jugador ${currentPlayer} ha ganado!`;
         const drawMessage = () => '¡El juego ha terminado en empate!';
         const currentPlayerTurn = () => `Turno de: ${currentPlayer}`;
 
-        // Combinaciones ganadoras
         const winningConditions = [
             [0, 1, 2],
             [3, 4, 5],
@@ -92,7 +90,6 @@
             [2, 4, 6]
         ];
 
-        // --- INICIALIZACIÓN ---
         function initializeGame() {
             for (let i = 0; i < 9; i++) {
                 const cell = document.createElement('button');
@@ -104,21 +101,17 @@
             statusElement.innerHTML = currentPlayerTurn();
         }
 
-        // --- LÓGICA DEL JUEGO ---
         function handleCellClick(event) {
             const clickedCell = event.target;
             const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
 
-            // Si la celda ya está ocupada o el juego no está activo, no hacer nada
             if (gameState[clickedCellIndex] !== '' || !gameActive) {
                 return;
             }
 
-            // Actualiza el estado y la UI
             gameState[clickedCellIndex] = currentPlayer;
             clickedCell.innerHTML = currentPlayer;
 
-            // Comprueba si hay un resultado
             checkResult();
         }
 
