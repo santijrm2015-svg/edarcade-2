@@ -3,47 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Espejo de la Sociedad</title>
+    <title>El Espejo Social - Juego Original</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="gameContainer">
+        <div id="gameHeader">
+            <h1>📸 El Espejo Social</h1>
+            <div id="stats">
+                <div class="stat">
+                    <span class="stat-label">📷 Fotos:</span>
+                    <span id="photosCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">😡 Ira:</span>
+                    <span id="angerLevel">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">💑 Parejas:</span>
+                    <span id="couplesCount">0/5</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">📊 Etapa:</span>
+                    <span id="stageLevel">0</span>
+                </div>
+            </div>
+            <div id="controls">
+                <button id="pauseBtn">⏸️ Pausar</button>
+                <button id="fullscreenBtn">🖥️ Pantalla Completa</button>
+                <button id="resetBtn">🔄 Reiniciar</button>
+            </div>
+        </div>
+        
         <canvas id="gameCanvas" width="900" height="600"></canvas>
         
         <div id="overlay" class="overlay">
-            <div class="title">EL ESPEJO DE LA SOCIEDAD</div>
-            <div class="subtitle">Un juego sobre el poder de los medios</div>
-            <button id="startBtn" class="btn">INICIAR EXPERIENCIA</button>
-            <div class="instructions">
-                <p>Mueve el cursor para apuntar la cámara</p>
-                <p>Haz clic para tomar fotos</p>
-                <p>Observa cómo tus noticias afectan a la ciudad</p>
+            <div class="overlay-content">
+                <h2>📸 El Espejo Social</h2>
+                <p>Un juego sobre el poder de los medios y la violencia</p>
+                <div class="instructions">
+                    <h3>📋 Instrucciones:</h3>
+                    <ul>
+                        <li>🖱️ Mueve el ratón para apuntar la cámara</li>
+                        <li>📸 Haz clic para tomar fotos</li>
+                        <li>📺 Las noticias aparecen en la TV del centro</li>
+                        <li>😡 Cada foto de ira aumenta la violencia</li>
+                        <li>💑 Las parejas pueden formarse y romperse</li>
+                        <li>⚠️ Demasiada ira destruye la ciudad</li>
+                    </ul>
+                </div>
+                <button id="startBtn">🎮 Comenzar Juego</button>
             </div>
-        </div>
-        
-        <div id="stats" class="stats">
-            <div class="stat-item">
-                <span class="stat-label">📸 Fotos:</span>
-                <span id="photosCount" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">😡 Ira:</span>
-                <span id="angerLevel" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">💑 Parejas:</span>
-                <span id="couplesCount" class="stat-value">0/5</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">📊 Etapa:</span>
-                <span id="stageLevel" class="stat-value">0</span>
-            </div>
-        </div>
-        
-        <div id="controls" class="controls">
-            <button id="pauseBtn" class="control-btn">⏸️ Pausar</button>
-            <button id="fullscreenBtn" class="control-btn">🖥️ Pantalla Completa</button>
-            <button id="resetBtn" class="control-btn">🔄 Reiniciar</button>
         </div>
     </div>
     
