@@ -6,7 +6,6 @@ const pauseBtn = document.getElementById('pauseBtn');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-// Variables del juego
 let gameRunning = false;
 let gamePaused = false;
 let mouseX = 450;
@@ -24,34 +23,26 @@ let animationId = null;
 
 const MAX_COUPLES = 5;
 
-// Mapa de la ciudad
+// Mapa original del juego
 const map = {
-    buildings: [
-        { x: 10, y: 10, width: 150, height: 150, color: '#8B4513' },
-        { x: 210, y: 10, width: 150, height: 150, color: '#A0522D' },
-        { x: 410, y: 10, width: 100, height: 150, color: '#8B4513' },
-        { x: 540, y: 10, width: 140, height: 150, color: '#A0522D' },
-        { x: 710, y: 10, width: 170, height: 150, color: '#8B4513' },
-        { x: 10, y: 210, width: 150, height: 120, color: '#A0522D' },
-        { x: 210, y: 210, width: 150, height: 120, color: '#8B4513' },
-        { x: 410, y: 210, width: 100, height: 120, color: '#A0522D' },
-        { x: 540, y: 210, width: 140, height: 120, color: '#8B4513' },
-        { x: 710, y: 210, width: 170, height: 120, color: '#8B4513' },
-        { x: 10, y: 390, width: 150, height: 190, color: '#8B4513' },
-        { x: 210, y: 390, width: 150, height: 190, color: '#A0522D' },
-        { x: 410, y: 390, width: 100, height: 190, color: '#8B4513' },
-        { x: 540, y: 390, width: 140, height: 190, color: '#A0522D' },
-        { x: 710, y: 390, width: 170, height: 190, color: '#8B4513' }
-    ],
     tv: {
-        x: 440,
-        y: 240,
-        width: 120,
-        height: 90
-    }
+        x: 425,
+        y: 275,
+        width: 50,
+        height: 50
+    },
+    buildings: [
+        { x: 50, y: 50, width: 100, height: 80, color: '#8B4513' },
+        { x: 750, y: 50, width: 100, height: 80, color: '#8B4513' },
+        { x: 50, y: 470, width: 100, height: 80, color: '#8B4513' },
+        { x: 750, y: 470, width: 100, height: 80, color: '#8B4513' },
+        { x: 200, y: 100, width: 80, height: 100, color: '#A0522D' },
+        { x: 620, y: 100, width: 80, height: 100, color: '#A0522D' },
+        { x: 200, y: 400, width: 80, height: 100, color: '#A0522D' },
+        { x: 620, y: 400, width: 80, height: 100, color: '#A0522D' }
+    ]
 };
 
-// Clase Character
 class Character {
     constructor(x, y, shape) {
         this.x = x;
@@ -70,7 +61,6 @@ class Character {
         this.isLeaving = false;
         this.leaveTimer = 0;
         this.bouncePhase = Math.random() * Math.PI * 2;
-        this.walkPhase = 0;
     }
     
     update() {
@@ -86,7 +76,6 @@ class Character {
         }
         
         this.bouncePhase += 0.05;
-        this.walkPhase += 0.1;
         
         if (this.partner && this.isInLove) {
             const dx = this.partner.x - this.x;
@@ -110,11 +99,13 @@ class Character {
             }
         }
         
+        // Límites del mapa
         if (this.x < 20) { this.x = 20; this.direction = Math.PI - this.direction; }
         if (this.x > canvas.width - 20) { this.x = canvas.width - 20; this.direction = Math.PI - this.direction; }
         if (this.y < 20) { this.y = 20; this.direction = -this.direction; }
         if (this.y > canvas.height - 20) { this.y = canvas.height - 20; this.direction = -this.direction; }
         
+        // Estados emocionales
         if (this.isEmbarrassed) {
             if (Math.random() < 0.02) {
                 this.isEmbarrassed = false;
@@ -136,94 +127,40 @@ class Character {
         const bounce = Math.sin(this.bouncePhase) * 2;
         const drawY = this.y + bounce;
         
+        // Cambiar color según estado
+        let drawColor = this.color;
+        if (this.isAngry) {
+            drawColor = '#FF0000';
+        } else if (this.isEmbarrassed) {
+            drawColor = '#FFA500';
+        } else if (this.isInLove) {
+            drawColor = '#FF69B4';
+        }
+        
+        // Dibujar personaje
+        ctx.fillStyle = drawColor;
         if (this.shape === 'circle') {
-            const gradient = ctx.createRadialGradient(
-                this.x - this.size/3, drawY - this.size/3, 0,
-                this.x, drawY, this.size
-            );
-            
-            let lightColor, darkColor;
-            if (this.isAngry) {
-                lightColor = '#FF6B6B';
-                darkColor = '#C62828';
-            } else if (this.isEmbarrassed) {
-                lightColor = '#FFB74D';
-                darkColor = '#E65100';
-            } else if (this.isInLove) {
-                lightColor = '#F48FB1';
-                darkColor = '#880E4F';
-            } else {
-                lightColor = '#81C784';
-                darkColor = '#2E7D32';
-            }
-            
-            gradient.addColorStop(0, lightColor);
-            gradient.addColorStop(0.7, this.color);
-            gradient.addColorStop(1, darkColor);
-            
-            ctx.fillStyle = gradient;
             ctx.beginPath();
             ctx.arc(this.x, drawY, this.size, 0, Math.PI * 2);
             ctx.fill();
-            
-            ctx.strokeStyle = darkColor;
+            ctx.strokeStyle = '#000';
             ctx.lineWidth = 2;
             ctx.stroke();
-            
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.beginPath();
-            ctx.ellipse(this.x - this.size/3, drawY - this.size/3, this.size/3, this.size/4, -Math.PI/4, 0, Math.PI * 2);
-            ctx.fill();
-            
         } else {
-            const gradient = ctx.createLinearGradient(
-                this.x - this.size, drawY - this.size,
-                this.x + this.size, drawY + this.size
-            );
-            
-            let lightColor, darkColor;
-            if (this.isAngry) {
-                lightColor = '#FF6B6B';
-                darkColor = '#C62828';
-            } else if (this.isEmbarrassed) {
-                lightColor = '#FFB74D';
-                darkColor = '#E65100';
-            } else if (this.isInLove) {
-                lightColor = '#F48FB1';
-                darkColor = '#880E4F';
-            } else {
-                lightColor = '#64B5F6';
-                darkColor = '#0D47A1';
-            }
-            
-            gradient.addColorStop(0, lightColor);
-            gradient.addColorStop(0.5, this.color);
-            gradient.addColorStop(1, darkColor);
-            
-            ctx.fillStyle = gradient;
             ctx.fillRect(this.x - this.size, drawY - this.size, this.size * 2, this.size * 2);
-            
-            ctx.strokeStyle = darkColor;
+            ctx.strokeStyle = '#000';
             ctx.lineWidth = 2;
             ctx.strokeRect(this.x - this.size, drawY - this.size, this.size * 2, this.size * 2);
-            
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.fillRect(this.x - this.size + 2, drawY - this.size + 2, this.size/2, this.size/2);
         }
         
+        // Ojos
         ctx.fillStyle = '#FFF';
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        
         ctx.beginPath();
-        ctx.ellipse(this.x - 4, drawY - 2, 3, 3.5, 0, 0, Math.PI * 2);
+        ctx.arc(this.x - 4, drawY - 2, 3, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
-        
         ctx.beginPath();
-        ctx.ellipse(this.x + 4, drawY - 2, 3, 3.5, 0, 0, Math.PI * 2);
+        ctx.arc(this.x + 4, drawY - 2, 3, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
         
         ctx.fillStyle = '#000';
         ctx.beginPath();
@@ -233,19 +170,10 @@ class Character {
         ctx.arc(this.x + 4, drawY - 2, 1.5, 0, Math.PI * 2);
         ctx.fill();
         
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.beginPath();
-        ctx.arc(this.x - 4.5, drawY - 2.5, 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(this.x + 3.5, drawY - 2.5, 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        
+        // Boca
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
         ctx.beginPath();
-        
         if (this.isAngry) {
             ctx.arc(this.x, drawY + 5, this.size * 0.4, 1.2 * Math.PI, 1.8 * Math.PI);
         } else if (this.isEmbarrassed) {
@@ -258,69 +186,29 @@ class Character {
         }
         ctx.stroke();
         
+        // Sombrero
         if (this.hasHat) {
             const hatY = drawY - this.size - 4;
+            ctx.fillStyle = '#8B4513';
             
             if (this.hatType === 'square') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                ctx.fillRect(this.x - 7, hatY - 2, 14, 5);
-                ctx.fillRect(this.x - 9, hatY + 2, 18, 3);
-                
-                const hatGradient = ctx.createLinearGradient(
-                    this.x - 6, hatY - 4,
-                    this.x + 6, hatY + 2
-                );
-                hatGradient.addColorStop(0, '#A0522D');
-                hatGradient.addColorStop(1, '#654321');
-                
-                ctx.fillStyle = hatGradient;
                 ctx.fillRect(this.x - 6, hatY - 4, 12, 5);
-                ctx.fillStyle = '#654321';
                 ctx.fillRect(this.x - 8, hatY + 1, 16, 3);
-                
-                ctx.strokeStyle = '#4A2C17';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(this.x - 6, hatY - 4, 12, 5);
-                ctx.strokeRect(this.x - 8, hatY + 1, 16, 3);
-                
             } else {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                ctx.beginPath();
-                ctx.moveTo(this.x + 2, hatY - 4);
-                ctx.lineTo(this.x - 7, hatY + 2);
-                ctx.lineTo(this.x + 7, hatY + 2);
-                ctx.closePath();
-                ctx.fill();
-                
-                const hatGradient = ctx.createLinearGradient(
-                    this.x, hatY - 6,
-                    this.x, hatY + 2
-                );
-                hatGradient.addColorStop(0, '#A0522D');
-                hatGradient.addColorStop(1, '#654321');
-                
-                ctx.fillStyle = hatGradient;
                 ctx.beginPath();
                 ctx.moveTo(this.x, hatY - 6);
                 ctx.lineTo(this.x - 6, hatY + 2);
                 ctx.lineTo(this.x + 6, hatY + 2);
                 ctx.closePath();
                 ctx.fill();
-                
-                ctx.strokeStyle = '#4A2C17';
-                ctx.lineWidth = 1;
-                ctx.stroke();
             }
         }
         
+        // Corazón si está enamorado
         if (this.isInLove) {
-            const heartBounce = Math.sin(this.bouncePhase * 2) * 3;
             ctx.fillStyle = '#FF1493';
             ctx.font = 'bold 12px Arial';
-            ctx.fillText('❤', this.x - 6, drawY - this.size - 10 + heartBounce);
-            
-            ctx.font = '8px Arial';
-            ctx.fillText('❤', this.x + 8, drawY - this.size - 5 + heartBounce/2);
+            ctx.fillText('❤', this.x - 6, drawY - this.size - 10);
         }
         
         ctx.restore();
@@ -337,13 +225,16 @@ class Character {
 }
 
 function drawMap() {
+    // Fondo gris
     ctx.fillStyle = '#808080';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+    // Calles (líneas blancas discontinuas)
     ctx.strokeStyle = '#FFF';
     ctx.lineWidth = 2;
     ctx.setLineDash([10, 10]);
     
+    // Calles horizontales
     ctx.beginPath();
     ctx.moveTo(0, 180);
     ctx.lineTo(canvas.width, 180);
@@ -351,6 +242,7 @@ function drawMap() {
     ctx.lineTo(canvas.width, 360);
     ctx.stroke();
     
+    // Calles verticales
     ctx.beginPath();
     ctx.moveTo(185, 0);
     ctx.lineTo(185, canvas.height);
@@ -364,13 +256,17 @@ function drawMap() {
     
     ctx.setLineDash([]);
     
+    // Edificios
     for (let building of map.buildings) {
+        // Sombra
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(building.x + 5, building.y + 5, building.width, building.height);
         
+        // Edificio
         ctx.fillStyle = building.color;
         ctx.fillRect(building.x, building.y, building.width, building.height);
         
+        // Ventanas
         ctx.fillStyle = '#FFE082';
         const windowSize = 8;
         const windowGap = 15;
@@ -382,145 +278,101 @@ function drawMap() {
             }
         }
         
+        // Borde
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.strokeRect(building.x, building.y, building.width, building.height);
     }
     
-    drawTVOnMap();
+    // Televisión en el centro
+    drawTV();
 }
 
-function drawTVOnMap() {
+function drawTV() {
     const tv = map.tv;
     
+    // Base de la TV
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(tv.x - 10, tv.y - 10, tv.width + 20, tv.height + 30);
     
-    const baseGradient = ctx.createLinearGradient(
-        tv.x + tv.width/2 - 20, tv.y + tv.height + 5,
-        tv.x + tv.width/2 + 20, tv.y + tv.height + 25
-    );
-    baseGradient.addColorStop(0, '#444');
-    baseGradient.addColorStop(0.5, '#222');
-    baseGradient.addColorStop(1, '#111');
-    
-    ctx.fillStyle = baseGradient;
-    ctx.beginPath();
-    ctx.moveTo(tv.x + tv.width/2 - 25, tv.y + tv.height + 5);
-    ctx.lineTo(tv.x + tv.width/2 + 25, tv.y + tv.height + 5);
-    ctx.lineTo(tv.x + tv.width/2 + 15, tv.y + tv.height + 25);
-    ctx.lineTo(tv.x + tv.width/2 - 15, tv.y + tv.height + 25);
-    ctx.closePath();
-    ctx.fill();
-    
+    // Soporte
     ctx.fillStyle = '#333';
     ctx.fillRect(tv.x + tv.width/2 - 3, tv.y + tv.height, 6, 10);
     
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(tv.x + 3, tv.y + 3, tv.width, tv.height);
-    
-    const frameGradient = ctx.createLinearGradient(
-        tv.x, tv.y,
-        tv.x + tv.width, tv.y + tv.height
-    );
-    frameGradient.addColorStop(0, '#2a2a2a');
-    frameGradient.addColorStop(0.5, '#1a1a1a');
-    frameGradient.addColorStop(1, '#0a0a0a');
-    
-    ctx.fillStyle = frameGradient;
+    // Pantalla
+    ctx.fillStyle = '#000';
     ctx.fillRect(tv.x, tv.y, tv.width, tv.height);
     
+    // Borde de la pantalla
     ctx.strokeStyle = '#444';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(tv.x + 2, tv.y + 2, tv.width - 4, tv.height - 4);
+    ctx.lineWidth = 3;
+    ctx.strokeRect(tv.x, tv.y, tv.width, tv.height);
     
-    const screenGradient = ctx.createRadialGradient(
-        tv.x + tv.width/2, tv.y + tv.height/2, 0,
-        tv.x + tv.width/2, tv.y + tv.height/2, tv.width/2
-    );
-    screenGradient.addColorStop(0, '#111');
-    screenGradient.addColorStop(1, '#000');
-    
-    ctx.fillStyle = screenGradient;
-    ctx.fillRect(tv.x + 5, tv.y + 5, tv.width - 10, tv.height - 10);
-    
+    // Contenido de la TV
     if (currentNews && currentNews.timer > 0) {
+        // Fondo de noticia
         ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(tv.x + 5, tv.y + 5, tv.width - 10, tv.height - 10);
+        ctx.fillRect(tv.x + 2, tv.y + 2, tv.width - 4, tv.height - 4);
         
-        ctx.save();
-        ctx.translate(tv.x + tv.width/2, tv.y + 25);
-        ctx.scale(0.35, 0.35);
-        
+        // Miniatura del personaje
         const subject = currentNews.image;
         ctx.fillStyle = subject.color;
         if (subject.shape === 'circle') {
             ctx.beginPath();
-            ctx.arc(0, 0, subject.size, 0, Math.PI * 2);
+            ctx.arc(tv.x + tv.width/2, tv.y + 25, 8, 0, Math.PI * 2);
             ctx.fill();
         } else {
-            ctx.fillRect(-subject.size, -subject.size, subject.size * 2, subject.size * 2);
+            ctx.fillRect(tv.x + tv.width/2 - 8, tv.y + 17, 16, 16);
         }
         
-        ctx.restore();
-        
+        // Barra de título
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(tv.x + 5, tv.y + tv.height - 20, tv.width - 10, 15);
+        ctx.fillRect(tv.x + 2, tv.y + tv.height - 20, tv.width - 4, 18);
         
+        // Texto de la noticia
         ctx.fillStyle = '#FFF';
         ctx.font = 'bold 7px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(currentNews.title, tv.x + tv.width/2, tv.y + tv.height - 10);
+        ctx.fillText(currentNews.title, tv.x + tv.width/2, tv.y + tv.height - 8);
         ctx.textAlign = 'left';
         
+        // Indicador de transmisión
         ctx.fillStyle = 'rgba(100, 200, 255, 0.1)';
-        ctx.fillRect(tv.x + 5, tv.y + 5, tv.width - 10, tv.height - 10);
+        ctx.fillRect(tv.x + 2, tv.y + 2, tv.width - 4, tv.height - 4);
         
     } else {
+        // Pantalla apagada con "6"
         ctx.fillStyle = '#0a0a0a';
-        ctx.fillRect(tv.x + 5, tv.y + 5, tv.width - 10, tv.height - 10);
+        ctx.fillRect(tv.x + 2, tv.y + 2, tv.width - 4, tv.height - 4);
         
+        // Número del canal
         const pulse = Math.sin(Date.now() * 0.002) * 0.2 + 0.8;
         ctx.fillStyle = `rgba(255, 0, 0, ${pulse})`;
-        ctx.font = 'bold 14px Arial';
+        ctx.font = 'bold 20px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('6', tv.x + tv.width/2, tv.y + tv.height/2);
+        ctx.fillText('6', tv.x + tv.width/2, tv.y + tv.height/2 + 5);
         
         ctx.fillStyle = '#333';
         ctx.font = '6px Arial';
-        ctx.fillText('CANAL 6', tv.x + tv.width/2, tv.y + tv.height/2 + 10);
+        ctx.fillText('CANAL 6', tv.x + tv.width/2, tv.y + tv.height/2 + 15);
         ctx.textAlign = 'left';
         
+        // Efecto de estática
         for (let i = 0; i < 15; i++) {
             ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.05})`;
             ctx.fillRect(
-                tv.x + 5 + Math.random() * (tv.width - 10),
-                tv.y + 5 + Math.random() * (tv.height - 10),
+                tv.x + 2 + Math.random() * (tv.width - 4),
+                tv.y + 2 + Math.random() * (tv.height - 4),
                 1, 1
             );
         }
-        
-        const reflectionGradient = ctx.createLinearGradient(
-            tv.x + 5, tv.y + 5,
-            tv.x + 5, tv.y + tv.height/2
-        );
-        reflectionGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
-        reflectionGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
-        ctx.fillStyle = reflectionGradient;
-        ctx.fillRect(tv.x + 5, tv.y + 5, tv.width - 10, tv.height/2);
     }
     
+    // Luz indicadora
     ctx.fillStyle = currentNews ? '#00FF00' : '#FF0000';
     ctx.beginPath();
-    ctx.arc(tv.x + tv.width - 8, tv.y + tv.height - 8, 2, 0, Math.PI * 2);
+    ctx.arc(tv.x + tv.width - 5, tv.y + tv.height - 5, 2, 0, Math.PI * 2);
     ctx.fill();
-    
-    ctx.fillStyle = '#555';
-    ctx.font = '4px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('SMART TV', tv.x + tv.width/2, tv.y + tv.height + 3);
-    ctx.textAlign = 'left';
 }
 
 class RandomEvent {
@@ -583,29 +435,46 @@ function resetGame() {
     events = [];
     lastEventTime = 0;
     
-    people.length = 0;
-    couples.length = 0;
-    events.length = 0;
-    
     updateStats();
     overlay.classList.remove('hidden');
 }
 
 function initGame() {
+    // Crear personajes en las calles
     for (let i = 0; i < 25; i++) {
         const shape = Math.random() < 0.5 ? 'circle' : 'square';
         let x, y;
-        if (Math.random() < 0.5) {
+        
+        // Posicionar en las calles
+        const streetChoice = Math.random();
+        if (streetChoice < 0.25) {
+            // Calle horizontal superior
             x = Math.random() * canvas.width;
-            y = Math.random() < 0.5 ? 180 : 360;
-        } else {
-            x = [185, 385, 535, 705][Math.floor(Math.random() * 4)];
+            y = 180;
+        } else if (streetChoice < 0.5) {
+            // Calle horizontal inferior
+            x = Math.random() * canvas.width;
+            y = 360;
+        } else if (streetChoice < 0.75) {
+            // Calles verticales
+            const streets = [185, 385, 535, 705];
+            x = streets[Math.floor(Math.random() * streets.length)];
             y = Math.random() * canvas.height;
+        } else {
+            // Intersecciones
+            const intersections = [
+                {x: 185, y: 180}, {x: 385, y: 180}, {x: 535, y: 180}, {x: 705, y: 180},
+                {x: 185, y: 360}, {x: 385, y: 360}, {x: 535, y: 360}, {x: 705, y: 360}
+            ];
+            const intersection = intersections[Math.floor(Math.random() * intersections.length)];
+            x = intersection.x + (Math.random() - 0.5) * 50;
+            y = intersection.y + (Math.random() - 0.5) * 50;
         }
         
         people.push(new Character(x, y, shape));
     }
     
+    // Dar sombreros a algunos personajes
     for (let i = 0; i < 4; i++) {
         const person = people[Math.floor(Math.random() * people.length)];
         person.hasHat = true;
@@ -642,12 +511,15 @@ function generateRandomEvent() {
 function takePhoto() {
     photosTaken++;
     
+    // Efecto de flash
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+    // Área de la cámara
     const cameraArea = 80;
     let photoSubjects = [];
     
+    // Detectar personajes en el área de la cámara
     for (let person of people) {
         const distance = Math.sqrt(
             Math.pow(person.x - mouseX, 2) + 
@@ -659,6 +531,7 @@ function takePhoto() {
         }
     }
     
+    // Procesar la foto
     if (photoSubjects.length > 0) {
         const mainSubject = photoSubjects[0];
         let newsTitle = "";
@@ -674,10 +547,12 @@ function takePhoto() {
             mainSubject.isEmbarrassed = true;
             mainSubject.partner.isEmbarrassed = true;
             
+            // Posible ruptura por vergüenza
             if (Math.random() < 0.5) {
                 setTimeout(() => {
                     mainSubject.leave();
                     mainSubject.partner.leave();
+                    couples = couples.filter(c => c[0] !== mainSubject && c[1] !== mainSubject);
                 }, 1000);
             }
         } else if (mainSubject.isAngry) {
@@ -685,6 +560,7 @@ function takePhoto() {
             newsDescription = "La tensión aumenta";
             angerLevel++;
             
+            // Contagio de ira
             for (let i = 0; i < Math.min(3, people.length); i++) {
                 const randomPerson = people[Math.floor(Math.random() * people.length)];
                 if (!randomPerson.isAngry && Math.random() < 0.3) {
@@ -699,6 +575,7 @@ function takePhoto() {
             newsDescription = "Vida cotidiana";
         }
         
+        // Crear noticia
         currentNews = {
             title: newsTitle,
             description: newsDescription,
@@ -706,12 +583,14 @@ function takePhoto() {
             timer: 300
         };
         
+        // Actualizar etapa según nivel de ira
         if (angerLevel >= 3 && stage < 2) {
             stage = 2;
         }
         
         if (angerLevel >= 7 && stage < 3) {
             stage = 3;
+            // Más gente se enoja
             for (let i = 0; i < 5; i++) {
                 if (Math.random() < 0.3) {
                     people[i].isAngry = true;
@@ -719,6 +598,7 @@ function takePhoto() {
             }
         }
         
+        // Fin del juego si la ira es muy alta
         if (angerLevel >= 15) {
             endGame();
         }
@@ -737,19 +617,28 @@ function updateStats() {
 function gameLoop() {
     if (!gameRunning || gamePaused) return;
     
+    // Dibujar mapa
     drawMap();
+    
+    // Generar eventos aleatorios
     generateRandomEvent();
+    
+    // Actualizar eventos
     events = events.filter(event => event.update());
+    
+    // Actualizar y dibujar personajes
     people = people.filter(person => {
         const alive = person.update();
         if (alive) person.draw();
         return alive;
     });
     
+    // Dibujar visor de la cámara
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 3;
     ctx.strokeRect(mouseX - 60, mouseY - 40, 120, 80);
     
+    // Cruz del visor
     ctx.beginPath();
     ctx.moveTo(mouseX - 10, mouseY);
     ctx.lineTo(mouseX + 10, mouseY);
@@ -757,6 +646,7 @@ function gameLoop() {
     ctx.lineTo(mouseX, mouseY + 10);
     ctx.stroke();
     
+    // Actualizar noticias
     if (currentNews) {
         currentNews.timer--;
         if (currentNews.timer <= 0) {
@@ -770,6 +660,7 @@ function gameLoop() {
 function endGame() {
     gameRunning = false;
     
+    // Pantalla de fin
     ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -782,116 +673,4 @@ function endGame() {
     ctx.fillText('El ciclo se completa', canvas.width/2, canvas.height/2 - 20);
     
     ctx.font = '18px Arial';
-    ctx.fillText(`Fotos tomadas: ${photosTaken}`, canvas.width/2, canvas.height/2 + 20);
-    ctx.fillText(`Nivel de ira alcanzado: ${angerLevel}`, canvas.width/2, canvas.height/2 + 50);
-    ctx.fillText('La violencia solo genera más violencia', canvas.width/2, canvas.height/2 + 80);
-    
-    ctx.font = '16px Arial';
-    ctx.fillText('Reflexiona sobre lo que consumes', canvas.width/2, canvas.height/2 + 120);
-    
-    ctx.fillStyle = '#4CAF50';
-    ctx.fillRect(canvas.width/2 - 80, canvas.height/2 + 150, 160, 40);
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 18px Arial';
-    ctx.fillText('REINICIAR', canvas.width/2, canvas.height/2 + 175);
-    
-    canvas.onclick = function(e) {
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-        
-        if (x > canvas.width/2 - 80 && x < canvas.width/2 + 80 && 
-            y > canvas.height/2 + 150 && y < canvas.height/2 + 190) {
-            resetGame();
-            canvas.onclick = function() {
-                if (gameRunning && !gamePaused) {
-                    takePhoto();
-                }
-            };
-        }
-    };
-    
-    ctx.textAlign = 'left';
-}
-
-function startGame() {
-    resetGame();
-    overlay.classList.add('hidden');
-    gameRunning = true;
-    initGame();
-    updateStats();
-    gameLoop();
-}
-
-function togglePause() {
-    if (!gameRunning) return;
-    gamePaused = !gamePaused;
-    pauseBtn.innerHTML = gamePaused ? '▶️ Reanudar' : '⏸️ Pausar';
-    if (!gamePaused) {
-        gameLoop();
-    }
-}
-
-function toggleFullscreen() {
-    const container = document.getElementById('gameContainer');
-    
-    if (!document.fullscreenElement) {
-        container.requestFullscreen().then(() => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            fullscreenBtn.innerHTML = '🔻 Salir Pantalla Completa';
-        }).catch(err => {
-            console.log('Error al entrar en pantalla completa:', err);
-        });
-    } else {
-        document.exitFullscreen().then(() => {
-            canvas.width = 900;
-            canvas.height = 600;
-            fullscreenBtn.innerHTML = '🖥️ Pantalla Completa';
-        }).catch(err => {
-            console.log('Error al salir de pantalla completa:', err);
-        });
-    }
-}
-
-// Event listeners
-startBtn.addEventListener('click', startGame);
-pauseBtn.addEventListener('click', togglePause);
-fullscreenBtn.addEventListener('click', toggleFullscreen);
-resetBtn.addEventListener('click', () => {
-    if (confirm('¿Estás seguro de que quieres reiniciar el juego?')) {
-        resetGame();
-    }
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
-});
-
-canvas.addEventListener('click', () => {
-    if (gameRunning && !gamePaused) {
-        takePhoto();
-    }
-});
-
-// Manejar redimensionamiento en pantalla completa
-window.addEventListener('resize', () => {
-    if (document.fullscreenElement) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    } else {
-        canvas.width = 900;
-        canvas.height = 600;
-    }
-});
-
-// Prevenir scroll en pantalla completa
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.fullscreenElement) {
-        canvas.width = 900;
-        canvas.height = 600;
-        fullscreenBtn.innerHTML = '🖥️ Pantalla Completa';
-    }
-});
+    ctx.fillText(`Fotos toma
