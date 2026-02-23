@@ -32,12 +32,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: screenPulse 4s infinite;
-        }
-
-        @keyframes screenPulse {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.1); }
+            transition: opacity 1s ease;
         }
 
         .game-title {
@@ -47,45 +42,89 @@
             text-shadow: 
                 0 0 20px #ff0000,
                 0 0 40px #ff0000,
-                0 0 60px #ff0000;
-            margin-bottom: 1rem;
-            animation: titleFlicker 2s infinite;
+                0 0 60px #ff0000,
+                0 0 80px #ff0000;
+            animation: glitch 2s infinite;
+            margin-bottom: 20px;
+            letter-spacing: 10px;
         }
 
-        @keyframes titleFlicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+        @keyframes glitch {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 20px #ff0000,
+                    0 0 40px #ff0000,
+                    0 0 60px #ff0000,
+                    0 0 80px #ff0000;
+                transform: translate(0);
+            }
+            20% { 
+                text-shadow: 
+                    2px 2px 20px #00ffff,
+                    -2px -2px 40px #ff00ff,
+                    2px -2px 60px #ffff00;
+                transform: translate(-2px, 2px);
+            }
+            40% { 
+                text-shadow: 
+                    -2px -2px 20px #00ff00,
+                    2px 2px 40px #ff0000,
+                    -2px 2px 60px #00ffff;
+                transform: translate(2px, -2px);
+            }
         }
 
         .game-subtitle {
             font-size: 1.5rem;
             color: #666;
-            margin-bottom: 3rem;
-            text-shadow: 0 0 10px #666;
+            margin-bottom: 50px;
+            animation: fadeInOut 3s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         .play-button {
             padding: 20px 60px;
-            font-size: 1.5rem;
-            background: linear-gradient(45deg, #ff0000, #660000);
-            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #ff0000, #8b0000);
             border: 3px solid #ff0000;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            font-weight: bold;
+            letter-spacing: 5px;
             box-shadow: 
                 0 0 20px rgba(255, 0, 0, 0.5),
-                inset 0 0 20px rgba(255, 0, 0, 0.2);
+                inset 0 0 20px rgba(255, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 
+                    0 0 20px rgba(255, 0, 0, 0.5),
+                    inset 0 0 20px rgba(255, 0, 0, 0.3);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 
+                    0 0 40px rgba(255, 0, 0, 0.8),
+                    inset 0 0 30px rgba(255, 0, 0, 0.5);
+            }
         }
 
         .play-button:hover {
+            background: linear-gradient(45deg, #ff3333, #ff0000);
             transform: scale(1.1);
-            background: linear-gradient(45deg, #ff3333, #990000);
             box-shadow: 
-                0 0 30px rgba(255, 0, 0, 0.8),
-                inset 0 0 30px rgba(255, 0, 0, 0.4);
+                0 0 40px rgba(255, 0, 0, 0.8),
+                inset 0 0 30px rgba(255, 255, 255, 0.3);
         }
 
         .play-button:active {
@@ -99,7 +138,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a0033 50%, #0a0a1a 100%);
+            background: radial-gradient(circle, #1a0033 0%, #000 100%);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -118,14 +157,14 @@
         .loading-title {
             font-size: 2.5rem;
             color: #00ffff;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
             text-shadow: 0 0 20px #00ffff;
-            animation: loadingPulse 1.5s infinite;
+            animation: flicker 1.5s infinite;
         }
 
-        @keyframes loadingPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .loading-bar-container {
@@ -135,7 +174,7 @@
             border: 2px solid #00ffff;
             border-radius: 15px;
             overflow: hidden;
-            margin: 2rem auto;
+            margin: 20px auto;
             position: relative;
         }
 
@@ -145,6 +184,12 @@
             width: 0%;
             transition: width 0.3s ease;
             box-shadow: 0 0 20px #00ffff;
+            animation: glow 1s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #00ffff; }
+            50% { box-shadow: 0 0 30px #00ffff, 0 0 50px #0099ff; }
         }
 
         .loading-percentage {
@@ -152,16 +197,51 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.2rem;
+            color: #fff;
             font-weight: bold;
-            color: white;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            font-size: 1.2rem;
         }
 
         #loadingStatus {
-            font-size: 1.1rem;
+            margin-top: 20px;
             color: #66ff99;
-            margin-top: 1rem;
+            font-size: 1.1rem;
+            animation: pulse 2s infinite;
+        }
+
+        /* Error Screen */
+        .error-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: #ff0000;
+        }
+
+        .error-screen.active {
+            display: flex;
+        }
+
+        .error-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff0000;
+            animation: glitch 1s infinite;
+        }
+
+        .error-message {
+            font-size: 1.5rem;
+            color: #ff6666;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
         }
 
         /* Game Canvas */
@@ -172,6 +252,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background: #000;
         }
 
         /* UI Overlay */
@@ -190,30 +271,31 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 2px solid rgba(0, 255, 255, 0.5);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
             border-radius: 50%;
+            opacity: 0.7;
             animation: crosshairPulse 2s infinite;
         }
 
         @keyframes crosshairPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
         }
 
         .interaction-prompt {
             position: absolute;
-            bottom: 100px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            background: rgba(0, 255, 255, 0.1);
-            border: 2px solid #00ffff;
-            border-radius: 10px;
+            transform: translate(-50%, 50px);
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
             font-size: 1.2rem;
-            color: #00ffff;
-            text-shadow: 0 0 10px #00ffff;
+            font-weight: bold;
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
@@ -225,15 +307,15 @@
 
         .dialogue-box {
             position: absolute;
-            top: 20%;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 20px 40px;
             background: rgba(0, 0, 0, 0.9);
             border: 2px solid #00ffff;
             border-radius: 10px;
-            font-size: 1.3rem;
+            padding: 20px;
             color: #00ffff;
+            font-size: 1.2rem;
             max-width: 80%;
             text-align: center;
             opacity: 0;
@@ -340,19 +422,48 @@
             text-align: center;
             color: #666;
             font-size: 1rem;
+            animation: pulse 2s infinite;
         }
 
         .start-instructions.hidden {
             display: none;
         }
+
+        /* Click to Start Message */
+        .click-message {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff0000;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .click-message.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
+    <!-- Error Screen -->
+    <div class="error-screen" id="errorScreen">
+        <div class="error-title">ERROR DE ACCESO</div>
+        <div class="error-message">
+            Este juego no puede ejecutarse desde Visual Studio Code o localhost.<br>
+            Por favor, abre el archivo directamente en tu navegador.<br>
+            Arrastra el archivo HTML a una ventana del navegador.
+        </div>
+    </div>
+
     <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <div class="game-title">NIGHT SHIFT</div>
         <div class="game-subtitle">Una noche en la oficina...</div>
-        <button class="play-button" onclick="startGame()">JUGAR</button>
+        <button class="play-button" id="playButton">JUGAR</button>
+        <div class="click-message" id="clickMessage">¡HAZ CLIC EN JUGAR!</div>
         <div class="start-instructions" id="startInstructions">
             Presiona JUGAR para comenzar tu aventura
         </div>
@@ -365,794 +476,3 @@
             <div class="loading-bar-container">
                 <div class="loading-bar" id="loadingBar"></div>
                 <div class="loading-percentage" id="loadingPercentage">0%</div>
-            </div>
-            <div id="loadingStatus">Preparando el mundo del juego...</div>
-        </div>
-    </div>
-
-    <!-- Game Canvas -->
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- UI Overlay -->
-    <div class="ui-overlay">
-        <div class="crosshair"></div>
-        <div class="interaction-prompt" id="interactionPrompt">[E] INTERACTUAR</div>
-        <div class="dialogue-box" id="dialogueBox"></div>
-        <div class="flashlight-overlay" id="flashlightOverlay"></div>
-    </div>
-
-    <!-- Controls HUD -->
-    <div class="controls-hud">
-        <div><span class="control-key">WASD</span>MOVER</div>
-        <div><span class="control-key">MOUSE</span>MIRAR</div>
-        <div><span class="control-key">E</span>INTERACTUAR</div>
-        <div><span class="control-key">F</span>LINTERNA</div>
-        <div><span class="control-key">SHIFT</span>CORRER</div>
-        <div><span class="control-key">ESC</span>SALIR</div>
-    </div>
-
-    <!-- Objectives -->
-    <div class="objectives">
-        <h3>OBJETIVOS</h3>
-        <div class="objective-item" id="obj1">Hablar con el jefe</div>
-        <div class="objective-item" id="obj2">Salir de la oficina</div>
-        <div class="objective-item" id="obj3">Hablar con el guardia</div>
-        <div class="objective-item" id="obj4">Explorar la calle</div>
-    </div>
-
-    <script type="module">
-        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
-        import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/controls/PointerLockControls.js';
-
-        // Game State
-        const gameState = {
-            currentScene: 'office',
-            flashlightOn: false,
-            canInteract: false,
-            currentInteraction: null,
-            objectives: {
-                talkedToBoss: false,
-                leftOffice: false,
-                talkedToGuard: false,
-                exploredStreet: false
-            },
-            gameStarted: false,
-            isInitialized: false
-        };
-
-        // Three.js Setup
-        let scene, camera, renderer, controls;
-        let flashlight, ambientLight, moonLight;
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let canRun = true, isRunning = false;
-
-        // Start Game
-        window.startGame = async function() {
-            console.log('Iniciando NIGHT SHIFT...');
-            
-            const startScreen = document.getElementById('startScreen');
-            const loadingScreen = document.getElementById('loadingScreen');
-            const loadingBar = document.getElementById('loadingBar');
-            const loadingPercentage = document.getElementById('loadingPercentage');
-            const loadingStatus = document.getElementById('loadingStatus');
-            const startInstructions = document.getElementById('startInstructions');
-
-            startScreen.classList.add('hidden');
-            loadingScreen.classList.add('active');
-            startInstructions.classList.add('hidden');
-
-            // Loading simulation
-            const loadingSteps = [
-                { progress: 10, status: 'Cargando motor Three.js...', delay: 300 },
-                { progress: 25, status: 'Inicializando renderizador...', delay: 400 },
-                { progress: 40, status: 'Creando escena 3D...', delay: 500 },
-                { progress: 55, status: 'Cargando modelos de personajes...', delay: 400 },
-                { progress: 70, status: 'Generando iluminación...', delay: 300 },
-                { progress: 85, status: 'Configurando controles...', delay: 400 },
-                { progress: 100, status: '¡Listo para jugar!', delay: 500 }
-            ];
-
-            for (const step of loadingSteps) {
-                loadingBar.style.width = step.progress + '%';
-                loadingPercentage.textContent = step.progress + '%';
-                loadingStatus.textContent = step.status;
-                await new Promise(resolve => setTimeout(resolve, step.delay));
-            }
-
-            // Initialize game
-            try {
-                if (!gameState.isInitialized) {
-                    initThreeJS();
-                    createOfficeScene();
-                    setupInputHandlers();
-                    gameState.isInitialized = true;
-                }
-                
-                animate();
-                
-                setTimeout(() => {
-                    loadingScreen.classList.add('hidden');
-                    document.getElementById('gameCanvas').style.display = 'block';
-                    gameState.gameStarted = true;
-                    console.log('¡Juego iniciado correctamente!');
-                }, 1000);
-                
-            } catch (error) {
-                console.error('Error al iniciar el juego:', error);
-                loadingStatus.textContent = 'Error al cargar el juego. Recarga la página.';
-            }
-        };
-
-        // Initialize Three.js
-        function initThreeJS() {
-            console.log('Inicializando Three.js...');
-            
-            const canvas = document.getElementById('gameCanvas');
-
-            scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x0a0a1a, 1, 100);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 10);
-
-            renderer = new THREE.WebGLRenderer({ 
-                canvas: canvas, 
-                antialias: false,
-                powerPreference: "high-performance"
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            controls = new PointerLockControls(camera, document.body);
-
-            ambientLight = new THREE.AmbientLight(0x1a1a3a, 0.3);
-            scene.add(ambientLight);
-
-            moonLight = new THREE.DirectionalLight(0x0066ff, 0.4);
-            moonLight.position.set(10, 20, 10);
-            moonLight.castShadow = true;
-            scene.add(moonLight);
-
-            flashlight = new THREE.SpotLight(0x00ffff, 3, 40, Math.PI / 8, 0.3, 2);
-            flashlight.position.copy(camera.position);
-            flashlight.target.position.set(0, 0, -1);
-            flashlight.castShadow = true;
-            camera.add(flashlight);
-            camera.add(flashlight.target);
-            scene.add(camera);
-
-            console.log('Three.js inicializado correctamente');
-        }
-
-        // Create Low Poly Character
-        function createLowPolyCharacter(type, position, colors) {
-            const character = new THREE.Group();
-            
-            // Body
-            const bodyGeometry = new THREE.BoxGeometry(1.2, 2, 0.8);
-            const bodyMaterial = new THREE.MeshLambertMaterial({ 
-                color: colors.body,
-                emissive: colors.emissive || 0x000000,
-                emissiveIntensity: 0.1
-            });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.position.y = 1.5;
-            character.add(body);
-
-            // Head
-            const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-            const headMaterial = new THREE.MeshLambertMaterial({ 
-                color: colors.head,
-                emissive: colors.emissive || 0x000000,
-                emissiveIntensity: 0.05
-            });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.y = 2.8;
-            character.add(head);
-
-            // Eyes
-            const eyeGeometry = new THREE.PlaneGeometry(0.15, 0.1);
-            const eyeMaterial = new THREE.MeshBasicMaterial({ 
-                color: colors.eyes || 0x00ffff,
-                emissive: colors.eyes || 0x00ffff,
-                emissiveIntensity: 0.8
-            });
-            
-            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            leftEye.position.set(-0.2, 2.85, 0.41);
-            character.add(leftEye);
-            
-            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            rightEye.position.set(0.2, 2.85, 0.41);
-            character.add(rightEye);
-
-            // Arms
-            const armGeometry = new THREE.BoxGeometry(0.4, 1.5, 0.4);
-            const armMaterial = new THREE.MeshLambertMaterial({ color: colors.body });
-
-            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-            leftArm.position.set(-0.8, 1.8, 0);
-            leftArm.rotation.z = 0.3;
-            character.add(leftArm);
-
-            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-            rightArm.position.set(0.8, 1.8, 0);
-            rightArm.rotation.z = -0.3;
-            character.add(rightArm);
-
-            // Legs
-            const legGeometry = new THREE.BoxGeometry(0.4, 1.5, 0.4);
-            const legMaterial = new THREE.MeshLambertMaterial({ color: colors.legs });
-
-            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-            leftLeg.position.set(-0.3, 0.5, 0);
-            character.add(leftLeg);
-
-            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-            rightLeg.position.set(0.3, 0.5, 0);
-            character.add(rightLeg);
-
-            character.position.set(position.x, position.y, position.z);
-            character.userData.baseY = position.y;
-
-            return character;
-        }
-
-        // Create Boss
-        function createBoss() {
-            const colors = {
-                body: 0x8b0000,
-                head: 0x4a0000,
-                legs: 0x2a0000,
-                eyes: 0xff0000,
-                emissive: 0xff0000
-            };
-            
-            const boss = createLowPolyCharacter('boss', { x: 8, y: 0, z: -8 }, colors);
-            
-            const auraGeometry = new THREE.BoxGeometry(2, 4, 2);
-            const auraMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0xff0000,
-                transparent: true,
-                opacity: 0.1,
-                side: THREE.BackSide
-            });
-            const aura = new THREE.Mesh(auraGeometry, auraMaterial);
-            boss.add(aura);
-
-            scene.add(boss);
-            gameState.boss = boss;
-            gameState.boss.userData = {
-                type: 'npc',
-                name: 'boss',
-                dialogue: [
-                    "¿Qué haces aquí todavía?",
-                    "Deberías haber ido a casa hace horas.",
-                    "Esta noche... algo no está normal."
-                ]
-            };
-
-            animateCharacter(boss);
-        }
-
-        // Create Security Guard
-        function createSecurityGuard() {
-            const colors = {
-                body: 0x1a1a4a,
-                head: 0x2a2a6a,
-                legs: 0x0a0a3a,
-                eyes: 0x00ff00,
-                emissive: 0x006600
-            };
-            
-            const guard = createLowPolyCharacter('guard', { x: -10, y: 0, z: 15 }, colors);
-            
-            const badgeGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.1);
-            const badgeMaterial = new THREE.MeshBasicMaterial({ 
-                color: 0xffd700,
-                emissive: 0xffd700,
-                emissiveIntensity: 0.5
-            });
-            const badge = new THREE.Mesh(badgeGeometry, badgeMaterial);
-            badge.position.set(0.5, 2, 0.41);
-            guard.add(badge);
-
-            scene.add(guard);
-            gameState.securityGuard = guard;
-            gameState.securityGuard.userData = {
-                type: 'npc',
-                name: 'securityGuard',
-                dialogue: [
-                    "La calle está vacía... demasiado vacía.",
-                    "Deberías irte. No es seguro quedarse.",
-                    "Algo anda mal con las luces..."
-                ]
-            };
-
-            animateCharacter(guard);
-        }
-
-        // Character Animation
-        function animateCharacter(character) {
-            const animate = () => {
-                if (!character.parent) return;
-                character.position.y = character.userData.baseY + Math.sin(Date.now() * 0.001) * 0.1;
-                character.rotation.y = Math.sin(Date.now() * 0.0005) * 0.05;
-                requestAnimationFrame(animate);
-            };
-            animate();
-        }
-
-        // Create Office Scene
-        function createOfficeScene() {
-            console.log('Creando escena de oficina...');
-            
-            // Floor
-            const floorGeometry = new THREE.PlaneGeometry(30, 30);
-            const floorMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0x1a1a2e,
-                emissive: 0x0a0a1a,
-                emissiveIntensity: 0.1
-            });
-            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
-
-            // Walls
-            const wallMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0x2a2a4a,
-                emissive: 0x1a1a3a,
-                emissiveIntensity: 0.05
-            });
-
-            const backWall = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 1), wallMaterial);
-            backWall.position.set(0, 5, -15);
-            scene.add(backWall);
-
-            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), wallMaterial);
-            leftWall.position.set(-15, 5, 0);
-            scene.add(leftWall);
-
-            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 30), wallMaterial);
-            rightWall.position.set(15, 5, 0);
-            scene.add(rightWall);
-
-            // Desks
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    const deskGeometry = new THREE.BoxGeometry(3, 1.5, 2);
-                    const deskMaterial = new THREE.MeshLambertMaterial({ 
-                        color: 0x3a3a5a,
-                        emissive: 0x2a2a4a,
-                        emissiveIntensity: 0.02
-                    });
-                    const desk = new THREE.Mesh(deskGeometry, deskMaterial);
-                    desk.position.set(-8 + i * 8, 0.75, -8 + j * 8);
-                    desk.castShadow = true;
-                    scene.add(desk);
-
-                    const monitorGeometry = new THREE.BoxGeometry(1.5, 1, 0.2);
-                    const monitorMaterial = new THREE.MeshLambertMaterial({ 
-                        color: 0x000000,
-                        emissive: 0x00ffff,
-                        emissiveIntensity: 0.3
-                    });
-                    const monitor = new THREE.Mesh(monitorGeometry, monitorMaterial);
-                    monitor.position.set(-8 + i * 8, 1.8, -8 + j * 8);
-                    scene.add(monitor);
-                }
-            }
-
-            // Office door
-            const doorGeometry = new THREE.BoxGeometry(3, 6, 0.5);
-            const doorMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0x2a1a1a,
-                emissive: 0x4a0066,
-                emissiveIntensity: 0.2
-            });
-            const door = new THREE.Mesh(doorGeometry, doorMaterial);
-            door.position.set(0, 3, 14.75);
-            scene.add(door);
-
-            gameState.officeDoor = door;
-            gameState.officeDoor.userData = {
-                type: 'door',
-                targetScene: 'street'
-            };
-
-            // Ceiling lights
-            for (let i = 0; i < 4; i++) {
-                const light = new THREE.PointLight(0x00ffff, 0.8, 20);
-                light.position.set(-10 + i * 6.5, 8, 0);
-                scene.add(light);
-
-                const lightGeometry = new THREE.BoxGeometry(2, 0.5, 2);
-                const lightMaterial = new THREE.MeshBasicMaterial({ 
-                    color: 0x00ffff,
-                    emissive: 0x00ffff,
-                    emissiveIntensity: 0.5
-                });
-                const lightBox = new THREE.Mesh(lightGeometry, lightMaterial);
-                lightBox.position.copy(light.position);
-                lightBox.position.y = 9.5;
-                scene.add(lightBox);
-            }
-
-            createBoss();
-            console.log('Escena de oficina creada');
-        }
-
-        // Create Street Scene
-        function createStreetScene() {
-            console.log('Creando escena de calle...');
-            
-            // Ground
-            const groundGeometry = new THREE.PlaneGeometry(100, 100);
-            const groundMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0x0a0a1a,
-                emissive: 0x1a0033,
-                emissiveIntensity: 0.1
-            });
-            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
-
-            // Buildings
-            const buildingData = [
-                { x: -30, z: -30, w: 20, h: 30, color: 0x2a2a4a },
-                { x: 30, z: -30, w: 25, h: 35, color: 0x3a3a5a },
-                { x: -30, z: 30, w: 22, h: 32, color: 0x2a2a4a },
-                { x: 30, z: 30, w: 28, h: 38, color: 0x3a3a5a }
-            ];
-
-            buildingData.forEach(data => {
-                const buildingGeometry = new THREE.BoxGeometry(data.w, data.h, data.w);
-                const buildingMaterial = new THREE.MeshLambertMaterial({ 
-                    color: data.color,
-                    emissive: 0x0a0a2a,
-                    emissiveIntensity: 0.05
-                });
-                const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
-                building.position.set(data.x, data.h / 2, data.z);
-                building.castShadow = true;
-                building.receiveShadow = true;
-                scene.add(building);
-
-                for (let i = 0; i < 4; i++) {
-                    for (let j = 0; j < 3; j++) {
-                        const windowLight = new THREE.PointLight(0x00ffff, 0.6, 15);
-                        windowLight.position.set(
-                            data.x + (Math.random() - 0.5) * (data.w - 3),
-                            data.h - 5 - i * 6,
-                            data.z + (Math.random() - 0.5) * (data.w - 3)
-                        );
-                        scene.add(windowLight);
-                    }
-                }
-            });
-
-            // Street lights
-            const lightPositions = [
-                { x: -20, z: 0 },
-                { x: 20, z: 0 },
-                { x: 0, z: -20 },
-                { x: 0, z: 20 }
-            ];
-
-            lightPositions.forEach(pos => {
-                const poleGeometry = new THREE.BoxGeometry(0.5, 12, 0.5);
-                const poleMaterial = new THREE.MeshLambertMaterial({ 
-                    color: 0x4a4a6a,
-                    emissive: 0x0066ff,
-                    emissiveIntensity: 0.1
-                });
-                const pole = new THREE.Mesh(poleGeometry, poleMaterial);
-                pole.position.set(pos.x, 6, pos.z);
-                scene.add(pole);
-
-                const light = new THREE.PointLight(0x00ffff, 1.2, 30);
-                light.position.set(pos.x, 10, pos.z);
-                light.castShadow = true;
-                scene.add(light);
-
-                const glowGeometry = new THREE.SphereGeometry(1.5, 8, 8);
-                const glowMaterial = new THREE.MeshBasicMaterial({ 
-                    color: 0x00ffff,
-                    transparent: true,
-                    opacity: 0.3
-                });
-                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-                glow.position.copy(light.position);
-                scene.add(glow);
-            });
-
-            createSecurityGuard();
-            console.log('Escena de calle creada');
-        }
-
-        // Setup Input Handlers
-        function setupInputHandlers() {
-            console.log('Configurando controles...');
-            
-            document.addEventListener('keydown', (event) => {
-                if (!gameState.gameStarted) return;
-                
-                switch (event.code) {
-                    case 'KeyW': moveForward = true; break;
-                    case 'KeyS': moveBackward = true; break;
-                    case 'KeyA': moveLeft = true; break;
-                    case 'KeyD': moveRight = true; break;
-                    case 'ShiftLeft':
-                        if (canRun) isRunning = true;
-                        break;
-                    case 'KeyE': handleInteraction(); break;
-                    case 'KeyF': toggleFlashlight(); break;
-                    case 'Escape':
-                        if (controls.isLocked) {
-                            controls.unlock();
-                        }
-                        break;
-                }
-            });
-
-            document.addEventListener('keyup', (event) => {
-                if (!gameState.gameStarted) return;
-                
-                switch (event.code) {
-                    case 'KeyW': moveForward = false; break;
-                    case 'KeyS': moveBackward = false; break;
-                    case 'KeyA': moveLeft = false; break;
-                    case 'KeyD': moveRight = false; break;
-                    case 'ShiftLeft': isRunning = false; break;
-                }
-            });
-
-            document.addEventListener('mousemove', (event) => {
-                if (controls.isLocked) {
-                    const flashlightOverlay = document.getElementById('flashlightOverlay');
-                    flashlightOverlay.style.setProperty('--mouse-x', `${(event.clientX / window.innerWidth) * 100}%`);
-                    flashlightOverlay.style.setProperty('--mouse-y', `${(event.clientY / window.innerHeight) * 100}%`);
-                }
-            });
-
-            document.getElementById('gameCanvas').addEventListener('click', () => {
-                if (!controls.isLocked && gameState.gameStarted) {
-                    controls.lock();
-                }
-            });
-
-            console.log('Controles configurados');
-        }
-
-        // Handle Interaction
-        function handleInteraction() {
-            if (!gameState.canInteract || !gameState.currentInteraction) return;
-
-            const interaction = gameState.currentInteraction;
-
-            switch (interaction.type) {
-                case 'npc':
-                    talkToNPC(interaction.object);
-                    break;
-                case 'door':
-                    openDoor(interaction.object);
-                    break;
-            }
-        }
-
-        // Talk to NPC
-        function talkToNPC(npc) {
-            const dialogueBox = document.getElementById('dialogueBox');
-            const dialogue = npc.userData.dialogue;
-            
-            if (dialogue && dialogue.length > 0) {
-                const randomDialogue = dialogue[Math.floor(Math.random() * dialogue.length)];
-                dialogueBox.textContent = randomDialogue;
-                dialogueBox.classList.add('active');
-
-                setTimeout(() => {
-                    dialogueBox.classList.remove('active');
-                    
-                    if (npc.userData.name === 'boss' && !gameState.objectives.talkedToBoss) {
-                        gameState.objectives.talkedToBoss = true;
-                        document.getElementById('obj1').classList.add('completed');
-                    } else if (npc.userData.name === 'securityGuard' && !gameState.objectives.talkedToGuard) {
-                        gameState.objectives.talkedToGuard = true;
-                        document.getElementById('obj3').classList.add('completed');
-                    }
-                }, 3000);
-            }
-        }
-
-        // Open Door
-        function openDoor(door) {
-            const doorAnimation = door.rotation.y + Math.PI / 2;
-            
-            const animateDoor = () => {
-                if (door.rotation.y < doorAnimation) {
-                    door.rotation.y += 0.05;
-                    requestAnimationFrame(animateDoor);
-                } else {
-                    if (gameState.currentScene === 'office') {
-                        changeScene('street');
-                        gameState.objectives.leftOffice = true;
-                        document.getElementById('obj2').classList.add('completed');
-                    }
-                }
-            };
-            animateDoor();
-        }
-
-        // Toggle Flashlight
-        function toggleFlashlight() {
-            gameState.flashlightOn = !gameState.flashlightOn;
-            flashlight.visible = gameState.flashlightOn;
-            
-            const flashlightOverlay = document.getElementById('flashlightOverlay');
-            if (gameState.flashlightOn) {
-                flashlightOverlay.classList.add('active');
-            } else {
-                flashlightOverlay.classList.remove('active');
-            }
-        }
-
-        // Change Scene
-        function changeScene(sceneName) {
-            console.log(`Cambiando a escena: ${sceneName}`);
-            
-            while(scene.children.length > 0) {
-                scene.remove(scene.children[0]);
-            }
-
-            scene.fog = new THREE.Fog(0x0a0a1a, 1, 100);
-
-            switch (sceneName) {
-                case 'office':
-                    createOfficeScene();
-                    gameState.currentScene = 'office';
-                    break;
-                case 'street':
-                    createStreetScene();
-                    gameState.currentScene = 'street';
-                    break;
-            }
-
-            camera.position.set(0, 2, 10);
-        }
-
-        // Check for nearby interactions
-        function checkInteractions() {
-            gameState.canInteract = false;
-            gameState.currentInteraction = null;
-
-            const interactionDistance = 5;
-            const interactionPrompt = document.getElementById('interactionPrompt');
-
-            if (gameState.boss && gameState.currentScene === 'office') {
-                const distance = camera.position.distanceTo(gameState.boss.position);
-                if (distance < interactionDistance) {
-                    gameState.canInteract = true;
-                    gameState.currentInteraction = {
-                        type: 'npc',
-                        object: gameState.boss
-                    };
-                    interactionPrompt.classList.add('active');
-                    return;
-                }
-            }
-
-            if (gameState.securityGuard && gameState.currentScene === 'street') {
-                const distance = camera.position.distanceTo(gameState.securityGuard.position);
-                if (distance < interactionDistance) {
-                    gameState.canInteract = true;
-                    gameState.currentInteraction = {
-                        type: 'npc',
-                        object: gameState.securityGuard
-                    };
-                    interactionPrompt.classList.add('active');
-                    return;
-                }
-            }
-
-            if (gameState.officeDoor && gameState.currentScene === 'office') {
-                const distance = camera.position.distanceTo(gameState.officeDoor.position);
-                if (distance < interactionDistance) {
-                    gameState.canInteract = true;
-                    gameState.currentInteraction = {
-                        type: 'door',
-                        object: gameState.officeDoor
-                    };
-                    interactionPrompt.classList.add('active');
-                    return;
-                }
-            }
-
-            interactionPrompt.classList.remove('active');
-        }
-
-        // Update Movement
-        function updateMovement() {
-            if (!controls.isLocked) return;
-
-            const speed = isRunning ? 0.3 : 0.1;
-            const direction = new THREE.Vector3();
-
-            if (moveForward) direction.z -= 1;
-            if (moveBackward) direction.z += 1;
-            if (moveLeft) direction.x -= 1;
-            if (moveRight) direction.x += 1;
-
-            direction.normalize();
-            direction.multiplyScalar(speed);
-
-            controls.moveRight(-direction.x);
-            controls.moveForward(-direction.z);
-
-            flashlight.position.copy(camera.position);
-            flashlight.target.position.copy(camera.position);
-            flashlight.target.position.add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(10));
-
-            // Check street exploration
-            if (gameState.currentScene === 'street' && !gameState.objectives.exploredStreet) {
-                const distance = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
-                if (distance > 20) {
-                    gameState.objectives.exploredStreet = true;
-                    document.getElementById('obj4').classList.add('completed');
-                }
-            }
-        }
-
-        // Animation Loop
-        function animate() {
-            requestAnimationFrame(animate);
-
-            updateMovement();
-            checkInteractions();
-
-            renderer.render(scene, camera);
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (camera && renderer) {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            }
-        });
-
-        // Auto-start for VS Code Live Server
-        window.addEventListener('load', () => {
-            console.log('Página cargada. Esperando inicio del juego...');
-            
-            // Detectar si estamos en VS Code Live Server
-            const isLiveServer = window.location.hostname === '127.0.0.1' || 
-                                window.location.hostname === 'localhost';
-            
-            if (isLiveServer) {
-                console.log('Detectado VS Code Live Server');
-                // Mostrar instrucciones para iniciar
-                setTimeout(() => {
-                    const instructions = document.getElementById('startInstructions');
-                    instructions.textContent = '👆 Presiona JUGAR para comenzar';
-                    instructions.style.animation = 'pulse 2s infinite';
-                }, 1000);
-            }
-        });
-
-        // Añadir animación de pulse a las instrucciones
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes pulse {
-                0%, 100% { opacity: 0.6; }
-                50% { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
-</body>
-</html>
